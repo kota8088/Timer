@@ -88,6 +88,14 @@ if (navButtons.notification) {
     });
 }
 
+// ページ読み込み時に通知状態を自動復元
+window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('timer_notify_enabled') === 'true' && Notification.permission === "granted") {
+        isNotificationEnabled = true;
+        updateNotificationButtonUI();
+    }
+});
+
 // ==========================================
 // 1. 世界時計システム
 // ==========================================
@@ -110,6 +118,7 @@ function initClockSearch() {
         });
     } catch (e) {}
 }
+
 function updateClock() {
     if (!clockDisplay) return;
     try {
@@ -118,20 +127,26 @@ function updateClock() {
             timeZone: currentTimeZone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
         });
         clockDisplay.textContent = formatter.format(now);
+        
+        // 毎秒アラームの判定を行う
         checkAlarm(now);
     } catch (e) {}
 }
+
 if (citySearch) {
     citySearch.addEventListener('change', () => {
         const selectedZone = citySearch.value.trim();
-        if (Intl.supportedValuesOf('timeZone').includes(selectedZone)) {
-            currentTimeZone = selectedZone;
-            if (clockLocation) clockLocation.textContent = (selectedZone === getLocalTimeZone()) ? `${selectedZone} (現在地)` : selectedZone;
-            updateClock();
-            citySearch.value = ""; citySearch.blur();
-        }
+        try {
+            if (Intl.supportedValuesOf('timeZone').includes(selectedZone)) {
+                currentTimeZone = selectedZone;
+                if (clockLocation) clockLocation.textContent = (selectedZone === getLocalTimeZone()) ? `${selectedZone} (現在地)` : selectedZone;
+                updateClock();
+                citySearch.value = ""; citySearch.blur();
+            }
+        } catch(e) {}
     });
 }
+
 if (currentLocationBtn) {
     currentLocationBtn.addEventListener('click', () => {
         currentTimeZone = getLocalTimeZone();
@@ -151,8 +166,7 @@ const inputSeconds = document.getElementById('input-seconds');
 const startButton = document.getElementById('start-btn');
 const stopButton = document.getElementById('stop-btn');
 const resetButton = document.getElementById('reset-btn');
-let countdown, timeLeft = 0, isRunning = false;
-let savedTime = 0;
+let countdown, timeLeft = 0, isTimerRunning = false;
 
 function handleInput(input, max) {
     if (!input) return;
@@ -161,6 +175,7 @@ function handleInput(input, max) {
     input.value = v;
     saveTimerInputs();
 }
+
 function handleBlur(input, max) {
     if (!input) return;
     let v = parseInt(input.value, 10); if (isNaN(v) || v < 0) v = 0; if (v > max) v = max;
@@ -198,58 +213,58 @@ function updateDisplayFromSeconds(totalSeconds) {
     inputSeconds.value = String(secs).padStart(2, '0');
 }
 
+function setInputsDisabled(disabled) {
+    if (inputHours) inputHours.disabled = disabled;
+    if (inputMinutes) inputMinutes.disabled = disabled;
+    if (inputSeconds) inputSeconds.disabled = disabled;
+}
+
 function startTimer() {
-    if (isRunning) return;
+    if (isTimerRunning) return;
     if (timeLeft <= 0 && inputHours && inputMinutes && inputSeconds) {
         const hrs = parseInt(inputHours.value, 10) || 0;
         const mins = parseInt(inputMinutes.value, 10) || 0;
         const secs = parseInt(inputSeconds.value, 10) || 0;
         timeLeft = (hrs * 3600) + (mins * 60) + secs;
-        savedTime = timeLeft;
     }
     if (timeLeft <= 0) return;
 
-    isRunning = true; 
-    if (startButton) startButton.disabled = true; 
+    isTimerRunning = true;
+    setInputsDisabled(true);
+    if (startButton) startButton.disabled = true;
     if (stopButton) stopButton.disabled = false;
-    if (inputHours) inputHours.disabled = true;
-    if (inputMinutes) inputMinutes.disabled = true;
-    if (inputSeconds) inputSeconds.disabled = true;
-    updateDisplayFromSeconds(timeLeft);
-    
+
     countdown = setInterval(() => {
-        timeLeft--; updateDisplayFromSeconds(timeLeft);
-        if (timeLeft <= 0) { 
-            clearInterval(countdown); 
+        timeLeft--;
+        updateDisplayFromSeconds(timeLeft);
+
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            isTimerRunning = false;
+            setInputsDisabled(false);
+            if (startButton) startButton.disabled = false;
+            if (stopButton) stopButton.disabled = true;
             sendSystemNotification("タイマー完了", "設定された時間が経過しました。");
-            alert('時間になりました。'); 
-            endTimerAndRestore(); 
+            alert("⏰ タイマーが終了しました！");
         }
     }, 1000);
 }
 
-function stopTimer() { 
-    clearInterval(countdown); isRunning = false; 
-    if (startButton) startButton.disabled = false; 
-    if (stopButton) stopButton.disabled = true; 
-    if (inputHours) inputHours.disabled = false;
-    if (inputMinutes) inputMinutes.disabled = false;
-    if (inputSeconds) inputSeconds.disabled = false;
-    saveTimerInputs();
-}
-function endTimerAndRestore() {
-    isRunning = false; timeLeft = 0; updateDisplayFromSeconds(savedTime);
-    if (startButton) startButton.disabled = false; 
+function stopTimer() {
+    if (!isTimerRunning) return;
+    clearInterval(countdown);
+    isTimerRunning = false;
+    if (startButton) startButton.disabled = false;
     if (stopButton) stopButton.disabled = true;
-    if (inputHours) inputHours.disabled = false;
-    if (inputMinutes) inputMinutes.disabled = false;
-    if (inputSeconds) inputSeconds.disabled = false;
-    saveTimerInputs();
 }
-function resetTimer() { 
-    clearInterval(countdown); isRunning = false; timeLeft = 0; savedTime = 0;
-    updateDisplayFromSeconds(timeLeft); 
-    if (startButton) startButton.disabled = false; 
-    if (stopButton) stopButton.disabled = true; 
-    if (inputHours) inputHours.disabled = false;
-    if (inputMinutes) inputMinutes.disabled = false;
+
+function resetTimer() {
+    clearInterval(countdown);
+    isTimerRunning = false;
+    timeLeft = 0;
+    setInputsDisabled(false);
+    if (startButton) startButton.disabled = false;
+    if (stopButton) stopButton.disabled = true;
+    
+    inputHours.value = localStorage.getItem('timer_saved_hours') || "00";
+    inputMinutes.value = localStorage.getItem('timer_saved_minutes') || "00";
