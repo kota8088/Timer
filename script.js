@@ -6,7 +6,7 @@ const navButtons = {
     alarm: document.getElementById('nav-alarm'),
     sw: document.getElementById('nav-sw'),
     pomodoro: document.getElementById('nav-pomodoro'),
-    notification: document.getElementById('nav-notification') // 【追加】
+    notification: document.getElementById('nav-notification')
 };
 const panels = {
     clock: document.getElementById('panel-clock'),
@@ -17,7 +17,7 @@ const panels = {
 
 function switchMode(modeName) {
     Object.keys(navButtons).forEach(key => {
-        if (key === 'notification') return; // 通知ボタンは除外
+        if (key === 'notification') return;
         if (key === modeName) {
             navButtons[key].classList.add('active');
             panels[key].classList.add('active');
@@ -33,21 +33,19 @@ navButtons.sw.addEventListener('click', () => switchMode('sw'));
 navButtons.pomodoro.addEventListener('click', () => switchMode('pomodoro'));
 
 // ==========================================
-// 【追加】デスクトップ通知制御システム
+// デスクトップ通知制御システム
 // ==========================================
 let isNotificationEnabled = false;
 
-// 通知を送信する共通関数
 function sendSystemNotification(title, message) {
     if (isNotificationEnabled && Notification.permission === "granted") {
         new Notification(title, {
             body: message,
-            icon: "https://flaticon.com" // サイバーな鈴アイコン風
+            icon: "https://flaticon.com"
         });
     }
 }
 
-// 通知ボタンのクリックイベント
 navButtons.notification.addEventListener('click', () => {
     if (!("Notification" in window)) {
         alert("このブラウザはシステム通知に対応していません。");
@@ -55,13 +53,11 @@ navButtons.notification.addEventListener('click', () => {
     }
 
     if (isNotificationEnabled) {
-        // ONからOFFへ切り替え
         isNotificationEnabled = false;
         navButtons.notification.textContent = "🔕 OFF";
         navButtons.notification.classList.remove('enabled');
         navButtons.notification.classList.add('disabled');
     } else {
-        // OFFからONへの切り替え要求
         Notification.requestPermission().then(permission => {
             if (permission === "granted") {
                 isNotificationEnabled = true;
@@ -75,7 +71,6 @@ navButtons.notification.addEventListener('click', () => {
         });
     }
 });
-
 
 // ==========================================
 // 1. 世界時計システム
@@ -179,7 +174,6 @@ function startTimer() {
         timeLeft--; updateDisplayFromSeconds(timeLeft);
         if (timeLeft <= 0) { 
             clearInterval(countdown); 
-            // 【通知連携】
             sendSystemNotification("タイマー完了", "設定された時間が経過しました。");
             alert('時間になりました。'); 
             endTimerAndRestore(); 
@@ -233,7 +227,6 @@ function checkAlarm(nowObj) {
     const curTimeStr = nowObj.toTimeString().split(' ');
     if (curTimeStr[0] === targetAlarmTime || curTimeStr[0].startsWith(targetAlarmTime)) {
         stopAlarm();
-        // 【通知連携】
         sendSystemNotification("アラーム警告", `設定時刻 [${targetAlarmTime}] になりました。`);
         alert('時間になりました。 (アラーム)');
     }
@@ -241,8 +234,11 @@ function checkAlarm(nowObj) {
 alarmStartBtn.addEventListener('click', startAlarm); alarmStopBtn.addEventListener('click', stopAlarm);
 
 // ==========================================
-// 4. ストップウォッチ システム
+// 4. ストップウォッチ システム (バグ完全修正)
 // ==========================================
 const swDisplay = document.getElementById('sw-display');
 const swStartBtn = document.getElementById('sw-start-btn');
 const swStopBtn = document.getElementById('sw-stop-btn');
+const swResetBtn = document.getElementById('sw-reset-btn');
+let swInterval, swStartTime = 0, swElapsedTime = 0;
+
