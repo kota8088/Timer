@@ -3,12 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer</title>
+    <title>タイマー</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="timer-container">
-        <!-- 初期値をすべて 00 に変更 -->
+        <!-- 【追加】世界時計エリア -->
+        <div class="clock-section">
+            <div class="search-box">
+                <input type="text" id="city-search" list="timezone-list" placeholder="都市を検索 (例: Tokyo, London, New York)">
+                <datalist id="timezone-list">
+                    <!-- JSで世界中のタイムゾーン候補を自動挿入します -->
+                </datalist>
+            </div>
+            <div id="clock-location" class="clock-location">Asia/Tokyo (現在地)</div>
+            <div id="clock-display" class="clock-display">00:00:00</div>
+        </div>
+
+        <!-- 区切り線 -->
+        <hr class="neon-divider">
+
+        <!-- タイマーエリア -->
         <div class="timer-display">
             <input type="number" id="input-hours" class="time-input" value="00" min="0" max="23" placeholder="00">
             <span class="colon">:</span>
