@@ -56,7 +56,7 @@ function updateClock() {
             timeZone: currentTimeZone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
         });
         clockDisplay.textContent = formatter.format(now);
-        checkAlarm(now); // アラームの常時チェック
+        checkAlarm(now);
     } catch (e) {}
 }
 citySearch.addEventListener('change', () => {
@@ -128,7 +128,7 @@ function startTimer() {
 }
 function stopTimer() { clearInterval(countdown); isRunning = false; startButton.disabled = false; stopButton.disabled = true; inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; }
 function resetTimer() { clearInterval(countdown); isRunning = false; timeLeft = 0; updateDisplayFromSeconds(timeLeft); startButton.disabled = false; stopButton.disabled = true; inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; }
-startButton.addEventListener('click', startTimer); stopTimer(); stopButton.addEventListener('click', stopTimer); resetButton.addEventListener('click', resetTimer);
+startButton.addEventListener('click', startTimer); stopButton.addEventListener('click', stopTimer); resetButton.addEventListener('click', resetTimer);
 
 // ==========================================
 // 3. アラーム システム
@@ -139,39 +139,31 @@ const alarmStartBtn = document.getElementById('alarm-start-btn');
 const alarmStopBtn = document.getElementById('alarm-stop-btn');
 let targetAlarmTime = null;
 
-// デフォルト値を現在の時刻にセット
 const d = new Date();
 alarmTimeInput.value = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`;
 
 function startAlarm() {
     if (!alarmTimeInput.value) return;
-    targetAlarmTime = alarmTimeInput.value; // "HH:MM:SS" もしくは "HH:MM"
+    targetAlarmTime = alarmTimeInput.value;
     alarmStatus.textContent = `アラーム作動中... [${targetAlarmTime}]`;
     alarmStatus.style.color = "#ff9f00";
-    alarmStartBtn.disabled = true;
-    alarmStopBtn.disabled = false;
-    alarmTimeInput.disabled = true;
+    alarmStartBtn.disabled = true; alarmStopBtn.disabled = false; alarmTimeInput.disabled = true;
 }
 function stopAlarm() {
     targetAlarmTime = null;
     alarmStatus.textContent = "アラーム停止中";
     alarmStatus.style.color = "#aaaaaa";
-    alarmStartBtn.disabled = false;
-    alarmStopBtn.disabled = true;
-    alarmTimeInput.disabled = false;
+    alarmStartBtn.disabled = false; alarmStopBtn.disabled = true; alarmTimeInput.disabled = false;
 }
 function checkAlarm(nowObj) {
     if (!targetAlarmTime) return;
-    const curTimeStr = nowObj.toTimeString().split(' ')[0]; // 現在の "HH:MM:SS"
-    
-    // 秒数のズレを考慮し、前方一致(時:分:秒)で検証
+    const curTimeStr = nowObj.toTimeString().split(' ')[0];
     if (curTimeStr === targetAlarmTime || curTimeStr.startsWith(targetAlarmTime)) {
         stopAlarm();
         alert('時間になりました。 (アラーム)');
     }
 }
-alarmStartBtn.addEventListener('click', startAlarm);
-alarmStopBtn.addEventListener('click', stopAlarm);
+alarmStartBtn.addEventListener('click', startAlarm); alarmStopBtn.addEventListener('click', stopAlarm);
 
 // ==========================================
 // 4. ストップウォッチ システム
@@ -188,18 +180,14 @@ function updateSWDisplay() {
     const mins = Math.floor((totalMs % 3600000) / 60000);
     const secs = Math.floor((totalMs % 60000) / 1000);
     const ms = Math.floor((totalMs % 1000) / 10);
-    
     swDisplay.innerHTML = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}<span class="sw-ms">.${String(ms).padStart(2,'0')}</span>`;
 }
 swStartBtn.addEventListener('click', () => {
-    swStartTime = Date.now();
-    swInterval = setInterval(updateSWDisplay, 10);
+    swStartTime = Date.now(); swInterval = setInterval(updateSWDisplay, 10);
     swStartBtn.disabled = true; swStopBtn.disabled = false; swResetBtn.disabled = true;
 });
 swStopBtn.addEventListener('click', () => {
-    clearInterval(swInterval);
-    swElapsedTime += Date.now() - swStartTime;
-    swStartTime = 0;
+    clearInterval(swInterval); swElapsedTime += Date.now() - swStartTime; swStartTime = 0;
     swStartBtn.disabled = false; swStopBtn.disabled = true; swResetBtn.disabled = false;
 });
 swResetBtn.addEventListener('click', () => {
@@ -209,10 +197,11 @@ swResetBtn.addEventListener('click', () => {
 });
 
 // ==========================================
-// 5. 自動連動ポモドーロシステム
+// 5. 自動連動ポモドーロシステム（可変セット数対応）
 // ==========================================
 const pomoWorkInput = document.getElementById('pomo-work-input');
 const pomoBreakInput = document.getElementById('pomo-break-input');
+const pomoMaxInput = document.getElementById('pomo-max-input'); // 【追加】
 const pomoPhase = document.getElementById('pomo-phase');
 const pomoDisplay = document.getElementById('pomo-display');
 const pomoRound = document.getElementById('pomo-round');
@@ -221,6 +210,11 @@ const pomoStopBtn = document.getElementById('pomo-stop-btn');
 const pomoResetBtn = document.getElementById('pomo-reset-btn');
 
 let pomoInterval, pomoTimeLeft = 0, pomoIsRunning = false;
-let pomoCurrentRound = 1, pomoMaxRounds = 4;
-let pomoState = "WORK"; // WORK or BREAK
+let pomoCurrentRound = 1, pomoState = "WORK";
+
+function getPomoMaxRounds() {
+    let val = parseInt(pomoMaxInput.value, 10);
+    if (isNaN(val) || val < 1) val = 1;
+    return val;
+}
 
