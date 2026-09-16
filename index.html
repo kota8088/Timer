@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>タイマー</title>
+    <title>Timer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="timer-container">
-        <!-- 時・分・秒の入力エリア（最大値を制限） -->
+        <!-- 初期値をすべて 00 に変更 -->
         <div class="timer-display">
             <input type="number" id="input-hours" class="time-input" value="00" min="0" max="23" placeholder="00">
             <span class="colon">:</span>
-            <input type="number" id="input-minutes" class="time-input" value="03" min="0" max="59" placeholder="00">
+            <input type="number" id="input-minutes" class="time-input" value="00" min="0" max="59" placeholder="00">
             <span class="colon">:</span>
             <input type="number" id="input-seconds" class="time-input" value="00" min="0" max="59" placeholder="00">
         </div>
