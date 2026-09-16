@@ -8,31 +8,36 @@
 </head>
 <body>
     <div class="timer-container">
-        <!-- 【追加】機能バー（ナビゲーションバー） -->
+        
+        <!-- ==========================================
+           【移動】世界時計エリア（常に最上部に表示）
+           ========================================== -->
+        <div class="clock-section">
+            <div class="search-box">
+                <input type="text" id="city-search" list="timezone-list" placeholder="都市を検索 (例: Tokyo, London, New York)">
+                <button id="current-location-btn" class="geo-btn" title="現在地に戻す">⌖</button>
+                <datalist id="timezone-list"></datalist>
+            </div>
+            <div style="color: #ffea00; font-size: 0.8rem; letter-spacing: 2px; margin-top: 15px; opacity: 0.7;">MISSION CLOCK</div>
+            <div id="clock-location" class="clock-location">Asia/Tokyo (現在地)</div>
+            <div id="clock-display" class="clock-display">00:00:00</div>
+        </div>
+
+        <!-- 区切り線 -->
+        <hr class="neon-divider">
+
+        <!-- 【機能バー】世界時計の下に配置 -->
         <div class="nav-bar">
-            <button id="nav-clock" class="nav-btn active">世界時計&タイマー</button>
+            <button id="nav-clock" class="nav-btn active">タイマー</button>
             <button id="nav-alarm" class="nav-btn">アラーム</button>
             <button id="nav-sw" class="nav-btn">ストップウォッチ</button>
             <button id="nav-pomodoro" class="nav-btn">ポモドーロ</button>
         </div>
 
         <!-- ==========================================
-           1. 世界時計 & タイマー モード (デフォルト)
+           1. 通常タイマー モード (デフォルト)
            ========================================== -->
         <div id="panel-clock" class="mode-panel active">
-            <div class="clock-section">
-                <div class="search-box">
-                    <input type="text" id="city-search" list="timezone-list" placeholder="都市を検索 (例: Tokyo, London, New York)">
-                    <button id="current-location-btn" class="geo-btn" title="現在地に戻す">⌖</button>
-                    <datalist id="timezone-list"></datalist>
-                </div>
-                <div style="color: #ffea00; font-size: 0.8rem; letter-spacing: 2px; margin-top: 15px; opacity: 0.7;">MISSION CLOCK</div>
-                <div id="clock-location" class="clock-location">Asia/Tokyo (現在地)</div>
-                <div id="clock-display" class="clock-display">00:00:00</div>
-            </div>
-
-            <hr class="neon-divider">
-
             <div class="timer-section">
                 <div style="color: #00f0ff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 5px; opacity: 0.7;">REMAINING TIME</div>
                 <div class="timer-display">
@@ -84,7 +89,6 @@
         <div id="panel-pomodoro" class="mode-panel">
             <div style="color: #ff00ff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px; opacity: 0.7;">AUTOMATIC POMODORO</div>
             
-            <!-- 時間設定 -->
             <div class="pomo-settings">
                 <div class="pomo-set-box">
                     <span>作業(分)</span>
@@ -96,7 +100,6 @@
                 </div>
             </div>
 
-            <!-- 現在の状態と残り時間 -->
             <div id="pomo-phase" class="pomo-phase">STANDBY</div>
             <div id="pomo-display" class="pomo-display">25:00</div>
             <div id="pomo-round" class="status-text">ROUND: 1 / 4</div>
