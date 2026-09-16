@@ -19,10 +19,10 @@ function switchMode(modeName) {
     Object.keys(navButtons).forEach(key => {
         if (key === 'notification') return;
         if (key === modeName) {
-            navButtons[key].classList.add('active');
+            if (navButtons[key]) navButtons[key].classList.add('active');
             if (panels[key]) panels[key].classList.add('active');
         } else {
-            navButtons[key].classList.remove('active');
+            if (navButtons[key]) navButtons[key].classList.remove('active');
             if (panels[key]) panels[key].classList.remove('active');
         }
     });
@@ -48,7 +48,6 @@ function sendSystemNotification(title, message) {
     }
 }
 
-// 通知の状態をUIに反映するヘルパー関数
 function updateNotificationButtonUI() {
     if (!navButtons.notification) return;
     if (isNotificationEnabled && Notification.permission === "granted") {
@@ -56,7 +55,7 @@ function updateNotificationButtonUI() {
         navButtons.notification.classList.remove('disabled');
         navButtons.notification.classList.add('enabled');
     } else {
-        isNotificationEnabled = false; // 権限がない場合は強制でfalse
+        isNotificationEnabled = false;
         navButtons.notification.textContent = "🔕 OFF";
         navButtons.notification.classList.remove('enabled');
         navButtons.notification.classList.add('disabled');
@@ -72,13 +71,13 @@ if (navButtons.notification) {
 
         if (isNotificationEnabled) {
             isNotificationEnabled = false;
-            localStorage.setItem('timer_notify_enabled', 'false'); // ローカルに保存
+            localStorage.setItem('timer_notify_enabled', 'false');
             updateNotificationButtonUI();
         } else {
             Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
                     isNotificationEnabled = true;
-                    localStorage.setItem('timer_notify_enabled', 'true'); // ローカルに保存
+                    localStorage.setItem('timer_notify_enabled', 'true');
                     updateNotificationButtonUI();
                     sendSystemNotification("通知システム起動", "タイマー終了時のシステム通知が有効化されました。");
                 } else {
@@ -160,16 +159,15 @@ function handleInput(input, max) {
     let r = input.value; if (r === '') return;
     let v = parseInt(r, 10); if (isNaN(v) || v < 0) v = 0; if (v > max) v = max;
     input.value = v;
-    saveTimerInputs(); // 入力するたびに自動保存
+    saveTimerInputs();
 }
 function handleBlur(input, max) {
     if (!input) return;
     let v = parseInt(input.value, 10); if (isNaN(v) || v < 0) v = 0; if (v > max) v = max;
     input.value = String(v).padStart(2, '0');
-    saveTimerInputs(); // 確定時も自動保存
+    saveTimerInputs();
 }
 
-// タイマーの現在の数値をブラウザに保存する関数
 function saveTimerInputs() {
     if (!inputHours || !inputMinutes || !inputSeconds) return;
     localStorage.setItem('timer_saved_hours', inputHours.value);
@@ -237,7 +235,7 @@ function stopTimer() {
     if (inputHours) inputHours.disabled = false;
     if (inputMinutes) inputMinutes.disabled = false;
     if (inputSeconds) inputSeconds.disabled = false;
-    saveTimerInputs(); // 停止した瞬間の時間を保存
+    saveTimerInputs();
 }
 function endTimerAndRestore() {
     isRunning = false; timeLeft = 0; updateDisplayFromSeconds(savedTime);
@@ -246,10 +244,12 @@ function endTimerAndRestore() {
     if (inputHours) inputHours.disabled = false;
     if (inputMinutes) inputMinutes.disabled = false;
     if (inputSeconds) inputSeconds.disabled = false;
-    saveTimerInputs(); // 復元された時間を保存
+    saveTimerInputs();
 }
 function resetTimer() { 
     clearInterval(countdown); isRunning = false; timeLeft = 0; savedTime = 0;
     updateDisplayFromSeconds(timeLeft); 
     if (startButton) startButton.disabled = false; 
     if (stopButton) stopButton.disabled = true; 
+    if (inputHours) inputHours.disabled = false;
+    if (inputMinutes) inputMinutes.disabled = false;
