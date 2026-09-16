@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイマー</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="timer-container">
+        <!-- 時・分・秒の入力エリア（最大値を制限） -->
+        <div class="timer-display">
+            <input type="number" id="input-hours" class="time-input" value="00" min="0" max="23" placeholder="00">
+            <span class="colon">:</span>
+            <input type="number" id="input-minutes" class="time-input" value="03" min="0" max="59" placeholder="00">
+            <span class="colon">:</span>
+            <input type="number" id="input-seconds" class="time-input" value="00" min="0" max="59" placeholder="00">
+        </div>
+        
+        <div class="button-group">
+            <button id="start-btn" class="btn start">スタート</button>
+            <button id="stop-btn" class="btn stop" disabled>ストップ</button>
+            <button id="reset-btn" class="btn reset">リセット</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
