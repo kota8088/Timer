@@ -12,11 +12,11 @@
         <!-- 世界時計エリア（常に最上部に表示） -->
         <div class="clock-section">
             <div class="search-box">
-                <input type="text" id="city-search" list="timezone-list" placeholder="都市を検索 (例: Tokyo, London)">
+                <input type="text" id="city-search" list="timezone-list" placeholder="都市を検索 (例: Tokyo, London, New York)">
                 <button id="current-location-btn" class="geo-btn" title="現在地に戻す">⌖</button>
                 <datalist id="timezone-list"></datalist>
             </div>
-            <div style="color: #ffea00; font-size: 0.75rem; letter-spacing: 2px; margin-top: 12px; opacity: 0.7;">MISSION CLOCK</div>
+            <div style="color: #ffea00; font-size: 0.8rem; letter-spacing: 2px; margin-top: 15px; opacity: 0.7;">MISSION CLOCK</div>
             <div id="clock-location" class="clock-location">Asia/Tokyo (現在地)</div>
             <div id="clock-display" class="clock-display">00:00:00</div>
         </div>
@@ -28,14 +28,14 @@
         <div class="nav-bar">
             <button id="nav-clock" class="nav-btn active">タイマー</button>
             <button id="nav-alarm" class="nav-btn">アラーム</button>
-            <button id="nav-sw" class="nav-btn">ラップ</button>
-            <button id="nav-pomodoro" class="nav-btn">ポモ</button>
+            <button id="nav-sw" class="nav-btn">ストップウォッチ</button>
+            <button id="nav-pomodoro" class="nav-btn">ポモドーロ</button>
         </div>
 
         <!-- 1. 通常タイマー モード -->
         <div id="panel-clock" class="mode-panel active">
             <div class="timer-section">
-                <div style="color: #00f0ff; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 5px; opacity: 0.7;">REMAINING TIME</div>
+                <div style="color: #00f0ff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 5px; opacity: 0.7;">REMAINING TIME</div>
                 <div class="timer-display">
                     <input type="number" id="input-hours" class="time-input" value="00" min="0" max="23" placeholder="00">
                     <span class="colon">:</span>
@@ -53,7 +53,7 @@
 
         <!-- 2. アラーム モード -->
         <div id="panel-alarm" class="mode-panel">
-            <div style="color: #ff9f00; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.7;">ALARM SYSTEM</div>
+            <div style="color: #ff9f00; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.7;">ALARM SYSTEM</div>
             <div class="alarm-setup">
                 <input type="time" id="alarm-time" class="alarm-input" step="1">
             </div>
@@ -66,7 +66,7 @@
 
         <!-- 3. ストップウォッチ モード -->
         <div id="panel-sw" class="mode-panel">
-            <div style="color: #00ffcc; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.7;">STOPWATCH</div>
+            <div style="color: #00ffcc; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.7;">STOPWATCH</div>
             <div id="sw-display" class="sw-display">00:00:00<span class="sw-ms">.00</span></div>
             <div class="button-group" style="margin-top: 25px;">
                 <button id="sw-start-btn" class="btn start">スタート</button>
@@ -77,9 +77,9 @@
 
         <!-- 4. ポモドーロタイマー モード -->
         <div id="panel-pomodoro" class="mode-panel">
-            <div style="color: #ff00ff; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 10px; opacity: 0.7;">AUTOMATIC POMODORO</div>
+            <div style="color: #ff00ff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px; opacity: 0.7;">AUTOMATIC POMODORO</div>
             
-            <!-- 時間設定 + 【追加】セット数設定 -->
+            <!-- 時間設定 + セット数設定 -->
             <div class="pomo-settings">
                 <div class="pomo-set-box">
                     <span>作業(分)</span>
@@ -99,7 +99,7 @@
             <div id="pomo-display" class="pomo-display">25:00</div>
             <div id="pomo-round" class="status-text">ROUND: 1 / 4</div>
 
-            <div class="button-group" style="margin-top: 20px;">
+            <div class="button-group" style="margin-top: 25px;">
                 <button id="pomo-start-btn" class="btn start">スタート</button>
                 <button id="pomo-stop-btn" class="btn stop" disabled>ストップ</button>
                 <button id="pomo-reset-btn" class="btn reset">リセット</button>
