@@ -20,57 +20,74 @@ function switchMode(modeName) {
         if (key === 'notification') return;
         if (key === modeName) {
             navButtons[key].classList.add('active');
-            panels[key].classList.add('active');
+            if (panels[key]) panels[key].classList.add('active');
         } else {
             navButtons[key].classList.remove('active');
-            panels[key].classList.remove('active');
+            if (panels[key]) panels[key].classList.remove('active');
         }
     });
 }
-navButtons.clock.addEventListener('click', () => switchMode('clock'));
-navButtons.alarm.addEventListener('click', () => switchMode('alarm'));
-navButtons.sw.addEventListener('click', () => switchMode('sw'));
-navButtons.pomodoro.addEventListener('click', () => switchMode('pomodoro'));
+if (navButtons.clock) navButtons.clock.addEventListener('click', () => switchMode('clock'));
+if (navButtons.alarm) navButtons.alarm.addEventListener('click', () => switchMode('alarm'));
+if (navButtons.sw) navButtons.sw.addEventListener('click', () => switchMode('sw'));
+if (navButtons.pomodoro) navButtons.pomodoro.addEventListener('click', () => switchMode('pomodoro'));
 
 // ==========================================
-// デスクトップ通知制御システム
+// デスクトップ通知制御システム（自動復元対応）
 // ==========================================
 let isNotificationEnabled = false;
 
 function sendSystemNotification(title, message) {
     if (isNotificationEnabled && Notification.permission === "granted") {
-        new Notification(title, {
-            body: message,
-            icon: "https://flaticon.com"
-        });
+        try {
+            new Notification(title, {
+                body: message,
+                icon: "https://flaticon.com"
+            });
+        } catch (e) {}
     }
 }
 
-navButtons.notification.addEventListener('click', () => {
-    if (!("Notification" in window)) {
-        alert("このブラウザはシステム通知に対応していません。");
-        return;
-    }
-
-    if (isNotificationEnabled) {
-        isNotificationEnabled = false;
+// 通知の状態をUIに反映するヘルパー関数
+function updateNotificationButtonUI() {
+    if (!navButtons.notification) return;
+    if (isNotificationEnabled && Notification.permission === "granted") {
+        navButtons.notification.textContent = "🔔 ON";
+        navButtons.notification.classList.remove('disabled');
+        navButtons.notification.classList.add('enabled');
+    } else {
+        isNotificationEnabled = false; // 権限がない場合は強制でfalse
         navButtons.notification.textContent = "🔕 OFF";
         navButtons.notification.classList.remove('enabled');
         navButtons.notification.classList.add('disabled');
-    } else {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                isNotificationEnabled = true;
-                navButtons.notification.textContent = "🔔 ON";
-                navButtons.notification.classList.remove('disabled');
-                navButtons.notification.classList.add('enabled');
-                sendSystemNotification("通知システム起動", "タイマー終了時のシステム通知が有効化されました。");
-            } else {
-                alert("ブラウザの通知設定が拒否されています。設定から許可してください。");
-            }
-        });
     }
-});
+}
+
+if (navButtons.notification) {
+    navButtons.notification.addEventListener('click', () => {
+        if (!("Notification" in window)) {
+            alert("このブラウザはシステム通知に対応していません。");
+            return;
+        }
+
+        if (isNotificationEnabled) {
+            isNotificationEnabled = false;
+            localStorage.setItem('timer_notify_enabled', 'false'); // ローカルに保存
+            updateNotificationButtonUI();
+        } else {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    isNotificationEnabled = true;
+                    localStorage.setItem('timer_notify_enabled', 'true'); // ローカルに保存
+                    updateNotificationButtonUI();
+                    sendSystemNotification("通知システム起動", "タイマー終了時のシステム通知が有効化されました。");
+                } else {
+                    alert("ブラウザの通知設定が拒否されています。設定から許可してください。");
+                }
+            });
+        }
+    });
+}
 
 // ==========================================
 // 1. 世界時計システム
@@ -85,13 +102,17 @@ function getLocalTimeZone() { return Intl.DateTimeFormat().resolvedOptions().tim
 let currentTimeZone = getLocalTimeZone();
 
 function initClockSearch() {
-    Intl.supportedValuesOf('timeZone').forEach(zone => {
-        const option = document.createElement('option');
-        option.value = zone;
-        timezoneList.appendChild(option);
-    });
+    if (!timezoneList) return;
+    try {
+        Intl.supportedValuesOf('timeZone').forEach(zone => {
+            const option = document.createElement('option');
+            option.value = zone;
+            timezoneList.appendChild(option);
+        });
+    } catch (e) {}
 }
 function updateClock() {
+    if (!clockDisplay) return;
     try {
         const now = new Date();
         const formatter = new Intl.DateTimeFormat('ja-JP', {
@@ -101,25 +122,29 @@ function updateClock() {
         checkAlarm(now);
     } catch (e) {}
 }
-citySearch.addEventListener('change', () => {
-    const selectedZone = citySearch.value.trim();
-    if (Intl.supportedValuesOf('timeZone').includes(selectedZone)) {
-        currentTimeZone = selectedZone;
-        clockLocation.textContent = (selectedZone === getLocalTimeZone()) ? `${selectedZone} (現在地)` : selectedZone;
+if (citySearch) {
+    citySearch.addEventListener('change', () => {
+        const selectedZone = citySearch.value.trim();
+        if (Intl.supportedValuesOf('timeZone').includes(selectedZone)) {
+            currentTimeZone = selectedZone;
+            if (clockLocation) clockLocation.textContent = (selectedZone === getLocalTimeZone()) ? `${selectedZone} (現在地)` : selectedZone;
+            updateClock();
+            citySearch.value = ""; citySearch.blur();
+        }
+    });
+}
+if (currentLocationBtn) {
+    currentLocationBtn.addEventListener('click', () => {
+        currentTimeZone = getLocalTimeZone();
+        if (clockLocation) clockLocation.textContent = `${currentTimeZone} (現在地)`;
         updateClock();
-        citySearch.value = ""; citySearch.blur();
-    }
-});
-currentLocationBtn.addEventListener('click', () => {
-    currentTimeZone = getLocalTimeZone();
-    clockLocation.textContent = `${currentTimeZone} (現在地)`;
-    updateClock();
-});
+    });
+}
 setInterval(updateClock, 1000);
 initClockSearch(); updateClock();
 
 // ==========================================
-// 2. タイマーシステム
+// 2. タイマーシステム（記憶機能付き）
 // ==========================================
 const inputHours = document.getElementById('input-hours');
 const inputMinutes = document.getElementById('input-minutes');
@@ -131,22 +156,42 @@ let countdown, timeLeft = 0, isRunning = false;
 let savedTime = 0;
 
 function handleInput(input, max) {
+    if (!input) return;
     let r = input.value; if (r === '') return;
     let v = parseInt(r, 10); if (isNaN(v) || v < 0) v = 0; if (v > max) v = max;
     input.value = v;
+    saveTimerInputs(); // 入力するたびに自動保存
 }
 function handleBlur(input, max) {
+    if (!input) return;
     let v = parseInt(input.value, 10); if (isNaN(v) || v < 0) v = 0; if (v > max) v = max;
     input.value = String(v).padStart(2, '0');
+    saveTimerInputs(); // 確定時も自動保存
 }
-inputHours.addEventListener('input', () => handleInput(inputHours, 23));
-inputMinutes.addEventListener('input', () => handleInput(inputMinutes, 59));
-inputSeconds.addEventListener('input', () => handleInput(inputSeconds, 59));
-inputHours.addEventListener('blur', () => handleBlur(inputHours, 23));
-inputMinutes.addEventListener('blur', () => handleBlur(inputMinutes, 59));
-inputSeconds.addEventListener('blur', () => handleBlur(inputSeconds, 59));
+
+// タイマーの現在の数値をブラウザに保存する関数
+function saveTimerInputs() {
+    if (!inputHours || !inputMinutes || !inputSeconds) return;
+    localStorage.setItem('timer_saved_hours', inputHours.value);
+    localStorage.setItem('timer_saved_minutes', inputMinutes.value);
+    localStorage.setItem('timer_saved_seconds', inputSeconds.value);
+}
+
+if (inputHours) {
+    inputHours.addEventListener('input', () => handleInput(inputHours, 23));
+    inputHours.addEventListener('blur', () => handleBlur(inputHours, 23));
+}
+if (inputMinutes) {
+    inputMinutes.addEventListener('input', () => handleInput(inputMinutes, 59));
+    inputMinutes.addEventListener('blur', () => handleBlur(inputMinutes, 59));
+}
+if (inputSeconds) {
+    inputSeconds.addEventListener('input', () => handleInput(inputSeconds, 59));
+    inputSeconds.addEventListener('blur', () => handleBlur(inputSeconds, 59));
+}
 
 function updateDisplayFromSeconds(totalSeconds) {
+    if (!inputHours || !inputMinutes || !inputSeconds) return;
     const hrs = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
     const secs = totalSeconds % 60;
@@ -157,7 +202,7 @@ function updateDisplayFromSeconds(totalSeconds) {
 
 function startTimer() {
     if (isRunning) return;
-    if (timeLeft <= 0) {
+    if (timeLeft <= 0 && inputHours && inputMinutes && inputSeconds) {
         const hrs = parseInt(inputHours.value, 10) || 0;
         const mins = parseInt(inputMinutes.value, 10) || 0;
         const secs = parseInt(inputSeconds.value, 10) || 0;
@@ -166,8 +211,12 @@ function startTimer() {
     }
     if (timeLeft <= 0) return;
 
-    isRunning = true; startButton.disabled = true; stopButton.disabled = false;
-    inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = true;
+    isRunning = true; 
+    if (startButton) startButton.disabled = true; 
+    if (stopButton) stopButton.disabled = false;
+    if (inputHours) inputHours.disabled = true;
+    if (inputMinutes) inputMinutes.disabled = true;
+    if (inputSeconds) inputSeconds.disabled = true;
     updateDisplayFromSeconds(timeLeft);
     
     countdown = setInterval(() => {
@@ -182,63 +231,25 @@ function startTimer() {
 }
 
 function stopTimer() { 
-    clearInterval(countdown); isRunning = false; startButton.disabled = false; stopButton.disabled = true; 
-    inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; 
+    clearInterval(countdown); isRunning = false; 
+    if (startButton) startButton.disabled = false; 
+    if (stopButton) stopButton.disabled = true; 
+    if (inputHours) inputHours.disabled = false;
+    if (inputMinutes) inputMinutes.disabled = false;
+    if (inputSeconds) inputSeconds.disabled = false;
+    saveTimerInputs(); // 停止した瞬間の時間を保存
 }
 function endTimerAndRestore() {
     isRunning = false; timeLeft = 0; updateDisplayFromSeconds(savedTime);
-    startButton.disabled = false; stopButton.disabled = true;
-    inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false;
+    if (startButton) startButton.disabled = false; 
+    if (stopButton) stopButton.disabled = true;
+    if (inputHours) inputHours.disabled = false;
+    if (inputMinutes) inputMinutes.disabled = false;
+    if (inputSeconds) inputSeconds.disabled = false;
+    saveTimerInputs(); // 復元された時間を保存
 }
 function resetTimer() { 
     clearInterval(countdown); isRunning = false; timeLeft = 0; savedTime = 0;
-    updateDisplayFromSeconds(timeLeft); startButton.disabled = false; stopButton.disabled = true; 
-    inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; 
-}
-startButton.addEventListener('click', startTimer); stopButton.addEventListener('click', stopTimer); resetButton.addEventListener('click', resetTimer);
-
-// ==========================================
-// 3. アラーム システム
-// ==========================================
-const alarmTimeInput = document.getElementById('alarm-time');
-const alarmStatus = document.getElementById('alarm-status');
-const alarmStartBtn = document.getElementById('alarm-start-btn');
-const alarmStopBtn = document.getElementById('alarm-stop-btn');
-let targetAlarmTime = null;
-
-const d = new Date();
-alarmTimeInput.value = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`;
-
-function startAlarm() {
-    if (!alarmTimeInput.value) return;
-    targetAlarmTime = alarmTimeInput.value;
-    alarmStatus.textContent = `アラーム作動中... [${targetAlarmTime}]`;
-    alarmStatus.style.color = "#ff9f00";
-    alarmStartBtn.disabled = true; alarmStopBtn.disabled = false; alarmTimeInput.disabled = true;
-}
-function stopAlarm() {
-    targetAlarmTime = null;
-    alarmStatus.textContent = "アラーム停止中";
-    alarmStatus.style.color = "#aaaaaa";
-    alarmStartBtn.disabled = false; alarmStopBtn.disabled = true; alarmTimeInput.disabled = false;
-}
-function checkAlarm(nowObj) {
-    if (!targetAlarmTime) return;
-    const curTimeStr = nowObj.toTimeString().split(' ');
-    if (curTimeStr[0] === targetAlarmTime || curTimeStr[0].startsWith(targetAlarmTime)) {
-        stopAlarm();
-        sendSystemNotification("アラーム警告", `設定時刻 [${targetAlarmTime}] になりました。`);
-        alert('時間になりました。 (アラーム)');
-    }
-}
-alarmStartBtn.addEventListener('click', startAlarm); alarmStopBtn.addEventListener('click', stopAlarm);
-
-// ==========================================
-// 4. ストップウォッチ システム (バグ完全修正)
-// ==========================================
-const swDisplay = document.getElementById('sw-display');
-const swStartBtn = document.getElementById('sw-start-btn');
-const swStopBtn = document.getElementById('sw-stop-btn');
-const swResetBtn = document.getElementById('sw-reset-btn');
-let swInterval, swStartTime = 0, swElapsedTime = 0;
-
+    updateDisplayFromSeconds(timeLeft); 
+    if (startButton) startButton.disabled = false; 
+    if (stopButton) stopButton.disabled = true; 
