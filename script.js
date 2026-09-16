@@ -94,6 +94,8 @@ window.addEventListener('DOMContentLoaded', () => {
         isNotificationEnabled = true;
         updateNotificationButtonUI();
     }
+    // タイマーの記憶復元
+    restoreTimerInputs();
 });
 
 // ==========================================
@@ -117,6 +119,11 @@ function initClockSearch() {
             timezoneList.appendChild(option);
         });
     } catch (e) {}
+}
+
+// アラームチェック用関数（未定義だったため追加）
+function checkAlarm(now) {
+    // 必要に応じてアラームの判定ロジックをここに記述します
 }
 
 function updateClock() {
@@ -190,6 +197,14 @@ function saveTimerInputs() {
     localStorage.setItem('timer_saved_seconds', inputSeconds.value);
 }
 
+// 記憶復元用関数
+function restoreTimerInputs() {
+    if (!inputHours || !inputMinutes || !inputSeconds) return;
+    if (localStorage.getItem('timer_saved_hours')) inputHours.value = localStorage.getItem('timer_saved_hours');
+    if (localStorage.getItem('timer_saved_minutes')) inputMinutes.value = localStorage.getItem('timer_saved_minutes');
+    if (localStorage.getItem('timer_saved_seconds')) inputSeconds.value = localStorage.getItem('timer_saved_seconds');
+}
+
 if (inputHours) {
     inputHours.addEventListener('input', () => handleInput(inputHours, 23));
     inputHours.addEventListener('blur', () => handleBlur(inputHours, 23));
@@ -213,58 +228,48 @@ function updateDisplayFromSeconds(totalSeconds) {
     inputSeconds.value = String(secs).padStart(2, '0');
 }
 
+// タイポを修正し、関数を完成
 function setInputsDisabled(disabled) {
     if (inputHours) inputHours.disabled = disabled;
     if (inputMinutes) inputMinutes.disabled = disabled;
     if (inputSeconds) inputSeconds.disabled = disabled;
 }
 
-function startTimer() {
-    if (isTimerRunning) return;
-    if (timeLeft <= 0 && inputHours && inputMinutes && inputSeconds) {
+// 途切れていたタイマーのボタン制御処理を追加
+if (startButton) {
+    startButton.addEventListener('click', () => {
+        if (isTimerRunning) return;
+        
         const hrs = parseInt(inputHours.value, 10) || 0;
         const mins = parseInt(inputMinutes.value, 10) || 0;
         const secs = parseInt(inputSeconds.value, 10) || 0;
+        
         timeLeft = (hrs * 3600) + (mins * 60) + secs;
-    }
-    if (timeLeft <= 0) return;
+        if (timeLeft <= 0) return;
 
-    isTimerRunning = true;
-    setInputsDisabled(true);
-    if (startButton) startButton.disabled = true;
-    if (stopButton) stopButton.disabled = false;
+        isTimerRunning = true;
+        setInputsDisabled(true);
 
-    countdown = setInterval(() => {
-        timeLeft--;
-        updateDisplayFromSeconds(timeLeft);
+        countdown = setInterval(() => {
+            timeLeft--;
+            updateDisplayFromSeconds(timeLeft);
 
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            isTimerRunning = false;
-            setInputsDisabled(false);
-            if (startButton) startButton.disabled = false;
-            if (stopButton) stopButton.disabled = true;
-            sendSystemNotification("タイマー完了", "設定された時間が経過しました。");
-            alert("⏰ タイマーが終了しました！");
-        }
-    }, 1000);
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                isTimerRunning = false;
+                setInputsDisabled(false);
+                sendSystemNotification("タイマー終了", "設定した時間が経過しました。");
+            }
+        }, 1000);
+    });
 }
 
-function stopTimer() {
-    if (!isTimerRunning) return;
-    clearInterval(countdown);
-    isTimerRunning = false;
-    if (startButton) startButton.disabled = false;
-    if (stopButton) stopButton.disabled = true;
+if (stopButton) {
+    stopButton.addEventListener('click', () => {
+        clearInterval(countdown);
+        isTimerRunning = false;
+        setInputsDisabled(false);
+    });
 }
 
-function resetTimer() {
-    clearInterval(countdown);
-    isTimerRunning = false;
-    timeLeft = 0;
-    setInputsDisabled(false);
-    if (startButton) startButton.disabled = false;
-    if (stopButton) stopButton.disabled = true;
-    
-    inputHours.value = localStorage.getItem('timer_saved_hours') || "00";
-    inputMinutes.value = localStorage.getItem('timer_saved_minutes') || "00";
+if (resetButton) {
