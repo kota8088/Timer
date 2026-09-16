@@ -19,7 +19,7 @@ body {
     text-align: center;
     backdrop-filter: blur(10px);
     width: 90%;
-    max-width: 540px; /* 通知ボタン追加に伴い横幅をわずかに最適化 */
+    max-width: 540px;
     box-sizing: border-box;
 }
 
@@ -51,9 +51,9 @@ body {
 .nav-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
 .nav-btn.active { color: #010811; background: #00f0ff; box-shadow: 0 0 10px #00f0ff; }
 
-/* 【追加】通知ボタンの個別スタイル */
+/* 通知ボタンの個別スタイル */
 .notify-btn {
-    flex: 0 0 75px; /* 通知ボタンだけ幅を固定 */
+    flex: 0 0 75px;
     border: 1px solid rgba(255, 159, 0, 0.3);
 }
 .notify-btn.disabled {
