@@ -5,7 +5,8 @@ const navButtons = {
     clock: document.getElementById('nav-clock'),
     alarm: document.getElementById('nav-alarm'),
     sw: document.getElementById('nav-sw'),
-    pomodoro: document.getElementById('nav-pomodoro')
+    pomodoro: document.getElementById('nav-pomodoro'),
+    notification: document.getElementById('nav-notification') // 【追加】
 };
 const panels = {
     clock: document.getElementById('panel-clock'),
@@ -16,6 +17,7 @@ const panels = {
 
 function switchMode(modeName) {
     Object.keys(navButtons).forEach(key => {
+        if (key === 'notification') return; // 通知ボタンは除外
         if (key === modeName) {
             navButtons[key].classList.add('active');
             panels[key].classList.add('active');
@@ -29,6 +31,51 @@ navButtons.clock.addEventListener('click', () => switchMode('clock'));
 navButtons.alarm.addEventListener('click', () => switchMode('alarm'));
 navButtons.sw.addEventListener('click', () => switchMode('sw'));
 navButtons.pomodoro.addEventListener('click', () => switchMode('pomodoro'));
+
+// ==========================================
+// 【追加】デスクトップ通知制御システム
+// ==========================================
+let isNotificationEnabled = false;
+
+// 通知を送信する共通関数
+function sendSystemNotification(title, message) {
+    if (isNotificationEnabled && Notification.permission === "granted") {
+        new Notification(title, {
+            body: message,
+            icon: "https://flaticon.com" // サイバーな鈴アイコン風
+        });
+    }
+}
+
+// 通知ボタンのクリックイベント
+navButtons.notification.addEventListener('click', () => {
+    if (!("Notification" in window)) {
+        alert("このブラウザはシステム通知に対応していません。");
+        return;
+    }
+
+    if (isNotificationEnabled) {
+        // ONからOFFへ切り替え
+        isNotificationEnabled = false;
+        navButtons.notification.textContent = "🔕 OFF";
+        navButtons.notification.classList.remove('enabled');
+        navButtons.notification.classList.add('disabled');
+    } else {
+        // OFFからONへの切り替え要求
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                isNotificationEnabled = true;
+                navButtons.notification.textContent = "🔔 ON";
+                navButtons.notification.classList.remove('disabled');
+                navButtons.notification.classList.add('enabled');
+                sendSystemNotification("通知システム起動", "タイマー終了時のシステム通知が有効化されました。");
+            } else {
+                alert("ブラウザの通知設定が拒否されています。設定から許可してください。");
+            }
+        });
+    }
+});
+
 
 // ==========================================
 // 1. 世界時計システム
@@ -86,6 +133,7 @@ const startButton = document.getElementById('start-btn');
 const stopButton = document.getElementById('stop-btn');
 const resetButton = document.getElementById('reset-btn');
 let countdown, timeLeft = 0, isRunning = false;
+let savedTime = 0;
 
 function handleInput(input, max) {
     let r = input.value; if (r === '') return;
@@ -111,23 +159,48 @@ function updateDisplayFromSeconds(totalSeconds) {
     inputMinutes.value = String(mins).padStart(2, '0');
     inputSeconds.value = String(secs).padStart(2, '0');
 }
+
 function startTimer() {
     if (isRunning) return;
-    const hrs = parseInt(inputHours.value, 10) || 0;
-    const mins = parseInt(inputMinutes.value, 10) || 0;
-    const secs = parseInt(inputSeconds.value, 10) || 0;
-    timeLeft = (hrs * 3600) + (mins * 60) + secs;
+    if (timeLeft <= 0) {
+        const hrs = parseInt(inputHours.value, 10) || 0;
+        const mins = parseInt(inputMinutes.value, 10) || 0;
+        const secs = parseInt(inputSeconds.value, 10) || 0;
+        timeLeft = (hrs * 3600) + (mins * 60) + secs;
+        savedTime = timeLeft;
+    }
     if (timeLeft <= 0) return;
+
     isRunning = true; startButton.disabled = true; stopButton.disabled = false;
     inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = true;
     updateDisplayFromSeconds(timeLeft);
+    
     countdown = setInterval(() => {
         timeLeft--; updateDisplayFromSeconds(timeLeft);
-        if (timeLeft <= 0) { clearInterval(countdown); alert('時間になりました。'); resetTimer(); }
+        if (timeLeft <= 0) { 
+            clearInterval(countdown); 
+            // 【通知連携】
+            sendSystemNotification("タイマー完了", "設定された時間が経過しました。");
+            alert('時間になりました。'); 
+            endTimerAndRestore(); 
+        }
     }, 1000);
 }
-function stopTimer() { clearInterval(countdown); isRunning = false; startButton.disabled = false; stopButton.disabled = true; inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; }
-function resetTimer() { clearInterval(countdown); isRunning = false; timeLeft = 0; updateDisplayFromSeconds(timeLeft); startButton.disabled = false; stopButton.disabled = true; inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; }
+
+function stopTimer() { 
+    clearInterval(countdown); isRunning = false; startButton.disabled = false; stopButton.disabled = true; 
+    inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; 
+}
+function endTimerAndRestore() {
+    isRunning = false; timeLeft = 0; updateDisplayFromSeconds(savedTime);
+    startButton.disabled = false; stopButton.disabled = true;
+    inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false;
+}
+function resetTimer() { 
+    clearInterval(countdown); isRunning = false; timeLeft = 0; savedTime = 0;
+    updateDisplayFromSeconds(timeLeft); startButton.disabled = false; stopButton.disabled = true; 
+    inputHours.disabled = inputMinutes.disabled = inputSeconds.disabled = false; 
+}
 startButton.addEventListener('click', startTimer); stopButton.addEventListener('click', stopTimer); resetButton.addEventListener('click', resetTimer);
 
 // ==========================================
@@ -158,8 +231,10 @@ function stopAlarm() {
 function checkAlarm(nowObj) {
     if (!targetAlarmTime) return;
     const curTimeStr = nowObj.toTimeString().split(' ');
-    if (curTimeStr === targetAlarmTime || curTimeStr.startsWith(targetAlarmTime)) {
+    if (curTimeStr[0] === targetAlarmTime || curTimeStr[0].startsWith(targetAlarmTime)) {
         stopAlarm();
+        // 【通知連携】
+        sendSystemNotification("アラーム警告", `設定時刻 [${targetAlarmTime}] になりました。`);
         alert('時間になりました。 (アラーム)');
     }
 }
@@ -171,50 +246,3 @@ alarmStartBtn.addEventListener('click', startAlarm); alarmStopBtn.addEventListen
 const swDisplay = document.getElementById('sw-display');
 const swStartBtn = document.getElementById('sw-start-btn');
 const swStopBtn = document.getElementById('sw-stop-btn');
-const swResetBtn = document.getElementById('sw-reset-btn');
-let swInterval, swStartTime = 0, swElapsedTime = 0;
-
-function updateSWDisplay() {
-    const totalMs = swElapsedTime + (swStartTime ? Date.now() - swStartTime : 0);
-    const hrs = Math.floor(totalMs / 3600000);
-    const mins = Math.floor((totalMs % 3600000) / 60000);
-    const secs = Math.floor((totalMs % 60000) / 1000);
-    const ms = Math.floor((totalMs % 1000) / 10);
-    swDisplay.innerHTML = `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}<span class="sw-ms">.${String(ms).padStart(2,'0')}</span>`;
-}
-swStartBtn.addEventListener('click', () => {
-    swStartTime = Date.now(); swInterval = setInterval(updateSWDisplay, 10);
-    swStartBtn.disabled = true; swStopBtn.disabled = false; swResetBtn.disabled = true;
-});
-swStopBtn.addEventListener('click', () => {
-    clearInterval(swInterval); swElapsedTime += Date.now() - swStartTime; swStartTime = 0;
-    swStartBtn.disabled = false; swStopBtn.disabled = true; swResetBtn.disabled = false;
-});
-swResetBtn.addEventListener('click', () => {
-    clearInterval(swInterval); swStartTime = 0; swElapsedTime = 0;
-    swDisplay.innerHTML = `00:00:00<span class="sw-ms">.00</span>`;
-    swStartBtn.disabled = false; swStopBtn.disabled = true; swResetBtn.disabled = true;
-});
-
-// ==========================================
-// 5. 自動連動ポモドーロシステム（バグ修正版）
-// ==========================================
-const pomoWorkInput = document.getElementById('pomo-work-input');
-const pomoBreakInput = document.getElementById('pomo-break-input');
-const pomoMaxInput = document.getElementById('pomo-max-input');
-const pomoPhase = document.getElementById('pomo-phase');
-const pomoDisplay = document.getElementById('pomo-display');
-const pomoRound = document.getElementById('pomo-round');
-const pomoStartBtn = document.getElementById('pomo-start-btn');
-const pomoStopBtn = document.getElementById('pomo-stop-btn');
-const pomoResetBtn = document.getElementById('pomo-reset-btn');
-
-let pomoInterval, pomoTimeLeft = 0, pomoIsRunning = false;
-let pomoCurrentRound = 1, pomoState = "WORK";
-
-function getPomoMaxRounds() {
-    let val = parseInt(pomoMaxInput.value, 10);
-    if (isNaN(val) || val < 1) val = 1;
-    return val;
-}
-
