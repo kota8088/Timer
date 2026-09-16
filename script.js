@@ -157,7 +157,7 @@ function stopAlarm() {
 }
 function checkAlarm(nowObj) {
     if (!targetAlarmTime) return;
-    const curTimeStr = nowObj.toTimeString().split(' ')[0];
+    const curTimeStr = nowObj.toTimeString().split(' ');
     if (curTimeStr === targetAlarmTime || curTimeStr.startsWith(targetAlarmTime)) {
         stopAlarm();
         alert('時間になりました。 (アラーム)');
@@ -197,11 +197,11 @@ swResetBtn.addEventListener('click', () => {
 });
 
 // ==========================================
-// 5. 自動連動ポモドーロシステム（可変セット数対応）
+// 5. 自動連動ポモドーロシステム（バグ修正版）
 // ==========================================
 const pomoWorkInput = document.getElementById('pomo-work-input');
 const pomoBreakInput = document.getElementById('pomo-break-input');
-const pomoMaxInput = document.getElementById('pomo-max-input'); // 【追加】
+const pomoMaxInput = document.getElementById('pomo-max-input');
 const pomoPhase = document.getElementById('pomo-phase');
 const pomoDisplay = document.getElementById('pomo-display');
 const pomoRound = document.getElementById('pomo-round');
