@@ -24,12 +24,13 @@
         <!-- 区切り線 -->
         <hr class="neon-divider">
 
-        <!-- 機能バー -->
+        <!-- 機能バー（右端に通知切り替えボタンを搭載） -->
         <div class="nav-bar">
             <button id="nav-clock" class="nav-btn active">タイマー</button>
             <button id="nav-alarm" class="nav-btn">アラーム</button>
             <button id="nav-sw" class="nav-btn">ストップウォッチ</button>
             <button id="nav-pomodoro" class="nav-btn">ポモドーロ</button>
+            <button id="nav-notification" class="nav-btn notify-btn disabled" title="通知を有効にする">🔕 OFF</button>
         </div>
 
         <!-- 1. 通常タイマー モード -->
@@ -79,7 +80,6 @@
         <div id="panel-pomodoro" class="mode-panel">
             <div style="color: #ff00ff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px; opacity: 0.7;">AUTOMATIC POMODORO</div>
             
-            <!-- 時間設定 + セット数設定 -->
             <div class="pomo-settings">
                 <div class="pomo-set-box">
                     <span>作業(分)</span>
