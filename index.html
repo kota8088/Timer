@@ -7,105 +7,97 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="timer-container">
-        
-        <!-- 世界時計エリア（常に最上部に表示） -->
-        <div class="clock-section">
+    <div class="app-container">
+        <!-- 通知切り替えスイッチ -->
+        <div class="notification-toggle">
+            <label class="switch">
+                <input type="checkbox" id="notification-checkbox">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">デスクトップ通知</span>
+        </div>
+
+        <!-- リアルタイム時計セクション -->
+        <header class="neon-section neon-cyan">
+            <h2>REALTIME CLOCK</h2>
+            <div id="clock-display" class="neon-text">00:00:00</div>
             <div class="search-box">
-                <input type="text" id="city-search" list="timezone-list" placeholder="都市を検索 (例: Tokyo, London, New York)">
-                <button id="current-location-btn" class="geo-btn" title="現在地に戻す">⌖</button>
-                <datalist id="timezone-list"></datalist>
+                <input type="text" id="timezone-search" placeholder="都市名を入力 (例: London, Tokyo, New York)">
+                <button id="search-btn">検索</button>
             </div>
-            <div style="color: #ffea00; font-size: 0.8rem; letter-spacing: 2px; margin-top: 15px; opacity: 0.7;">MISSION CLOCK</div>
-            <div id="clock-location" class="clock-location">Asia/Tokyo (現在地)</div>
-            <div id="clock-display" class="clock-display">00:00:00</div>
-        </div>
+            <div id="timezone-label">現在の場所: アジア / 東京</div>
+        </header>
 
-        <!-- 区切り線 -->
-        <hr class="neon-divider">
-
-        <!-- 機能バー -->
-        <div class="nav-bar">
-            <button id="nav-clock" class="nav-btn active">タイマー</button>
-            <button id="nav-alarm" class="nav-btn">アラーム</button>
-            <button id="nav-sw" class="nav-btn">ストップウォッチ</button>
-            <button id="nav-pomodoro" class="nav-btn">ポモドーロ</button>
-            <button id="nav-notification" class="nav-btn notify-btn disabled" title="通知を有効にする">🔕 OFF</button>
-        </div>
-
-        <!-- 1. 通常タイマー モード -->
-        <div id="panel-clock" class="mode-panel active">
-            <div class="timer-section">
-                <div style="color: #00f0ff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 5px; opacity: 0.7;">REMAINING TIME</div>
-                <div class="timer-display">
-                    <input type="number" id="input-hours" class="time-input" value="00" min="0" max="23" placeholder="00">
-                    <span class="colon">:</span>
-                    <input type="number" id="input-minutes" class="time-input" value="00" min="0" max="59" placeholder="00">
-                    <span class="colon">:</span>
-                    <input type="number" id="input-seconds" class="time-input" value="00" min="0" max="59" placeholder="00">
+        <!-- グリッドレイアウト（各機能のマス） -->
+        <div class="grid-container">
+            <!-- 1. タイマー -->
+            <section class="neon-section neon-green">
+                <h3>TIMER</h3>
+                <div class="time-inputs">
+                    <input type="number" id="timer-min" min="0" max="99" value="3"><span>分</span>
+                    <input type="number" id="timer-sec" min="0" max="59" value="0"><span>秒</span>
                 </div>
-            </div>
-            <div class="button-group">
-                <button id="start-btn" class="btn start">スタート</button>
-                <button id="stop-btn" class="btn stop" disabled>ストップ</button>
-                <button id="reset-btn" class="btn reset">リセット</button>
-            </div>
-        </div>
-
-        <!-- 2. アラーム モード -->
-        <div id="panel-alarm" class="mode-panel">
-            <div style="color: #ff9f00; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.7;">ALARM SYSTEM</div>
-            <div class="alarm-setup">
-                <input type="time" id="alarm-time" class="alarm-input" step="1">
-            </div>
-            <div id="alarm-status" class="status-text">アラーム未設定</div>
-            <div class="button-group" style="margin-top: 25px;">
-                <button id="alarm-start-btn" class="btn start">スタート</button>
-                <button id="alarm-stop-btn" class="btn stop" disabled>停止</button>
-            </div>
-        </div>
-
-        <!-- 3. ストップウォッチ モード -->
-        <div id="panel-sw" class="mode-panel">
-            <div style="color: #00ffcc; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.7;">STOPWATCH</div>
-            <div id="sw-display" class="sw-display">00:00:00<span class="sw-ms">.00</span></div>
-            <div class="button-group" style="margin-top: 25px;">
-                <button id="sw-start-btn" class="btn start">スタート</button>
-                <button id="sw-stop-btn" class="btn stop" disabled>ストップ</button>
-                <button id="sw-reset-btn" class="btn reset">リセット</button>
-            </div>
-        </div>
-
-        <!-- 4. ポモドーロタイマー モード -->
-        <div id="panel-pomodoro" class="mode-panel">
-            <div style="color: #ff00ff; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px; opacity: 0.7;">AUTOMATIC POMODORO</div>
-            
-            <div class="pomo-settings">
-                <div class="pomo-set-box">
-                    <span>作業(分)</span>
-                    <input type="number" id="pomo-work-input" value="25" min="1" max="60">
+                <div id="timer-display" class="neon-text-sub">03:00</div>
+                <div class="btn-group">
+                    <button id="timer-start">スタート</button>
+                    <button id="timer-stop">停止</button>
                 </div>
-                <div class="pomo-set-box">
-                    <span>休憩(分)</span>
-                    <input type="number" id="pomo-break-input" value="5" min="1" max="60">
-                </div>
-                <div class="pomo-set-box">
-                    <span>セット数</span>
-                    <input type="number" id="pomo-max-input" value="4" min="1" max="99">
-                </div>
-            </div>
+            </section>
 
-            <div id="pomo-phase" class="pomo-phase">STANDBY</div>
-            <div id="pomo-display" class="pomo-display">25:00</div>
-            <div id="pomo-round" class="status-text">ROUND: 1 / 4</div>
+            <!-- 2. ストップウォッチ -->
+            <section class="neon-section neon-pink">
+                <h3>STOPWATCH</h3>
+                <div id="sw-display" class="neon-text-sub">00:00.00</div>
+                <div class="btn-group sw-buttons">
+                    <button id="sw-toggle">スタート</button>
+                    <button id="sw-lap" disabled>ラップ</button>
+                    <button id="sw-reset">リセット</button>
+                </div>
+                <!-- ラップ保存エリア（スクロール可能） -->
+                <div class="lap-container">
+                    <ul id="lap-list"></ul>
+                </div>
+            </section>
 
-            <div class="button-group" style="margin-top: 25px;">
-                <button id="pomo-start-btn" class="btn start">スタート</button>
-                <button id="pomo-stop-btn" class="btn stop" disabled>ストップ</button>
-                <button id="pomo-reset-btn" class="btn reset">リセット</button>
-            </div>
+            <!-- 3. アラーム -->
+            <section class="neon-section neon-yellow">
+                <h3>ALARM</h3>
+                <div class="time-inputs">
+                    <input type="time" id="alarm-time" value="07:00">
+                </div>
+                <div id="alarm-status">アラーム未設定</div>
+                <div class="btn-group">
+                    <button id="alarm-set">設定</button>
+                    <button id="alarm-clear">解除</button>
+                </div>
+            </section>
+
+            <!-- 4. ポモドーロタイマー -->
+            <section class="neon-section neon-purple">
+                <h3>POMODORO</h3>
+                <div class="pomo-settings">
+                    <div class="setting-item">
+                        <label>作業:</label>
+                        <input type="number" id="pomo-work" min="1" max="60" value="25">分
+                    </div>
+                    <div class="setting-item">
+                        <label>休憩:</label>
+                        <input type="number" id="pomo-break" min="1" max="60" value="5">分
+                    </div>
+                    <div class="setting-item">
+                        <label>目標:</label>
+                        <input type="number" id="pomo-rounds" min="1" max="10" value="4">回
+                    </div>
+                </div>
+                <div id="pomo-phase" class="pomo-phase-text">集中時間</div>
+                <div id="pomo-display" class="neon-text-sub">25:00</div>
+                <div id="pomo-round-display">ラウンド: 1 / 4</div>
+                <div class="btn-group">
+                    <button id="pomo-start">スタート</button>
+                    <button id="pomo-stop">停止</button>
+                </div>
+            </section>
         </div>
-
     </div>
     <script src="script.js"></script>
 </body>
