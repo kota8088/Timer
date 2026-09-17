@@ -3,102 +3,934 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>タイマー</title>
-    <link rel="stylesheet" href="style.css">
+    <title>ネオン タイマー & ウォッチ</title>
+    <style>
+        :root {
+            --neon-blue: #00ffff;
+            --neon-purple: #ff00ff;
+            --neon-pink: #ff1493;
+            --neon-green: #00ff00;
+            --neon-orange: #ffa500;
+            --background-dark: #1a1a2e;
+            --text-light: #e0e0e0;
+            --shadow-color: rgba(0, 255, 255, 0.7);
+            --shadow-purple: rgba(255, 0, 255, 0.7);
+            --shadow-pink: rgba(255, 20, 147, 0.7);
+            --shadow-green: rgba(0, 255, 0, 0.7);
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif; /* 未来的なフォント */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden; /* 横スクロール防止 */
+        }
+
+        h1 {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--shadow-color), 0 0 20px var(--shadow-color), 0 0 30px var(--shadow-color);
+            margin-bottom: 40px;
+            font-size: 3em;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 1300px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.2);
+        }
+
+        .box {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.5), 0 0 15px var(--shadow-color), 0 0 25px var(--shadow-color);
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .box:hover {
+            transform: translateY(-10px);
+            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.7), 0 0 25px var(--shadow-color), 0 0 40px var(--shadow-color);
+        }
+
+        .clock-section {
+            max-width: 450px;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .clock-section h2 {
+            margin-top: 0;
+            color: var(--neon-blue);
+            font-size: 2em;
+            text-shadow: 0 0 8px var(--shadow-color);
+        }
+
+        #currentTime {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--shadow-green), 0 0 20px var(--shadow-green);
+        }
+
+        #currentLocation {
+            font-size: 1.3em;
+            color: var(--neon-purple);
+            margin-bottom: 25px;
+            text-shadow: 0 0 5px var(--shadow-purple);
+        }
+
+        #locationSearch {
+            padding: 12px 15px;
+            margin-right: 8px;
+            border: 2px solid var(--neon-purple);
+            border-radius: 8px;
+            font-size: 1.1em;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            outline: none;
+            font-family: 'Orbitron', sans-serif;
+        }
+        #locationSearch::placeholder {
+            color: rgba(220, 220, 220, 0.6);
+        }
+
+        #locationSearchButton {
+            padding: 12px 20px;
+            background-color: var(--neon-pink);
+            color: var(--text-light);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px var(--shadow-pink);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 0 10px var(--shadow-pink);
+        }
+
+        #locationSearchButton:hover {
+            background-color: #e60073; /* より濃いピンク */
+            box-shadow: 0 0 15px var(--shadow-pink), 0 0 20px var(--shadow-pink);
+        }
+
+        .main-timer-section {
+            max-width: 850px;
+            border: 2px solid var(--neon-pink);
+        }
+
+        .timer-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--neon-purple);
+            padding-bottom: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .tab-button {
+            padding: 15px 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            color: var(--neon-blue);
+            transition: color 0.3s ease, border-bottom-color 0.3s ease, text-shadow 0.3s ease;
+            outline: none;
+            border-bottom: 3px solid transparent;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .tab-button.active {
+            color: var(--neon-green);
+            border-bottom-color: var(--neon-green);
+            font-weight: bold;
+            text-shadow: 0 0 10px var(--shadow-green);
+        }
+
+        .tab-content {
+            width: 100%;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+            padding-top: 20px; /* タブの下に余白 */
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .timer-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .input-group label {
+            font-size: 1.2em;
+            min-width: 150px;
+            text-align: right;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--shadow-color);
+        }
+
+        .input-group input[type="number"],
+        .input-group input[type="text"] {
+            padding: 12px 15px;
+            border: 2px solid var(--neon-purple);
+            border-radius: 8px;
+            font-size: 1.1em;
+            width: 100px;
+            text-align: center;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            font-family: 'Orbitron', sans-serif;
+            outline: none;
+        }
+        .input-group input[type="number"]:focus,
+        .input-group input[type="text"]:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--shadow-green);
+        }
+
+        .input-group input[type="text"] {
+            width: 200px;
+        }
+
+        .time-display {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 30px 0;
+            color: var(--neon-green);
+            text-shadow: 0 0 15px var(--shadow-green), 0 0 25px var(--shadow-green);
+            text-align: center;
+            min-height: 70px; /* Ensure consistent height */
+            width: 100%;
+        }
+
+        .stopwatch-display {
+            font-size: 4.5em;
+            font-weight: bold;
+            margin: 30px 0;
+            color: var(--neon-orange);
+            text-shadow: 0 0 15px var(--shadow-orange), 0 0 25px var(--shadow-orange);
+            text-align: center;
+            min-height: 70px;
+            width: 100%;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            outline: none;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        .start-button {
+            background-color: var(--neon-green);
+            color: var(--background-dark);
+            box-shadow: 0 0 10px var(--shadow-green);
+        }
+        .start-button:hover {
+            background-color: #1eff1e; /* より明るい緑 */
+            box-shadow: 0 0 15px var(--shadow-green), 0 0 25px var(--shadow-green);
+        }
+
+        .stop-button {
+            background-color: var(--neon-pink);
+            color: var(--text-light);
+            box-shadow: 0 0 10px var(--shadow-pink);
+        }
+        .stop-button:hover {
+            background-color: #ff007f; /* より明るいピンク */
+            box-shadow: 0 0 15px var(--shadow-pink), 0 0 25px var(--shadow-pink);
+        }
+
+        .reset-button {
+            background-color: var(--neon-blue);
+            color: var(--background-dark);
+            box-shadow: 0 0 10px var(--shadow-color);
+        }
+        .reset-button:hover {
+            background-color: #00eaff; /* より明るい青 */
+            box-shadow: 0 0 15px var(--shadow-color), 0 0 25px var(--shadow-color);
+        }
+
+        .set-button {
+            background-color: var(--neon-purple);
+            color: var(--text-light);
+            box-shadow: 0 0 10px var(--shadow-purple);
+        }
+        .set-button:hover {
+            background-color: #e600e6; /* より明るい紫 */
+            box-shadow: 0 0 15px var(--shadow-purple), 0 0 25px var(--shadow-purple);
+        }
+
+        .alarm-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .alarm-toggle label {
+            font-size: 1.2em;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--shadow-color);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 70px;
+            height: 38px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 38px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 30px;
+            width: 30px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        input:checked + .slider {
+            background-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--shadow-green);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--neon-green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .pomodoro-settings {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .pomodoro-settings input[type="number"] {
+            width: 120px; /* ポモドーロの入力フィールドを少し広く */
+        }
+
+        .pomodoro-settings .input-group {
+            margin-bottom: 0;
+        }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+        /* Orbitronフォントの追加 */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- 通知切り替えスイッチ -->
-        <div class="notification-toggle">
-            <label class="switch">
-                <input type="checkbox" id="notification-checkbox">
-                <span class="slider"></span>
-            </label>
-            <span class="toggle-label">デスクトップ通知</span>
-        </div>
 
-        <!-- リアルタイム時計セクション -->
-        <header class="neon-section neon-cyan">
-            <h2>REALTIME CLOCK</h2>
-            <div id="clock-display" class="neon-text">00:00:00</div>
-            <div class="search-box">
-                <input type="text" id="timezone-search" placeholder="都市名を入力 (例: London, Tokyo, New York)">
-                <button id="search-btn">検索</button>
+    <h1>ネオン タイマー & ウォッチ</h1>
+
+    <div class="container">
+        <section class="box clock-section">
+            <h2>リアルタイム時計</h2>
+            <div id="currentTime">--:--:--</div>
+            <div class="location-search-wrapper">
+                <input type="text" id="locationSearch" placeholder="場所を入力 (例: Tokyo)">
+                <button id="locationSearchButton">検索</button>
             </div>
-            <div id="timezone-label">現在の場所: アジア / 東京</div>
-        </header>
+            <div id="currentLocation">場所が選択されていません</div>
+        </section>
 
-        <!-- グリッドレイアウト（各機能のマス） -->
-        <div class="grid-container">
-            <!-- 1. タイマー -->
-            <section class="neon-section neon-green">
-                <h3>TIMER</h3>
-                <div class="time-inputs">
-                    <input type="number" id="timer-min" min="0" max="99" value="3"><span>分</span>
-                    <input type="number" id="timer-sec" min="0" max="59" value="0"><span>秒</span>
-                </div>
-                <div id="timer-display" class="neon-text-sub">03:00</div>
-                <div class="btn-group">
-                    <button id="timer-start">スタート</button>
-                    <button id="timer-stop">停止</button>
-                </div>
-            </section>
+        <section class="box main-timer-section">
+            <div class="timer-tabs">
+                <button class="tab-button active" data-tab="timer">タイマー</button>
+                <button class="tab-button" data-tab="stopwatch">ストップウォッチ</button>
+                <button class="tab-button" data-tab="alarm">アラーム</button>
+                <button class="tab-button" data-tab="pomodoro">ポモドーロ</button>
+            </div>
 
-            <!-- 2. ストップウォッチ -->
-            <section class="neon-section neon-pink">
-                <h3>STOPWATCH</h3>
-                <div id="sw-display" class="neon-text-sub">00:00.00</div>
-                <div class="btn-group sw-buttons">
-                    <button id="sw-toggle">スタート</button>
-                    <button id="sw-lap" disabled>ラップ</button>
-                    <button id="sw-reset">リセット</button>
-                </div>
-                <!-- ラップ保存エリア（スクロール可能） -->
-                <div class="lap-container">
-                    <ul id="lap-list"></ul>
-                </div>
-            </section>
-
-            <!-- 3. アラーム -->
-            <section class="neon-section neon-yellow">
-                <h3>ALARM</h3>
-                <div class="time-inputs">
-                    <input type="time" id="alarm-time" value="07:00">
-                </div>
-                <div id="alarm-status">アラーム未設定</div>
-                <div class="btn-group">
-                    <button id="alarm-set">設定</button>
-                    <button id="alarm-clear">解除</button>
-                </div>
-            </section>
-
-            <!-- 4. ポモドーロタイマー -->
-            <section class="neon-section neon-purple">
-                <h3>POMODORO</h3>
-                <div class="pomo-settings">
-                    <div class="setting-item">
-                        <label>作業:</label>
-                        <input type="number" id="pomo-work" min="1" max="60" value="25">分
+            <div id="timer" class="tab-content active">
+                <div class="timer-controls">
+                    <div class="input-group">
+                        <label for="timerHours">時間:</label>
+                        <input type="number" id="timerHours" min="0" value="0">
                     </div>
-                    <div class="setting-item">
-                        <label>休憩:</label>
-                        <input type="number" id="pomo-break" min="1" max="60" value="5">分
+                    <div class="input-group">
+                        <label for="timerMinutes">分:</label>
+                        <input type="number" id="timerMinutes" min="0" max="59" value="5">
                     </div>
-                    <div class="setting-item">
-                        <label>目標:</label>
-                        <input type="number" id="pomo-rounds" min="1" max="10" value="4">回
+                    <div class="input-group">
+                        <label for="timerSeconds">秒:</label>
+                        <input type="number" id="timerSeconds" min="0" max="59" value="0">
+                    </div>
+                    <div class="time-display" id="timerDisplay">05:00</div>
+                    <div class="button-group">
+                        <button class="start-button" id="startTimerBtn">開始</button>
+                        <button class="stop-button" id="stopTimerBtn">停止</button>
+                        <button class="reset-button" id="resetTimerBtn">リセット</button>
                     </div>
                 </div>
-                <div id="pomo-phase" class="pomo-phase-text">集中時間</div>
-                <div id="pomo-display" class="neon-text-sub">25:00</div>
-                <div id="pomo-round-display">ラウンド: 1 / 4</div>
-                <div class="btn-group">
-                    <button id="pomo-start">スタート</button>
-                    <button id="pomo-stop">停止</button>
+            </div>
+
+            <div id="stopwatch" class="tab-content">
+                <div class="timer-controls">
+                    <div class="stopwatch-display" id="stopwatchDisplay">00:00:00.00</div>
+                    <div class="button-group">
+                        <button class="start-button" id="startStopwatchBtn">開始</button>
+                        <button class="stop-button" id="stopStopwatchBtn">停止</button>
+                        <button class="reset-button" id="resetStopwatchBtn">リセット</button>
+                    </div>
                 </div>
-            </section>
-        </div>
+            </div>
+
+            <div id="alarm" class="tab-content">
+                <div class="timer-controls">
+                    <div class="input-group">
+                        <label for="alarmHours">時間:</label>
+                        <input type="number" id="alarmHours" min="0" value="7">
+                    </div>
+                    <div class="input-group">
+                        <label for="alarmMinutes">分:</label>
+                        <input type="number" id="alarmMinutes" min="0" max="59" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="alarmSeconds">秒:</label>
+                        <input type="number" id="alarmSeconds" min="0" max="59" value="0">
+                    </div>
+                    <div class="time-display" id="alarmDisplay">07:00:00</div>
+                    <div class="alarm-toggle">
+                        <label>アラーム:</label>
+                        <label class="switch">
+                            <input type="checkbox" id="alarmToggleInput">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="button-group">
+                        <button class="set-button" id="setAlarmBtn">設定</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pomodoro" class="tab-content">
+                <div class="pomodoro-settings">
+                    <div class="input-group">
+                        <label for="pomodoroWorkTime">作業時間 (分):</label>
+                        <input type="number" id="pomodoroWorkTime" min="1" value="25">
+                    </div>
+                    <div class="input-group">
+                        <label for="pomodoroBreakTime">休憩時間 (分):</label>
+                        <input type="number" id="pomodoroBreakTime" min="1" value="5">
+                    </div>
+                    <div class="input-group">
+                        <label for="pomodoroRounds">ラウンド数:</label>
+                        <input type="number" id="pomodoroRounds" min="1" value="4">
+                    </div>
+                    <div class="time-display" id="pomodoroDisplay">ポモドーロ</div>
+                    <div class="button-group">
+                        <button class="start-button" id="startPomodoroBtn">開始</button>
+                        <button class="stop-button" id="stopPomodoroBtn">停止</button>
+                        <button class="reset-button" id="resetPomodoroBtn">リセット</button>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    <script src="script.js"></script>
+
+    <footer class="footer">
+        © 2023 ネオン タイマー. All rights reserved.
+    </footer>
+
+    <script>
+        // --- グローバル変数 ---
+        let clockInterval;
+        let timerInterval;
+        let stopwatchInterval;
+        let alarmInterval;
+        let pomodoroInterval;
+        let initialTimerSeconds = 0; // タイマーのリセット用
+        let currentTimerState = 'stop'; // 'timer', 'stopwatch', 'alarm', 'pomodoro'
+        let currentPomodoroState = 'work'; // 'work', 'break'
+        let currentRound = 0;
+        let totalRounds = 0;
+        let isAlarmActive = false;
+        let selectedTimeZone = null; // 現在選択されているタイムゾーン
+
+        // --- 要素の取得 ---
+        const currentTimeEl = document.getElementById('currentTime');
+        const currentLocationEl = document.getElementById('currentLocation');
+        const locationSearchInput = document.getElementById('locationSearch');
+        const locationSearchButton = document.getElementById('locationSearchButton');
+
+        // タイマー関連
+        const timerHoursInput = document.getElementById('timerHours');
+        const timerMinutesInput = document.getElementById('timerMinutes');
+        const timerSecondsInput = document.getElementById('timerSeconds');
+        const timerDisplayEl = document.getElementById('timerDisplay');
+        const startTimerBtn = document.getElementById('startTimerBtn');
+        const stopTimerBtn = document.getElementById('stopTimerBtn');
+        const resetTimerBtn = document.getElementById('resetTimerBtn');
+
+        // ストップウォッチ関連
+        const stopwatchDisplayEl = document.getElementById('stopwatchDisplay');
+        const startStopwatchBtn = document.getElementById('startStopwatchBtn');
+        const stopStopwatchBtn = document.getElementById('stopStopwatchBtn');
+        const resetStopwatchBtn = document.getElementById('resetStopwatchBtn');
+        let stopwatchMilliseconds = 0;
+
+        // アラーム関連
+        const alarmHoursInput = document.getElementById('alarmHours');
+        const alarmMinutesInput = document.getElementById('alarmMinutes');
+        const alarmSecondsInput = document.getElementById('alarmSeconds');
+        const alarmDisplayEl = document.getElementById('alarmDisplay');
+        const alarmToggleInput = document.getElementById('alarmToggleInput');
+        const setAlarmBtn = document.getElementById('setAlarmBtn');
+
+        // ポモドーロ関連
+        const pomodoroWorkTimeInput = document.getElementById('pomodoroWorkTime');
+        const pomodoroBreakTimeInput = document.getElementById('pomodoroBreakTime');
+        const pomodoroRoundsInput = document.getElementById('pomodoroRounds');
+        const pomodoroDisplayEl = document.getElementById('pomodoroDisplay');
+        const startPomodoroBtn = document.getElementById('startPomodoroBtn');
+        const stopPomodoroBtn = document.getElementById('stopPomodoroBtn');
+        const resetPomodoroBtn = document.getElementById('resetPomodoroBtn');
+
+        // タブ関連
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // --- 関数 ---
+
+        // 通知を送信する関数
+        function sendNotification(title, options) {
+            if (!("Notification" in window)) {
+                console.error("このブラウザはデスクトップ通知をサポートしていません。");
+                return;
+            }
+            if (Notification.permission === "granted") {
+                new Notification(title, options);
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(function (permission) {
+                    if (permission === "granted") {
+                        new Notification(title, options);
+                    }
+                });
+            }
+        }
+
+        // 時間をフォーマットする関数 (HH:MM:SS)
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // 1/100秒単位の時間をフォーマットする関数 (HH:MM:SS.ms)
+        function formatStopwatchTime(milliseconds) {
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const hundredths = Math.floor((milliseconds % 1000) / 10);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}`;
+        }
+
+        // 場所からタイムゾーンを取得する (簡易実装)
+        function getTimezoneForLocation(location) {
+            const lowerLocation = location.toLowerCase();
+            if (lowerLocation.includes('tokyo') || lowerLocation.includes('japan')) return 'Asia/Tokyo';
+            if (lowerLocation.includes('new york') || lowerLocation.includes('nyc')) return 'America/New_York';
+            if (lowerLocation.includes('london') || lowerLocation.includes('uk')) return 'Europe/London';
+            if (lowerLocation.includes('paris') || lowerLocation.includes('france')) return 'Europe/Paris';
+            if (lowerLocation.includes('sydney') || lowerLocation.includes('australia')) return 'Australia/Sydney';
+            if (lowerLocation.includes('los angeles') || lowerLocation.includes('la')) return 'America/Los_Angeles';
+            if (lowerLocation.includes('moscow') || lowerLocation.includes('russia')) return 'Europe/Moscow';
+            if (lowerLocation.includes('beijing') || lowerLocation.includes('china')) return 'Asia/Shanghai';
+            if (lowerLocation.includes('berlin') || lowerLocation.includes('germany')) return 'Europe/Berlin';
+            if (lowerLocation.includes('india')) return 'Asia/Kolkata';
+            if (lowerLocation.includes('rome') || lowerLocation.includes('italy')) return 'Europe/Rome';
+            if (lowerLocation.includes('canada')) return 'America/Toronto'; // 例として
+            if (lowerLocation.includes('mexico')) return 'America/Mexico_City'; // 例として
+            return null; // 見つからない場合はnull
+        }
+
+        // リアルタイム時計の更新
+        function updateClock() {
+            const now = new Date();
+            let displayedTime = '';
+
+            if (selectedTimeZone) {
+                try {
+                    // Intl.DateTimeFormatはブラウザのAPIでタイムゾーンを扱うための標準的な方法
+                    displayedTime = new Intl.DateTimeFormat('ja-JP', {
+                        timeZone: selectedTimeZone,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false // 24時間表示
+                    }).format(now);
+                } catch (e) {
+                    console.error("タイムゾーンの表示に失敗:", e);
+                    // エラー時はローカル時刻を表示
+                    displayedTime = now.toLocaleTimeString('ja-JP');
+                    selectedTimeZone = null; // エラーなのでリセット
+                    currentLocationEl.textContent = '場所が選択されていません';
+                }
+            } else {
+                // タイムゾーンが選択されていない場合はローカル時刻を表示
+                displayedTime = now.toLocaleTimeString('ja-JP');
+                currentLocationEl.textContent = '場所が選択されていません';
+            }
+            currentTimeEl.textContent = displayedTime;
+        }
+
+        // 場所検索ボタンのクリックイベント
+        locationSearchButton.addEventListener('click', () => {
+            const location = locationSearchInput.value.trim();
+            if (location) {
+                const timezone = getTimezoneForLocation(location);
+                if (timezone) {
+                    selectedTimeZone = timezone;
+                    currentLocationEl.textContent = location;
+                    locationSearchInput.value = ''; // 入力フィールドをクリア
+                    updateClock(); // 即座に更新
+                } else {
+                    alert(`「${location}」のタイムゾーン情報が見つかりませんでした。一般的な都市名または国名を入力してください。`);
+                }
+            } else {
+                alert('場所を入力してください。');
+            }
+        });
+
+        // タイマーの初期設定
+        function setupTimer() {
+            const hours = parseInt(timerHoursInput.value, 10) || 0;
+            const minutes = parseInt(timerMinutesInput.value, 10) || 0;
+            const seconds = parseInt(timerSecondsInput.value, 10) || 0;
+            initialTimerSeconds = hours * 3600 + minutes * 60 + seconds;
+            timerDisplayEl.textContent = formatTime(initialTimerSeconds);
+            currentTimerState = 'stop';
+        }
+
+        // タイマー開始
+        startTimerBtn.addEventListener('click', () => {
+            if (currentTimerState === 'stop') {
+                currentTimerState = 'timer';
+                let remainingSeconds = 0;
+
+                // 現在表示されている時間から再開
+                const currentDisplayTime = timerDisplayEl.textContent.split(':');
+                remainingSeconds = parseInt(currentDisplayTime[0]) * 3600 + parseInt(currentDisplayTime[1]) * 60 + parseInt(currentDisplayTime[2]);
+
+                // もしリセットされて0秒なら、初期設定から開始
+                if (remainingSeconds === 0 && initialTimerSeconds > 0) {
+                     remainingSeconds = initialTimerSeconds;
+                } else if (initialTimerSeconds === 0 && remainingSeconds === 0) { // 初期設定も0秒の場合
+                    alert('タイマー時間を設定してください。');
+                    currentTimerState = 'stop';
+                    return;
+                }
+
+
+                if (remainingSeconds <= 0) return; // 0秒なら開始しない
+
+                timerInterval = setInterval(() => {
+                    remainingSeconds--;
+                    timerDisplayEl.textContent = formatTime(remainingSeconds);
+
+                    if (remainingSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        // タイマー終了後、設定した時間に戻す
+                        timerDisplayEl.textContent = formatTime(initialTimerSeconds);
+                        sendNotification('タイマー終了', { body: '設定した時間が経過しました！' });
+                        currentTimerState = 'stop';
+                        alert('タイマー終了！');
+                    }
+                }, 1000);
+            }
+        });
+
+        // タイマー停止
+        stopTimerBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            currentTimerState = 'stop';
+        });
+
+        // タイマーリセット
+        resetTimerBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            setupTimer(); // 初期設定に戻す
+            currentTimerState = 'stop';
+        });
+
+        // ストップウォッチ開始
+        startStopwatchBtn.addEventListener('click', () => {
+            if (!stopwatchInterval) {
+                stopwatchInterval = setInterval(() => {
+                    stopwatchMilliseconds += 10; // 10ms 単位で加算
+                    stopwatchDisplayEl.textContent = formatStopwatchTime(stopwatchMilliseconds);
+                }, 10); // 10ms ごとに更新
+            }
+        });
+
+        // ストップウォッチ停止
+        stopStopwatchBtn.addEventListener('click', () => {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+        });
+
+        // ストップウォッチリセット
+        resetStopwatchBtn.addEventListener('click', () => {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+            stopwatchMilliseconds = 0;
+            stopwatchDisplayEl.textContent = '00:00:00.00';
+        });
+
+        // アラーム設定
+        setAlarmBtn.addEventListener('click', () => {
+            const hours = parseInt(alarmHoursInput.value, 10) || 0;
+            const minutes = parseInt(alarmMinutesInput.value, 10) || 0;
+            const seconds = parseInt(alarmSecondsInput.value, 10) || 0;
+            const alarmTargetSeconds = hours * 3600 + minutes * 60 + seconds;
+            alarmDisplayEl.textContent = formatTime(alarmTargetSeconds);
+            alert(`アラームを ${formatTime(alarmTargetSeconds)} に設定しました。`);
+            // 設定時にアラームが有効なら、再度インターバルを開始
+            if (alarmToggleInput.checked) {
+                alarmToggleInput.checked = false; // 一度オフにしてから再度オンにする
+                alarmToggleInput.click();
+            }
+        });
+
+        // アラームトグル
+        alarmToggleInput.addEventListener('change', () => {
+            isAlarmActive = alarmToggleInput.checked;
+            if (isAlarmActive) {
+                const currentAlarmTimeStr = alarmDisplayEl.textContent;
+                const currentAlarmTimeParts = currentAlarmTimeStr.split(':');
+                const alarmTargetSeconds = parseInt(currentAlarmTimeParts[0]) * 3600 + parseInt(currentAlarmTimeParts[1]) * 60 + parseInt(currentAlarmTimeParts[2]);
+
+                if (alarmTargetSeconds <= 0) {
+                    alert('アラーム時刻が設定されていません。');
+                    alarmToggleInput.checked = false; // 無効にする
+                    isAlarmActive = false;
+                    return;
+                }
+
+                // アラームが有効になったら、毎秒チェック
+                alarmInterval = setInterval(() => {
+                    const now = new Date();
+                    const currentSecondsToday = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+                    // 設定されたアラーム時刻と現在時刻を比較
+                    if (currentSecondsToday >= alarmTargetSeconds) {
+                        if (isAlarmActive) { // アラームが有効な場合のみ実行
+                            sendNotification('アラーム', { body: '設定した時間が経過しました！' });
+                            alert('アラーム！');
+                            clearInterval(alarmInterval); // 一度鳴らしたら停止
+                            alarmToggleInput.checked = false; // 自動的にオフにする
+                            isAlarmActive = false;
+                            // アラーム表示をリセット（例: 12:00:00 -> 12:00:00）
+                            // alarmDisplayEl.textContent = formatTime(alarmTargetSeconds);
+                        }
+                    }
+                }, 1000);
+            } else {
+                clearInterval(alarmInterval); // アラームを停止
+            }
+        });
+
+        // ポモドーロタイマー開始
+        startPomodoroBtn.addEventListener('click', () => {
+            if (!pomodoroInterval) {
+                const workTime = parseInt(pomodoroWorkTimeInput.value, 10) * 60 || 25 * 60;
+                const breakTime = parseInt(pomodoroBreakTimeInput.value, 10) * 60 || 5 * 60;
+                totalRounds = parseInt(pomodoroRoundsInput.value, 10) || 4;
+                currentRound = 1;
+                currentPomodoroState = 'work';
+                let timeRemaining = workTime;
+
+                pomodoroDisplayEl.textContent = `ラウンド ${currentRound}/${totalRounds} - 作業中...`;
+
+                pomodoroInterval = setInterval(() => {
+                    timeRemaining--;
+                    const minutes = Math.floor(timeRemaining / 60);
+                    const seconds = timeRemaining % 60;
+                    pomodoroDisplayEl.textContent = `${currentPomodoroState === 'work' ? '作業中' : '休憩中'} (${minutes}:${String(seconds).padStart(2, '0')})`;
+
+                    if (timeRemaining <= 0) {
+                        clearInterval(pomodoroInterval);
+                        pomodoroInterval = null;
+
+                        if (currentPomodoroState === 'work') {
+                            sendNotification('ポモドーロ', { body: '作業時間終了！休憩時間です。' });
+                            alert('作業時間終了！休憩時間です。');
+                            currentPomodoroState = 'break';
+                            timeRemaining = breakTime;
+                            pomodoroDisplayEl.textContent = `ラウンド ${currentRound}/${totalRounds} - 休憩中...`;
+                            startPomodoroBtn.textContent = '休憩開始';
+                            if (breakTime > 0) startPomodoroBtn.click(); // 自動的に休憩を開始
+                        } else { // 休憩終了
+                            currentRound++;
+                            if (currentRound <= totalRounds) {
+                                sendNotification('ポモドーロ', { body: '休憩時間終了！次の作業時間です。' });
+                                alert('休憩時間終了！次の作業時間です。');
+                                currentPomodoroState = 'work';
+                                timeRemaining = workTime;
+                                pomodoroDisplayEl.textContent = `ラウンド ${currentRound}/${totalRounds} - 作業中...`;
+                                startPomodoroBtn.textContent = '作業開始';
+                                if (workTime > 0) startPomodoroBtn.click(); // 自動的に作業を開始
+                            } else {
+                                sendNotification('ポモドーロ', { body: '全てのポモドーロセッションが完了しました！' });
+                                alert('全てのポモドーロセッションが完了しました！');
+                                pomodoroDisplayEl.textContent = '完了！';
+                                resetPomodoroBtn.click(); // 自動的にリセット
+                            }
+                        }
+                    }
+                }, 1000);
+            }
+        });
+
+        // ポモドーロタイマー停止
+        stopPomodoroBtn.addEventListener('click', () => {
+            clearInterval(pomodoroInterval);
+            pomodoroInterval = null;
+            startPomodoroBtn.textContent = '開始';
+        });
+
+        // ポモドーロタイマーリセット
+        resetPomodoroBtn.addEventListener('click', () => {
+            clearInterval(pomodoroInterval);
+            pomodoroInterval = null;
+            currentRound = 0;
+            totalRounds = 0;
+            currentPomodoroState = 'work';
+            pomodoroDisplayEl.textContent = 'ポモドーロ';
+            startPomodoroBtn.textContent = '開始';
+        });
+
+
+        // タブの切り替え
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.add('active');
+
+                // タブ切り替え時にタイマーやストップウォッチを一時停止
+                if (timerInterval) {
+                    stopTimerBtn.click();
+                }
+                if (stopwatchInterval) {
+                    stopStopwatchBtn.click();
+                }
+                if (pomodoroInterval) {
+                    stopPomodoroBtn.click();
+                }
+            });
+        });
+
+        // --- 初期化処理 ---
+
+        // 通知の許可を求める
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        // 初期設定
+        setupTimer(); // タイマーの初期設定
+        updateClock(); // 時計の初回表示
+
+        // インターバル開始
+        clockInterval = setInterval(updateClock, 1000); // 1秒ごとに時計を更新
+
+        // 初期表示するタブの設定
+        document.querySelector('.tab-button.active').click();
+
+    </script>
+
 </body>
 </html>
