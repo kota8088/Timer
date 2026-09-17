@@ -41,11 +41,16 @@ function updateClock() {
             second: '2-digit',
             hour12: false
         });
-        clockDisplay.textContent = formatter.format(now);
+        // 要素が正しく取得できているか確認してから代入
+        if (clockDisplay) {
+            clockDisplay.textContent = formatter.format(now);
+        }
     } catch (e) {
         currentZone = "Asia/Tokyo"; // エラー時はデフォルトに戻す
     }
 }
+
+// 順番を変更：HTML要素を読み込んだ「後」でタイマーを動かす
 setInterval(updateClock, 1000);
 updateClock();
 
@@ -59,26 +64,6 @@ const tzDictionary = {
     "singapore": "Asia/Singapore", "シンガポール": "Asia/Singapore",
     "sydney": "Australia/Sydney", "シドニー": "Australia/Sydney"
 };
-
-searchBtn.addEventListener('click', () => {
-    const query = timezoneInput.value.trim().toLowerCase();
-    if (!query) return;
-
-    if (tzDictionary[query]) {
-        currentZone = tzDictionary[query];
-        timezoneLabel.textContent = `現在の場所: ${currentZone}`;
-    } else {
-        // 直接IANAタイムゾーン形式で入力された場合を考慮 (例: America/Chicago)
-        try {
-            new Intl.DateTimeFormat('ja-JP', { timeZone: query });
-            currentZone = query;
-            timezoneLabel.textContent = `現在の場所: ${currentZone}`;
-        } catch (e) {
-            alert("都市が見つかりません。対応ワード: Tokyo, London, New York, Paris など、または 'Europe/Berlin' 形式");
-        }
-    }
-    updateClock();
-});
 
 // ==========================================
 // 2. タイマー (停止で設定時に戻る)
