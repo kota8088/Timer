@@ -1,275 +1,302 @@
 // ==========================================
-// 0. モードパネル切り替え制御システム
+// 共通：通知機能 (Notification)
 // ==========================================
-const navButtons = {
-    clock: document.getElementById('nav-clock'),
-    alarm: document.getElementById('nav-alarm'),
-    sw: document.getElementById('nav-sw'),
-    pomodoro: document.getElementById('nav-pomodoro'),
-    notification: document.getElementById('nav-notification')
-};
-const panels = {
-    clock: document.getElementById('panel-clock'),
-    alarm: document.getElementById('panel-alarm'),
-    sw: document.getElementById('panel-sw'),
-    pomodoro: document.getElementById('panel-pomodoro')
-};
+const notifyCheckbox = document.getElementById('notification-checkbox');
 
-function switchMode(modeName) {
-    Object.keys(navButtons).forEach(key => {
-        if (key === 'notification') return;
-        if (key === modeName) {
-            if (navButtons[key]) navButtons[key].classList.add('active');
-            if (panels[key]) panels[key].classList.add('active');
-        } else {
-            if (navButtons[key]) navButtons[key].classList.remove('active');
-            if (panels[key]) panels[key].classList.remove('active');
-        }
-    });
-}
-if (navButtons.clock) navButtons.clock.addEventListener('click', () => switchMode('clock'));
-if (navButtons.alarm) navButtons.alarm.addEventListener('click', () => switchMode('alarm'));
-if (navButtons.sw) navButtons.sw.addEventListener('click', () => switchMode('sw'));
-if (navButtons.pomodoro) navButtons.pomodoro.addEventListener('click', () => switchMode('pomodoro'));
-
-// ==========================================
-// デスクトップ通知制御システム（自動復元対応）
-// ==========================================
-let isNotificationEnabled = false;
-
-function sendSystemNotification(title, message) {
-    if (isNotificationEnabled && Notification.permission === "granted") {
-        try {
-            new Notification(title, {
-                body: message,
-                icon: "https://flaticon.com"
-            });
-        } catch (e) {}
-    }
-}
-
-function updateNotificationButtonUI() {
-    if (!navButtons.notification) return;
-    if (isNotificationEnabled && Notification.permission === "granted") {
-        navButtons.notification.textContent = "🔔 ON";
-        navButtons.notification.classList.remove('disabled');
-        navButtons.notification.classList.add('enabled');
-    } else {
-        isNotificationEnabled = false;
-        navButtons.notification.textContent = "🔕 OFF";
-        navButtons.notification.classList.remove('enabled');
-        navButtons.notification.classList.add('disabled');
-    }
-}
-
-if (navButtons.notification) {
-    navButtons.notification.addEventListener('click', () => {
-        if (!("Notification" in window)) {
-            alert("このブラウザはシステム通知に対応していません。");
-            return;
-        }
-
-        if (isNotificationEnabled) {
-            isNotificationEnabled = false;
-            localStorage.setItem('timer_notify_enabled', 'false');
-            updateNotificationButtonUI();
-        } else {
+notifyCheckbox.addEventListener('change', () => {
+    if (notifyCheckbox.checked) {
+        if (Notification.permission !== 'granted') {
             Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    isNotificationEnabled = true;
-                    localStorage.setItem('timer_notify_enabled', 'true');
-                    updateNotificationButtonUI();
-                    sendSystemNotification("通知システム起動", "タイマー終了時のシステム通知が有効化されました。");
-                } else {
-                    alert("ブラウザの通知設定が拒否されています。設定から許可してください。");
+                if (permission !== 'granted') {
+                    notifyCheckbox.checked = false;
+                    alert('通知が拒否されました。ブラウザの設定を変更してください。');
                 }
             });
         }
-    });
-}
-
-// ページ読み込み時に通知状態を自動復元
-window.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('timer_notify_enabled') === 'true' && Notification.permission === "granted") {
-        isNotificationEnabled = true;
-        updateNotificationButtonUI();
     }
-    // タイマーの記憶復元
-    restoreTimerInputs();
 });
 
+function sendNotification(title, body) {
+    if (notifyCheckbox.checked && Notification.permission === 'granted') {
+        new Notification(title, { body: body });
+    }
+}
+
 // ==========================================
-// 1. 世界時計システム
+// 1. リアルタイム時計 (場所検索つき)
 // ==========================================
+let currentZone = "Asia/Tokyo";
 const clockDisplay = document.getElementById('clock-display');
-const clockLocation = document.getElementById('clock-location');
-const citySearch = document.getElementById('city-search');
-const timezoneList = document.getElementById('timezone-list');
-const currentLocationBtn = document.getElementById('current-location-btn');
-
-function getLocalTimeZone() { return Intl.DateTimeFormat().resolvedOptions().timeZone; }
-let currentTimeZone = getLocalTimeZone();
-
-function initClockSearch() {
-    if (!timezoneList) return;
-    try {
-        Intl.supportedValuesOf('timeZone').forEach(zone => {
-            const option = document.createElement('option');
-            option.value = zone;
-            timezoneList.appendChild(option);
-        });
-    } catch (e) {}
-}
-
-// アラームチェック用関数（未定義だったため追加）
-function checkAlarm(now) {
-    // 必要に応じてアラームの判定ロジックをここに記述します
-}
+const timezoneInput = document.getElementById('timezone-search');
+const searchBtn = document.getElementById('search-btn');
+const timezoneLabel = document.getElementById('timezone-label');
 
 function updateClock() {
-    if (!clockDisplay) return;
     try {
         const now = new Date();
         const formatter = new Intl.DateTimeFormat('ja-JP', {
-            timeZone: currentTimeZone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            timeZone: currentZone,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
         });
         clockDisplay.textContent = formatter.format(now);
-        
-        // 毎秒アラームの判定を行う
-        checkAlarm(now);
-    } catch (e) {}
-}
-
-if (citySearch) {
-    citySearch.addEventListener('change', () => {
-        const selectedZone = citySearch.value.trim();
-        try {
-            if (Intl.supportedValuesOf('timeZone').includes(selectedZone)) {
-                currentTimeZone = selectedZone;
-                if (clockLocation) clockLocation.textContent = (selectedZone === getLocalTimeZone()) ? `${selectedZone} (現在地)` : selectedZone;
-                updateClock();
-                citySearch.value = ""; citySearch.blur();
-            }
-        } catch(e) {}
-    });
-}
-
-if (currentLocationBtn) {
-    currentLocationBtn.addEventListener('click', () => {
-        currentTimeZone = getLocalTimeZone();
-        if (clockLocation) clockLocation.textContent = `${currentTimeZone} (現在地)`;
-        updateClock();
-    });
+    } catch (e) {
+        currentZone = "Asia/Tokyo"; // エラー時はデフォルトに戻す
+    }
 }
 setInterval(updateClock, 1000);
-initClockSearch(); updateClock();
+updateClock();
+
+// 簡易タイムゾーン都市検索辞書 (一般的な主要都市)
+const tzDictionary = {
+    "tokyo": "Asia/Tokyo", "東京": "Asia/Tokyo",
+    "london": "Europe/London", "ロンドン": "Europe/London",
+    "new york": "America/New_York", "ニューヨーク": "America/New_York",
+    "los angeles": "America/Los_Angeles", "ロサンゼルス": "America/Los_Angeles",
+    "paris": "Europe/Paris", "パリ": "Europe/Paris",
+    "singapore": "Asia/Singapore", "シンガポール": "Asia/Singapore",
+    "sydney": "Australia/Sydney", "シドニー": "Australia/Sydney"
+};
+
+searchBtn.addEventListener('click', () => {
+    const query = timezoneInput.value.trim().toLowerCase();
+    if (!query) return;
+
+    if (tzDictionary[query]) {
+        currentZone = tzDictionary[query];
+        timezoneLabel.textContent = `現在の場所: ${currentZone}`;
+    } else {
+        // 直接IANAタイムゾーン形式で入力された場合を考慮 (例: America/Chicago)
+        try {
+            new Intl.DateTimeFormat('ja-JP', { timeZone: query });
+            currentZone = query;
+            timezoneLabel.textContent = `現在の場所: ${currentZone}`;
+        } catch (e) {
+            alert("都市が見つかりません。対応ワード: Tokyo, London, New York, Paris など、または 'Europe/Berlin' 形式");
+        }
+    }
+    updateClock();
+});
 
 // ==========================================
-// 2. タイマーシステム（記憶機能付き）
+// 2. タイマー (停止で設定時に戻る)
 // ==========================================
-const inputHours = document.getElementById('input-hours');
-const inputMinutes = document.getElementById('input-minutes');
-const inputSeconds = document.getElementById('input-seconds');
-const startButton = document.getElementById('start-btn');
-const stopButton = document.getElementById('stop-btn');
-const resetButton = document.getElementById('reset-btn');
-let countdown, timeLeft = 0, isTimerRunning = false;
+let timerId = null;
+let timerLeft = 0;
+const tMinInput = document.getElementById('timer-min');
+const tSecInput = document.getElementById('timer-sec');
+const tDisplay = document.getElementById('timer-display');
+const tStartBtn = document.getElementById('timer-start');
+const tStopBtn = document.getElementById('timer-stop');
 
-function handleInput(input, max) {
-    if (!input) return;
-    let r = input.value; if (r === '') return;
-    let v = parseInt(r, 10); if (isNaN(v) || v < 0) v = 0; if (v > max) v = max;
-    input.value = v;
-    saveTimerInputs();
+function getSelectedTimerSeconds() {
+    const m = parseInt(tMinInput.value) || 0;
+    const s = parseInt(tSecInput.value) || 0;
+    return (m * 60) + s;
 }
 
-function handleBlur(input, max) {
-    if (!input) return;
-    let v = parseInt(input.value, 10); if (isNaN(v) || v < 0) v = 0; if (v > max) v = max;
-    input.value = String(v).padStart(2, '0');
-    saveTimerInputs();
+function updateTimerDisplay(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    tDisplay.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 }
 
-function saveTimerInputs() {
-    if (!inputHours || !inputMinutes || !inputSeconds) return;
-    localStorage.setItem('timer_saved_hours', inputHours.value);
-    localStorage.setItem('timer_saved_minutes', inputMinutes.value);
-    localStorage.setItem('timer_saved_seconds', inputSeconds.value);
-}
+tStartBtn.addEventListener('click', () => {
+    if (timerId !== null) return;
+    
+    // 開始時に、現在フォームに入力されている値で残り時間を決定
+    if (timerLeft === 0) {
+        timerLeft = getSelectedTimerSeconds();
+    }
+    if (timerLeft <= 0) return;
 
-// 記憶復元用関数
-function restoreTimerInputs() {
-    if (!inputHours || !inputMinutes || !inputSeconds) return;
-    if (localStorage.getItem('timer_saved_hours')) inputHours.value = localStorage.getItem('timer_saved_hours');
-    if (localStorage.getItem('timer_saved_minutes')) inputMinutes.value = localStorage.getItem('timer_saved_minutes');
-    if (localStorage.getItem('timer_saved_seconds')) inputSeconds.value = localStorage.getItem('timer_saved_seconds');
-}
+    timerId = setInterval(() => {
+        timerLeft--;
+        updateTimerDisplay(timerLeft);
 
-if (inputHours) {
-    inputHours.addEventListener('input', () => handleInput(inputHours, 23));
-    inputHours.addEventListener('blur', () => handleBlur(inputHours, 23));
-}
-if (inputMinutes) {
-    inputMinutes.addEventListener('input', () => handleInput(inputMinutes, 59));
-    inputMinutes.addEventListener('blur', () => handleBlur(inputMinutes, 59));
-}
-if (inputSeconds) {
-    inputSeconds.addEventListener('input', () => handleInput(inputSeconds, 59));
-    inputSeconds.addEventListener('blur', () => handleBlur(inputSeconds, 59));
-}
+        if (timerLeft <= 0) {
+            clearInterval(timerId);
+            timerId = null;
+            sendNotification("TIMER", "設定した時間になりました！");
+            alert("タイマー終了！");
+            // 終了後も設定値に戻す
+            timerLeft = getSelectedTimerSeconds();
+            updateTimerDisplay(timerLeft);
+        }
+    }, 1000);
+});
 
-function updateDisplayFromSeconds(totalSeconds) {
-    if (!inputHours || !inputMinutes || !inputSeconds) return;
-    const hrs = Math.floor(totalSeconds / 3600);
-    const mins = Math.floor((totalSeconds % 3600) / 60);
-    const secs = totalSeconds % 60;
-    inputHours.value = String(hrs).padStart(2, '0');
-    inputMinutes.value = String(mins).padStart(2, '0');
-    inputSeconds.value = String(secs).padStart(2, '0');
-}
+tStopBtn.addEventListener('click', () => {
+    clearInterval(timerId);
+    timerId = null;
+    // 停止/キャンセルを押したら入力された元の設定時間に戻す
+    timerLeft = getSelectedTimerSeconds();
+    updateTimerDisplay(timerLeft);
+});
 
-// タイポを修正し、関数を完成
-function setInputsDisabled(disabled) {
-    if (inputHours) inputHours.disabled = disabled;
-    if (inputMinutes) inputMinutes.disabled = disabled;
-    if (inputSeconds) inputSeconds.disabled = disabled;
-}
-
-// 途切れていたタイマーのボタン制御処理を追加
-if (startButton) {
-    startButton.addEventListener('click', () => {
-        if (isTimerRunning) return;
-        
-        const hrs = parseInt(inputHours.value, 10) || 0;
-        const mins = parseInt(inputMinutes.value, 10) || 0;
-        const secs = parseInt(inputSeconds.value, 10) || 0;
-        
-        timeLeft = (hrs * 3600) + (mins * 60) + secs;
-        if (timeLeft <= 0) return;
-
-        isTimerRunning = true;
-        setInputsDisabled(true);
-
-        countdown = setInterval(() => {
-            timeLeft--;
-            updateDisplayFromSeconds(timeLeft);
-
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                isTimerRunning = false;
-                setInputsDisabled(false);
-                sendSystemNotification("タイマー終了", "設定した時間が経過しました。");
-            }
-        }, 1000);
+// 入力が変更されたら表示も同期
+[tMinInput, tSecInput].forEach(input => {
+    input.addEventListener('input', () => {
+        if (timerId === null) {
+            timerLeft = getSelectedTimerSeconds();
+            updateTimerDisplay(timerLeft);
+        }
     });
+});
+
+// ==========================================
+// 3. ストップウォッチ (1ボタン切替、リセットでラップ全削除)
+// ==========================================
+let swId = null;
+let swStartTime = 0;
+let swElapsed = 0;
+let lapCount = 0;
+
+const swDisplay = document.getElementById('sw-display');
+const swToggleBtn = document.getElementById('sw-toggle');
+const swLapBtn = document.getElementById('sw-lap');
+const swResetBtn = document.getElementById('sw-reset');
+const lapList = document.getElementById('lap-list');
+
+function updateSwDisplay() {
+    const totalMs = swElapsed + (swId ? Date.now() - swStartTime : 0);
+    const min = Math.floor(totalMs / 60000);
+    const sec = Math.floor((totalMs % 60000) / 1000);
+    const ms = Math.floor((totalMs % 1000) / 10);
+    swDisplay.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+    return swDisplay.textContent;
 }
 
-if (stopButton) {
-    stopButton.addEventListener('click', () => {
-        clearInterval(countdown);
-        isTimerRunning = false;
-        setInputsDisabled(false);
-    });
+swToggleBtn.addEventListener('click', () => {
+    if (swId === null) {
+        // スタート処理
+        swStartTime = Date.now();
+        swId = setInterval(updateSwDisplay, 10);
+        swToggleBtn.textContent = "ストップ";
+        swToggleBtn.style.borderColor = "#ff3333"; // ストップ時は赤寄りに
+        swLapBtn.disabled = false;
+    } else {
+        // ストップ処理
+        swElapsed += Date.now() - swStartTime;
+        clearInterval(swId);
+        swId = null;
+        swToggleBtn.textContent = "スタート";
+        swToggleBtn.style.borderColor = "#ff007f";
+        swLapBtn.disabled = true;
+    }
+});
+
+swLapBtn.addEventListener('click', () => {
+    if (swId === null) return;
+    lapCount++;
+    const currentTimeStr = updateSwDisplay();
+    const li = document.createElement('li');
+    li.innerHTML = `<span>Lap ${lapCount}</span> <span>${currentTimeStr}</span>`;
+    lapList.insertBefore(li, lapList.firstChild); // 新しいラップを上に
+});
+
+swResetBtn.addEventListener('click', () => {
+    clearInterval(swId);
+    swId = null;
+    swElapsed = 0;
+    lapCount = 0;
+    swToggleBtn.textContent = "スタート";
+    swToggleBtn.style.borderColor = "#ff007f";
+    swLapBtn.disabled = true;
+    swDisplay.textContent = "00:00.00";
+    lapList.innerHTML = ""; // ラップ保存の消去
+});
+
+// ==========================================
+// 4. アラーム
+// ==========================================
+let alarmTimeValue = null;
+const alarmInput = document.getElementById('alarm-time');
+const alarmStatus = document.getElementById('alarm-status');
+const alarmSetBtn = document.getElementById('alarm-set');
+const alarmClearBtn = document.getElementById('alarm-clear');
+
+alarmSetBtn.addEventListener('click', () => {
+    alarmTimeValue = alarmInput.value;
+    if (alarmTimeValue) {
+        alarmStatus.textContent = `設定中: ${alarmTimeValue}`;
+    }
+});
+
+alarmClearBtn.addEventListener('click', () => {
+    alarmTimeValue = null;
+    alarmStatus.textContent = "アラーム未設定";
+});
+
+// アラームの監視 (1秒ごとにチェック)
+setInterval(() => {
+    if (!alarmTimeValue) return;
+    const now = new Date();
+    const currentStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    if (currentStr === alarmTimeValue && now.getSeconds() === 0) {
+        sendNotification("ALARM", "アラームの時間になりました！");
+        alert(`アラーム時間です! (${alarmTimeValue})`);
+        alarmTimeValue = null;
+        alarmStatus.textContent = "アラーム未設定";
+    }
+}, 1000);
+
+// ==========================================
+// 5. ポモドーロ (停止で設定時に戻る)
+// ==========================================
+let pomoId = null;
+let pomoLeft = 0;
+let isWorkPhase = true; // true: 作業, false: 休憩
+let currentRound = 1;
+
+const pWorkInput = document.getElementById('pomo-work');
+const pBreakInput = document.getElementById('pomo-break');
+const pRoundsInput = document.getElementById('pomo-rounds');
+const pPhaseText = document.getElementById('pomo-phase');
+const pDisplay = document.getElementById('pomo-display');
+const pRoundDisplay = document.getElementById('pomo-round-display');
+const pStartBtn = document.getElementById('pomo-start');
+const pStopBtn = document.getElementById('pomo-stop');
+
+function updatePomoDisplay() {
+    const min = Math.floor(pomoLeft / 60);
+    const sec = pomoLeft % 60;
+    pDisplay.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    pRoundDisplay.textContent = `ラウンド: ${currentRound} / ${pRoundsInput.value}`;
 }
 
-if (resetButton) {
+function resetPomoToConfig() {
+    isWorkPhase = true;
+    currentRound = 1;
+    pomoLeft = (parseInt(pWorkInput.value) || 25) * 60;
+    pPhaseText.textContent = "集中時間";
+    pPhaseText.style.color = "#fff";
+    updatePomoDisplay();
+}
+
+pStartBtn.addEventListener('click', () => {
+    if (pomoId !== null) return;
+
+    if (pomoLeft === 0) {
+        pomoLeft = (isWorkPhase ? pWorkInput.value : pBreakInput.value) * 60;
+    }
+
+    pomoId = setInterval(() => {
+        pomoLeft--;
+        updatePomoDisplay();
+
+        if (pomoLeft <= 0) {
+            clearInterval(pomoId);
+            pomoId = null;
+
+            const maxRounds = parseInt(pRoundsInput.value) || 4;
+
+            if (isWorkPhase) {
+                sendNotification("POMODORO", "作業終了！休憩してください。");
+                alert("作業終了！休憩に入りましょう。");
+                if (currentRound >= maxRounds) {
+                    alert("すべてのラウンドが完了しました！お疲れ様でした。");
+                    resetPomoToConfig();
