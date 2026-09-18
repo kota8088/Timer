@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ネオン・コスモ・タイマー</title>
+    <title>ネオン・コスモ・タイマー (v2)</title>
     <style>
         /* 全体デザイン・テーマ */
         body {
@@ -43,6 +43,7 @@
             font-size: 16px;
             transition: all 0.3s ease;
             box-shadow: 0 0 8px #00ffff, 0 0 15px #00ffff;
+            text-decoration: none; /* ボタンのリンクスタイルをリセット */
         }
 
         .neon-button:hover {
@@ -60,6 +61,7 @@
             border-radius: 5px;
             font-size: 16px;
             box-shadow: 0 0 8px #00ff00, 0 0 15px #00ff00;
+            outline: none; /* フォーカス時のアウトラインを消す */
         }
 
         .neon-input::placeholder, .neon-select::placeholder {
@@ -67,7 +69,6 @@
         }
 
         .neon-input:focus, .neon-select:focus {
-            outline: none;
             border-color: #00ff00;
             box-shadow: 0 0 12px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
         }
@@ -82,20 +83,20 @@
         .container {
             width: 95%;
             max-width: 1000px;
-            background-color: rgba(10, 10, 40, 0.6); /* 半透明のダーク背景 */
-            padding: 20px;
+            background-color: rgba(10, 10, 40, 0.5); /* 半透明のダーク背景、少し透明度を上げる */
+            padding: 25px; /* 少し padding を増やす */
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(255, 0, 255, 0.3); /* ネオン調の影 */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), 0 0 40px rgba(255, 0, 255, 0.2); /* ネオン調の影 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px; /* セクション間のマージンを増やす */
         }
 
         h1, h2, h3 {
             color: #00ffff; /* ネオンブルー */
             text-shadow: 0 0 8px #00ffff, 0 0 15px #00ffff;
-            margin-bottom: 20px;
+            margin-bottom: 25px; /* タイトル下のマージンを増やす */
             text-align: center;
         }
 
@@ -118,19 +119,19 @@
         }
 
         #city-search {
-            width: 250px; /* 検索バーの幅 */
+            width: 220px; /* 検索バーの幅 */
             flex-shrink: 0; /* 縮小させない */
         }
 
         #city-select {
-            width: 250px; /* ドロップダウンの幅 */
+            width: 220px; /* ドロップダウンの幅 */
             flex-shrink: 0; /* 縮小させない */
         }
 
         #current-time-display {
             font-size: 3em; /* 大きめのフォントサイズ */
             font-weight: bold;
-            margin-top: 10px;
+            margin-top: 15px;
             color: #00ff00; /* ネオングリーン */
             text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
         }
@@ -166,7 +167,7 @@
         }
 
         #alarm-time-input, #alarm-label-input {
-            width: 200px;
+            width: 180px; /* 幅を少し調整 */
             margin-right: 10px;
         }
 
@@ -186,7 +187,7 @@
 
         #alarm-list li {
             background-color: rgba(0, 255, 255, 0.1);
-            padding: 10px;
+            padding: 12px 15px; /* 少し padding を増やす */
             margin-bottom: 10px;
             border-radius: 8px;
             border: 1px solid #00ffff;
@@ -194,15 +195,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* モバイル対応 */
+            gap: 10px;
         }
 
         #alarm-list li span {
             color: #00ff00;
             text-shadow: 0 0 5px #00ff00;
+            flex-grow: 1; /* スペースを占める */
+            text-align: left; /* テキストを左寄せ */
         }
 
         #alarm-list li button {
-            padding: 5px 10px;
+            padding: 6px 12px; /* ボタンサイズ調整 */
             font-size: 14px;
         }
 
@@ -223,11 +228,11 @@
         }
 
         .pomodoro-timer {
-            background-color: rgba(255, 0, 255, 0.1); /* ネオンピンク基調 */
+            background-color: rgba(255, 0, 255, 0.08); /* ネオンピンク基調、透明度下げる */
             padding: 20px;
             border-radius: 10px;
             border: 2px solid #ff00ff;
-            box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            box-shadow: 0 0 8px #ff00ff, 0 0 15px #ff00ff;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -238,6 +243,7 @@
         .pomodoro-timer h3 {
             color: #ff00ff; /* ネオンピンク */
             margin-top: 0;
+            font-size: 1.8em; /* 少し小さく */
         }
 
         .pomodoro-controls {
@@ -251,16 +257,16 @@
         .pomodoro-controls input[type="number"],
         .pomodoro-controls input[type="checkbox"] {
             margin: 5px;
-            font-size: 16px;
+            font-size: 15px; /* 少し小さく */
         }
 
         .pomodoro-controls input[type="number"] {
-            width: 60px;
+            width: 55px; /* 幅を調整 */
             text-align: center;
         }
 
         .pomodoro-display {
-            font-size: 3em;
+            font-size: 2.8em; /* 少し小さく */
             font-weight: bold;
             margin: 15px 0;
             color: #00ffff; /* ネオンブルー */
@@ -277,6 +283,7 @@
             margin-top: 15px;
             display: flex;
             align-items: center;
+            margin-bottom: 10px; /* ボタンとの間隔 */
         }
 
         .pomodoro-loop-toggle label {
@@ -285,11 +292,93 @@
             margin-left: 10px;
         }
 
-        #add-pomodoro-button {
+        .pomodoro-delete-button {
+            background-color: #ff0000; /* 赤色 */
+            border-color: #ff0000;
+            box-shadow: 0 0 8px #ff0000, 0 0 15px #ff0000;
+            margin-top: 5px; /* 上の要素との間隔 */
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        .pomodoro-delete-button:hover {
+            background-color: #cc0000;
+            border-color: #cc0000;
+            box-shadow: 0 0 12px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+        }
+
+
+        #add-pomodoro-button, #add-timer-button {
             margin-top: 20px;
             width: 200px;
             padding: 12px 25px;
             font-size: 18px;
+        }
+
+        /* 新規タイマー機能 */
+        #timer-section .container-inner {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer {
+            background-color: rgba(0, 255, 0, 0.08); /* ネオングリーン基調 */
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 8px #00ff00, 0 0 15px #00ff00;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 280px;
+            margin-bottom: 20px;
+        }
+
+        .timer h3 {
+            color: #00ff00; /* ネオングリーン */
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+
+        .timer-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .timer-controls input[type="number"] {
+            width: 55px;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #ff00ff; /* ネオンピンク */
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+        }
+
+        .timer-buttons button {
+            margin: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .timer-delete-button {
+            background-color: #ff0000;
+            border-color: #ff0000;
+            box-shadow: 0 0 8px #ff0000, 0 0 15px #ff0000;
+            margin-top: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+         .timer-delete-button:hover {
+            background-color: #cc0000;
+            border-color: #cc0000;
+            box-shadow: 0 0 12px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
         }
 
         /* 共通のタイマー設定 */
@@ -345,10 +434,10 @@
             border: 2px solid #00ff00;
             color: #00ff00;
             box-shadow: 0 0 5px #00ff00;
+            outline: none;
         }
 
         .time-input-group input[type="number"]:focus {
-            outline: none;
             box-shadow: 0 0 8px #00ff00, 0 0 15px #00ff00;
         }
 
@@ -358,10 +447,10 @@
             color: #00ffff;
             box-shadow: 0 0 5px #00ffff;
             padding: 3px 5px;
+            outline: none;
         }
 
         .time-input-group select:focus {
-            outline: none;
             box-shadow: 0 0 8px #00ffff, 0 0 15px #00ffff;
         }
 
@@ -377,13 +466,76 @@
             box-shadow: 0 0 12px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
         }
 
+        /* デスクトップ通知のON/OFF */
+        #notification-settings {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #00ffff;
+            box-shadow: 0 0 5px #00ffff;
+        }
+
+        #notification-settings label {
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-right: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* デフォルトはグレー */
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3; /* オン時の色 */
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
         /* デスクトップ通知の許可を求めるメッセージ */
         .notification-prompt {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #333;
+            background-color: rgba(50, 50, 50, 0.9); /* 少し暗めに */
             color: #eee;
             padding: 15px 25px;
             border-radius: 10px;
@@ -392,6 +544,7 @@
             display: none; /* 初期状態は非表示 */
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
+            font-size: 1.1em;
         }
 
         .notification-prompt.show {
@@ -495,6 +648,30 @@
         </section>
     </div>
 
+    <div class="container">
+        <!-- 新規：タイマー機能 -->
+        <section id="timer-section">
+            <h2 class="neon-text">タイマー</h2>
+            <div class="container-inner">
+                <div id="timer-templates">
+                    <!-- 初期状態のタイマーがここに生成されます -->
+                </div>
+                <button id="add-timer-button" class="neon-button">タイマーを追加</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- デスクトップ通知のON/OFF設定 -->
+    <div class="container" id="notification-settings-container">
+        <div id="notification-settings">
+            <label class="neon-label">デスクトップ通知:</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="notification-toggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
     <!-- デスクトップ通知の許可を求めるメッセージ -->
     <div id="notification-prompt" class="notification-prompt">
         このアプリはデスクトップ通知を使用します。通知の許可をお願いします。
@@ -508,38 +685,50 @@
         let alarms = []; // アラームの配列
         let alarmInterval; // アラームチェックのインターバルID
         let nextPomodoroId = 0; // ポモドーロタイマーのユニークID
+        let nextTimerId = 0; // タイマーのユニークID
         const MAX_TIME_SECONDS = 23 * 60 * 60 + 59 * 60 + 59; // 23:59:59 を秒で表現
 
         // --- Notification API 関連 ---
-        let notificationPermissionGranted = false;
+        let notificationPermissionGranted = false; // 初期状態は許可されていない
+        let isNotificationEnabled = true; // 通知のON/OFFフラグ
 
         // 通知の許可を求める関数
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
                 console.warn('このブラウザはデスクトップ通知をサポートしていません。');
+                isNotificationEnabled = false; // サポートされていない場合は無効にする
+                document.getElementById('notification-toggle').checked = false;
+                document.getElementById('notification-toggle').disabled = true;
                 return;
             }
 
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    notificationPermissionGranted = true;
-                    console.log('通知の許可が得られました。');
-                    document.getElementById('notification-prompt').classList.remove('show');
-                } else if (permission === 'denied') {
-                    console.log('通知の許可が得られませんでした。');
-                    document.getElementById('notification-prompt').innerText = '通知の許可が得られませんでした。設定から許可してください。';
-                    document.getElementById('notification-prompt').classList.add('show');
-                } else { // 'default'
-                    console.log('通知の許可が保留されています。');
-                    document.getElementById('notification-prompt').classList.add('show');
-                }
-            });
+            // 初期状態では、通知トグルはONになっていることを前提とする
+            if (Notification.permission === 'granted') {
+                notificationPermissionGranted = true;
+                isNotificationEnabled = true;
+            } else if (Notification.permission === 'denied') {
+                notificationPermissionGranted = false;
+                isNotificationEnabled = false;
+                document.getElementById('notification-toggle').checked = false;
+                document.getElementById('notification-toggle').disabled = false; // 許可されなくてもON/OFFは可能
+                document.getElementById('notification-prompt').innerText = '通知が拒否されています。設定から許可してください。';
+                document.getElementById('notification-prompt').classList.add('show');
+            } else { // 'default'
+                // ユーザーがまだ選択していない場合
+                document.getElementById('notification-prompt').classList.add('show');
+                // 通知トグルはONのまま（許可を求めるプロンプトが表示されている状態）
+            }
         }
 
         // デスクトップ通知を表示する関数
         function showDesktopNotification(title, body) {
-            if (!notificationPermissionGranted) {
-                console.log('通知は許可されていません。');
+            if (!notificationPermissionGranted || !isNotificationEnabled) {
+                console.log('通知は許可されていないか、無効になっています。');
+                return;
+            }
+            // Notification APIが利用可能か再度確認
+            if (!('Notification' in window) || Notification.permission !== 'granted') {
+                console.warn('Notification APIが利用できないか、許可されていません。');
                 return;
             }
             new Notification(title, { body: body, icon: '' }); // iconは必要に応じて設定
@@ -560,11 +749,6 @@
             const paddedMs = String(ms).padStart(2, '0');
 
             return `${paddedH}:${paddedM}:${paddedS}.${paddedMs}`;
-        }
-
-        // 時分秒の合計秒数を計算する関数
-        function calculateTotalSeconds(h, m, s) {
-            return h * 3600 + m * 60 + s;
         }
 
         // 秒数を HH:MM:SS 形式に変換する関数
@@ -736,7 +920,8 @@
             alarms.push(newAlarm);
             addAlarmToDOM(newAlarm);
 
-            alarmTimeInput.value = '07:00'; // 初期化
+            // 入力フィールドをリセット
+            alarmTimeInput.value = '07:00';
             alarmLabelInput.value = '';
             alarmDaysCheckboxes.forEach(cb => cb.checked = false);
         }
@@ -749,14 +934,14 @@
         // アラームをチェックする関数
         function checkAlarms() {
             const now = new Date();
-            const currentDay = now.toDateString().split(' ')[0]; // 例: 'Mon'
+            const currentDayOfWeek = now.getDay(); // 0:日, 1:月, ..., 6:土
+            const currentDayAbbr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][currentDayOfWeek];
             const currentTime = now.toTimeString().substring(0, 5); // HH:MM形式
 
             alarms.forEach(alarm => {
                 // 毎日アラームの場合、または今日の曜日が設定されている場合
-                if (alarm.days.includes('毎日') || alarm.days.includes(currentDay)) {
+                if (alarm.days.includes('毎日') || alarm.days.includes(currentDayAbbr)) {
                     if (alarm.time === currentTime) {
-                        // 既に鳴らしたアラームは重複して鳴らさないようにフラグ管理も可能だが、ここではシンプルに
                         alert(`アラーム: ${alarm.label || '指定時刻です'}`);
                         showDesktopNotification('アラーム', `${alarm.label || '指定時刻です'} - ${alarm.time}`);
 
@@ -776,7 +961,7 @@
         // --- ⑤ ポモドーロタイマー ---
 
         // ポモドーロタイマーのHTMLを生成する関数
-        function createPomodoroTimerHTML(id, workTime = 25, roundCount = 4, loopEnabled = true) {
+        function createPomodoroTimerHTML(id, workTime = 25, breakTime = 5, roundCount = 4, loopEnabled = true) {
             const timerDiv = document.createElement('div');
             timerDiv.classList.add('pomodoro-timer');
             timerDiv.dataset.id = id;
@@ -784,13 +969,13 @@
             timerDiv.innerHTML = `
                 <h3 class="neon-text">ポモドーロ ${id + 1}</h3>
                 <div class="timer-config">
-                    <label class="neon-label">作業時間:</label>
+                    <label class="neon-label">作業:</label>
                     <input type="number" class="pomodoro-work-time" min="1" max="59" value="${workTime}"> 分
-                    <label class="neon-label">休憩時間:</label>
-                    <input type="number" class="pomodoro-break-time" min="1" max="59" value="5"> 分
+                    <label class="neon-label">休憩:</label>
+                    <input type="number" class="pomodoro-break-time" min="1" max="59" value="${breakTime}"> 分
                 </div>
                 <div class="timer-config">
-                    <label class="neon-label">ラウンド数:</label>
+                    <label class="neon-label">ラウンド:</label>
                     <input type="number" class="pomodoro-round-count" min="1" max="10" value="${roundCount}">
                 </div>
                 <div class="pomodoro-display neon-text">--:--</div>
@@ -800,8 +985,9 @@
                 </div>
                 <div class="pomodoro-loop-toggle">
                     <input type="checkbox" class="pomodoro-loop-toggle-checkbox" ${loopEnabled ? 'checked' : ''}>
-                    <label class="neon-label">ループする</label>
+                    <label class="neon-label">ループ</label>
                 </div>
+                <button class="neon-button pomodoro-delete-button">タイマー削除</button>
             `;
             return timerDiv;
         }
@@ -820,6 +1006,7 @@
         function setupPomodoroEventListeners(timerElement) {
             const startButton = timerElement.querySelector('.start-pomodoro');
             const resetButton = timerElement.querySelector('.reset-pomodoro');
+            const deleteButton = timerElement.querySelector('.pomodoro-delete-button');
             const display = timerElement.querySelector('.pomodoro-display');
             const workTimeInput = timerElement.querySelector('.pomodoro-work-time');
             const breakTimeInput = timerElement.querySelector('.pomodoro-break-time');
@@ -917,6 +1104,11 @@
                 resetPomodoro();
             });
 
+            // 削除ボタンのイベント
+            deleteButton.addEventListener('click', () => {
+                timerElement.remove();
+            });
+
             // 時間入力フィールドの変更イベント（バリデーション付き）
             const updateDurations = () => {
                 workDuration = parseInt(workTimeInput.value) * 60;
@@ -959,9 +1151,178 @@
             setupPomodoroEventListeners(newTimerElement);
         });
 
+        // --- 新規：タイマー機能 ---
+
+        // タイマーのHTMLを生成する関数
+        function createTimerHTML(id, initialHours = 0, initialMinutes = 0, initialSeconds = 0) {
+            const timerDiv = document.createElement('div');
+            timerDiv.classList.add('timer');
+            timerDiv.dataset.id = id;
+
+            timerDiv.innerHTML = `
+                <h3 class="neon-text">タイマー ${id + 1}</h3>
+                <div class="timer-config">
+                    <div class="time-input-group">
+                        <label class="neon-label">時:</label>
+                        <input type="number" class="timer-hours" min="0" max="23" value="${String(initialHours).padStart(2, '0')}">
+                    </div>
+                    <div class="time-input-group">
+                        <label class="neon-label">分:</label>
+                        <input type="number" class="timer-minutes" min="0" max="59" value="${String(initialMinutes).padStart(2, '0')}">
+                    </div>
+                    <div class="time-input-group">
+                        <label class="neon-label">秒:</label>
+                        <input type="number" class="timer-seconds" min="0" max="59" value="${String(initialSeconds).padStart(2, '0')}">
+                    </div>
+                </div>
+                <div class="timer-display neon-text">--:--:--</div>
+                <div class="timer-controls">
+                    <button class="neon-button start-timer">スタート</button>
+                    <button class="neon-button reset-timer">リセット</button>
+                </div>
+                <button class="neon-button timer-delete-button">タイマー削除</button>
+            `;
+            return timerDiv;
+        }
+
+        // タイマーのイベントリスナーを設定する関数
+        function setupTimerEventListeners(timerElement) {
+            const startButton = timerElement.querySelector('.start-timer');
+            const resetButton = timerElement.querySelector('.reset-timer');
+            const deleteButton = timerElement.querySelector('.timer-delete-button');
+            const display = timerElement.querySelector('.timer-display');
+            const hoursInput = timerElement.querySelector('.timer-hours');
+            const minutesInput = timerElement.querySelector('.timer-minutes');
+            const secondsInput = timerElement.querySelector('.timer-seconds');
+
+            let timerInterval;
+            let currentSeconds;
+            let isTimerRunning = false;
+
+            // 表示を更新する関数
+            function updateTimerDisplay() {
+                display.textContent = formatTimeHMS(currentSeconds);
+            }
+
+            // タイマーをリセットする関数
+            function resetTimer() {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                const h = parseInt(hoursInput.value) || 0;
+                const m = parseInt(minutesInput.value) || 0;
+                const s = parseInt(secondsInput.value) || 0;
+                currentSeconds = clampTimeToMax(h * 3600 + m * 60 + s); // 最大値補正
+                updateTimerDisplay();
+                startButton.textContent = 'スタート';
+            }
+
+            // タイマーのカウントダウン関数
+            function countdownTimer() {
+                currentSeconds--;
+                if (currentSeconds < 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    alert('タイマー終了！');
+                    showDesktopNotification('タイマー', '設定した時間が終了しました！');
+                    currentSeconds = 0; // 0秒にリセット
+                }
+                updateTimerDisplay();
+            }
+
+            // スタート/ストップボタンのイベント
+            startButton.addEventListener('click', () => {
+                if (!isTimerRunning) {
+                    // 初期化または再開
+                    const h = parseInt(hoursInput.value) || 0;
+                    const m = parseInt(minutesInput.value) || 0;
+                    const s = parseInt(secondsInput.value) || 0;
+                    const initialTotalSeconds = clampTimeToMax(h * 3600 + m * 60 + s); // 最大値補正
+
+                    if (currentSeconds === undefined || currentSeconds <= 0 || initialTotalSeconds > 0 && currentSeconds === initialTotalSeconds) {
+                        // 初回起動またはリセット後
+                        currentSeconds = initialTotalSeconds;
+                    }
+
+                    if (currentSeconds <= 0) { // 設定時間が0秒の場合は開始しない
+                        alert("時間を設定してください。");
+                        return;
+                    }
+
+                    isTimerRunning = true;
+                    startButton.textContent = 'ストップ';
+                    timerInterval = setInterval(countdownTimer, 1000); // 1秒ごとに更新
+                    updateTimerDisplay(); // 即時反映
+                } else {
+                    // ストップ
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    startButton.textContent = '再開';
+                }
+            });
+
+            // リセットボタンのイベント
+            resetButton.addEventListener('click', () => {
+                resetTimer();
+            });
+
+            // 削除ボタンのイベント
+            deleteButton.addEventListener('click', () => {
+                timerElement.remove();
+            });
+
+            // 時間入力フィールドの変更イベント（バリデーション付き）
+            const updateTimerConfig = () => {
+                const h = parseInt(hoursInput.value) || 0;
+                const m = parseInt(minutesInput.value) || 0;
+                const s = parseInt(secondsInput.value) || 0;
+                const totalSeconds = clampTimeToMax(h * 3600 + m * 60 + s); // 最大値補正
+
+                // タイマーが停止している場合のみ表示を更新
+                if (!isTimerRunning) {
+                    currentSeconds = totalSeconds;
+                    updateTimerDisplay();
+                }
+            };
+
+            hoursInput.addEventListener('change', updateTimerConfig);
+            minutesInput.addEventListener('change', updateTimerConfig);
+            secondsInput.addEventListener('change', updateTimerConfig);
+
+            // 初期表示設定
+            resetTimer();
+        }
+
+        // タイマー追加ボタンのイベント
+        document.getElementById('add-timer-button').addEventListener('click', () => {
+            const timerTemplates = document.getElementById('timer-templates');
+            const newTimerElement = createTimerHTML(nextTimerId++);
+            timerTemplates.appendChild(newTimerElement);
+            setupTimerEventListeners(newTimerElement);
+        });
+
+        // --- 通知設定ON/OFF ---
+        const notificationToggle = document.getElementById('notification-toggle');
+        const notificationPrompt = document.getElementById('notification-prompt');
+
+        // 通知トグルボタンのイベントリスナー
+        notificationToggle.addEventListener('change', () => {
+            isNotificationEnabled = notificationToggle.checked;
+            if (isNotificationEnabled && !notificationPermissionGranted) {
+                // ONにしたが、まだ許可されていない場合は、再度許可を求める
+                notificationPrompt.innerText = '通知を有効にするには、許可が必要です。';
+                notificationPrompt.classList.add('show');
+                requestNotificationPermission(); // 通知許可を再要求
+            } else if (!isNotificationEnabled) {
+                notificationPrompt.classList.remove('show'); // OFFにした場合はプロンプトを隠す
+            } else {
+                notificationPrompt.classList.remove('show'); // ONで許可済みの場合はプロンプトを隠す
+            }
+        });
+
         // --- 初期化処理 ---
         initializePomodoros(); // 初期ポモドーロタイマーを生成
         requestNotificationPermission(); // 通知の許可を求める
+        setupTimerEventListeners(createTimerHTML(nextTimerId++)); // 初期タイマーを生成してイベント設定
 
     </script>
 </body>
