@@ -58,15 +58,10 @@
 
   /* ===== 通知設定パネル ===== */
   #notifPanel {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
     background: rgba(255,0,229,0.06);
     border: 1px solid rgba(255,0,229,0.35);
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 18px;
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;
     box-shadow: 0 0 15px rgba(255,0,229,0.15);
   }
   #notifPanel .notif-label {
@@ -85,7 +80,6 @@
   #notifPanel .status-text.blocked { color: var(--neon-pink); text-shadow: 0 0 6px var(--neon-pink); }
   #notifPanel .spacer { flex: 1; }
 
-  /* ===== 大きなトグルスイッチ ===== */
   .big-switch {
     position: relative; width: 68px; height: 34px; border-radius: 17px;
     background: rgba(0,0,0,0.55); border: 1px solid #555;
@@ -340,6 +334,12 @@
     border: 1px solid rgba(0,240,255,0.2);
     border-radius: 10px; margin-bottom: 8px;
     background: rgba(0,0,0,0.3);
+    transition: all 0.2s;
+  }
+  .interval-item {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 12px 10px;
   }
   .alarm-item .alarm-days { display: flex; gap: 4px; font-size: 0.75rem; }
   .alarm-item .alarm-days span { padding: 2px 5px; border-radius: 5px; background: rgba(176,38,255,0.15); color: #8a8aa8; }
@@ -385,17 +385,110 @@
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* ===== インターバル専用 ===== */
   .interval-item .idx {
-    width: 26px; height: 26px; border-radius: 50%;
+    width: 28px; height: 28px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     background: rgba(176,38,255,0.25);
     border: 1px solid var(--neon-purple);
     color: #fff; font-size: 0.8rem;
     box-shadow: 0 0 8px rgba(176,38,255,0.5); flex-shrink: 0;
   }
-  .interval-item.active { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57,255,20,0.4); }
+  .interval-item.active {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 15px rgba(57,255,20,0.5);
+    background: rgba(57,255,20,0.08);
+  }
+  .interval-item .step-flags {
+    display: flex; flex-direction: column; gap: 4px;
+    flex-shrink: 0;
+  }
+  .flag-toggle {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.7rem; cursor: pointer;
+    color: #8a8aa8; user-select: none;
+    padding: 2px 6px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.3);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .flag-toggle:hover { border-color: rgba(0,240,255,0.4); }
+  .flag-toggle.on {
+    color: var(--neon-green);
+    border-color: var(--neon-green);
+    background: rgba(57,255,20,0.15);
+    text-shadow: 0 0 5px var(--neon-green);
+    box-shadow: 0 0 6px rgba(57,255,20,0.4);
+  }
+  .flag-toggle.repeat-start.on {
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    background: rgba(0,240,255,0.15);
+    text-shadow: 0 0 5px var(--neon-cyan);
+    box-shadow: 0 0 6px rgba(0,240,255,0.4);
+  }
+  .flag-toggle .flag-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #444; transition: all 0.15s;
+  }
+  .flag-toggle.on .flag-dot { background: currentColor; box-shadow: 0 0 6px currentColor; }
 
-  ::-webkit-scrollbar { width: 8px; }
+  .interval-item .step-display {
+    flex: 1;
+    min-width: 100px;
+    font-size: 0.9rem;
+    color: var(--neon-green);
+    text-shadow: 0 0 8px var(--neon-green);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  #roundControl {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 12px 14px;
+    background: rgba(176,38,255,0.08);
+    border: 1px solid rgba(176,38,255,0.4);
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  #roundControl label {
+    font-size: 0.85rem;
+    color: #d6c8ff;
+    text-shadow: 0 0 6px rgba(176,38,255,0.5);
+    letter-spacing: 1px;
+  }
+  #roundControl input[type=number] {
+    width: 70px; text-align: center; font-size: 1.2rem;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--neon-purple);
+    border-radius: 8px;
+    color: var(--neon-purple);
+    text-shadow: 0 0 8px var(--neon-purple);
+    padding: 6px; outline: none; font-family: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+  #roundControl input[type=number]::-webkit-outer-spin-button,
+  #roundControl input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  #roundControl input[type=number] { -moz-appearance: textfield; }
+  #roundControl input[type=number]:focus {
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+    box-shadow: 0 0 12px var(--neon-pink);
+  }
+  #roundControl .round-info {
+    font-size: 0.8rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 6px var(--neon-cyan);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,240,255,0.4);
+    background: rgba(0,240,255,0.06);
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.4); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(0,240,255,0.6); }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -507,14 +600,27 @@
 <!-- ========== インターバルタイマー ========== -->
 <div class="panel">
   <div class="panel-title">🔁 インターバルタイマー</div>
+
+  <!-- ラウンド設定 -->
+  <div id="roundControl">
+    <label>🔂 ラウンド数</label>
+    <input type="number" id="roundCount" min="1" max="999" value="1">
+    <span style="font-size:0.85rem; opacity:0.6;">回</span>
+    <div class="round-info" id="roundInfo">ラウンド 0 / 1</div>
+  </div>
+
   <div id="intervalList"></div>
+
   <div class="row" style="margin-top:10px;">
     <button class="green" id="ivAdd">＋ 追加</button>
     <button class="green" id="ivStart">スタート</button>
     <button class="pink" id="ivStop">ストップ</button>
     <button id="ivReset">停止(リセット)</button>
   </div>
-  <div class="hint">各マスごとに時間入力 / 上から順に実行</div>
+  <div class="hint">
+    各マスごとに時間入力 / 上から順に実行<br>
+    各ステップのフラグ: <span style="color:var(--neon-cyan);">▶開始</span> = ここからリピート開始 / <span style="color:var(--neon-green);">✕終了</span> = ここでリピートしない(このラウンドの最後)
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -544,13 +650,11 @@ try {
 
 /* =========================================================
    音生成エンジン (Web Audio API)
-   - 再生中ノードを管理し、新しい再生時に前の音を停止
-   - 「最後まで流す」ために playSound は Promise を返す
 ========================================================= */
 let audioCtx = null;
-let activeNodes = [];       // { osc, gain }
-let playSession = 0;        // 世代番号 - 新しい再生で古いタイマーを無効化
-let soundPlaying = false;   // 通知音再生中フラグ (トーストのビープ抑制用)
+let activeNodes = [];
+let playSession = 0;
+let soundPlaying = false;
 
 function getAudioCtx() {
   if (!audioCtx) {
@@ -560,9 +664,8 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-// 再生中の音をすべて止める
 function stopAllSounds() {
-  playSession++;  // 世代を進める → 予約済みの setTimeout を無効化
+  playSession++;
   activeNodes.forEach(({ osc }) => {
     try { osc.stop(); } catch(e) {}
     try { osc.disconnect(); } catch(e) {}
@@ -571,24 +674,30 @@ function stopAllSounds() {
   soundPlaying = false;
 }
 
-// 単音をスケジュール (Promise を返さない低レベル関数)
-function scheduleTone(freq, durationMs, type, volume, startDelay, session) {
+// duration は「メインの音」の長さ。release は余韻(フェードアウト)の長さ。
+function scheduleTone(freq, durationMs, type, volume, startDelay, session, releaseMs = 150) {
   try {
     const ctx = getAudioCtx();
     const t0 = ctx.currentTime + startDelay / 1000;
+    const mainEnd = t0 + durationMs / 1000;
+    const totalEnd = mainEnd + releaseMs / 1000;
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = type;
     osc.frequency.value = freq;
+
+    // アタック → サステイン → 余韻
     gain.gain.setValueAtTime(0.0001, t0);
     gain.gain.exponentialRampToValueAtTime(volume, t0 + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + durationMs / 1000);
+    gain.gain.setValueAtTime(volume, mainEnd);
+    gain.gain.exponentialRampToValueAtTime(0.0001, totalEnd);
+
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(t0);
-    osc.stop(t0 + durationMs / 1000 + 0.05);
+    osc.stop(totalEnd + 0.05);
 
-    // セッションが変わっていたら追加しない(停止済み扱い)
     if (session === playSession) {
       activeNodes.push({ osc, gain });
     } else {
@@ -597,29 +706,26 @@ function scheduleTone(freq, durationMs, type, volume, startDelay, session) {
   } catch(e) {}
 }
 
-// サウンドごとの「総再生時間(ミリ秒)」を計算
 function getSoundDuration(soundId) {
   switch (soundId) {
-    case 'beep':                return 650;
-    case 'iphone-reflection':   return 1400;
-    case 'iphone-ripple':       return 800;
-    case 'iphone-marimba':      return 180 * 3 + 300;
-    case 'iphone-xylophone':    return 160 * 3 + 250;
-    case 'iphone-opens':        return 200 * 3 + 400;
-    case 'famima':              return 2750;  // 11音 × 250ms
-    case 'alarm-classic':       return 300 * 2 + 200;
-    case 'alarm-digital':       return 150 * 3 + 100;
-    case 'chime':               return 650 + 800;
-    default:                    return 700;
+    case 'beep':                return 300 + 350 + 300 + 150;
+    case 'iphone-reflection':   return 400 + 400 + 600 + 200;
+    case 'iphone-ripple':       return 200 + 200 + 400 + 150;
+    case 'iphone-marimba':      return 180 * 3 + 300 + 200;
+    case 'iphone-xylophone':    return 160 * 3 + 250 + 150;
+    case 'iphone-opens':        return 200 * 3 + 400 + 200;
+    case 'famima':              return 250 * 10 + 250 + 400;  // 11音(休符含む) + 最後の音 + 余韻
+    case 'alarm-classic':       return 300 * 2 + 200 + 200;
+    case 'alarm-digital':       return 150 * 3 + 100 + 100;
+    case 'chime':               return 650 + 800 + 300;
+    default:                    return 800;
   }
 }
 
-// サウンドを再生 - 最後まで流れる
 function playSound(soundId) {
   const sound = SOUNDS.find(s => s.id === soundId) || SOUNDS[0];
   const session = ++playSession;
 
-  // 前の音を停止
   activeNodes.forEach(({ osc }) => {
     try { osc.stop(); } catch(e) {}
     try { osc.disconnect(); } catch(e) {}
@@ -630,8 +736,8 @@ function playSound(soundId) {
   const dur = getSoundDuration(sound.id);
 
   if (sound.id === 'beep') {
-    scheduleTone(880, 300, 'sine', 0.25, 0,     session);
-    scheduleTone(880, 300, 'sine', 0.25, 350,   session);
+    scheduleTone(880, 300, 'sine', 0.25, 0,    session);
+    scheduleTone(880, 300, 'sine', 0.25, 350,  session);
 
   } else if (sound.id === 'iphone-reflection') {
     scheduleTone(659.25, 400, 'sine', 0.2, 0,   session);
@@ -661,21 +767,26 @@ function playSound(soundId) {
   } else if (sound.id === 'famima') {
     // ファミマ入店音「大盛況」
     // シ→ソ→レ→ソ→ラ→レ→(休符)→レ→ラ→シ→ラ
-    const q = 250; // 四分音符
+    const q = 250;
     const notes = [
-      { f: 493.88, d: q, delay: q * 0 },
-      { f: 392.00, d: q, delay: q * 1 },
-      { f: 293.66, d: q, delay: q * 2 },
-      { f: 392.00, d: q, delay: q * 3 },
-      { f: 440.00, d: q, delay: q * 4 },
-      { f: 587.33, d: q, delay: q * 5 },
-      // 休符 (q * 6 は無音)
-      { f: 587.33, d: q, delay: q * 7 },
-      { f: 440.00, d: q, delay: q * 8 },
-      { f: 493.88, d: q, delay: q * 9 },
-      { f: 440.00, d: q, delay: q * 10 },
+      { f: 493.88, d: q, delay: q * 0 },   // シ
+      { f: 392.00, d: q, delay: q * 1 },   // ソ
+      { f: 293.66, d: q, delay: q * 2 },   // レ
+      { f: 392.00, d: q, delay: q * 3 },   // ソ
+      { f: 440.00, d: q, delay: q * 4 },   // ラ
+      { f: 587.33, d: q, delay: q * 5 },   // レ
+      // 休符 (q * 6) - 何も鳴らさない
+      { f: 587.33, d: q, delay: q * 7 },   // レ
+      { f: 440.00, d: q, delay: q * 8 },   // ラ
+      { f: 493.88, d: q, delay: q * 9 },   // シ
+      { f: 440.00, d: q, delay: q * 10 },  // ラ
+      { f: 440.00, d: q * 1.5, delay: q * 11 },  // ラ (最後の伸ばし)
     ];
-    notes.forEach(n => scheduleTone(n.f, n.d, 'sine', 0.25, n.delay, session));
+    // 最後の音は余韻長めに
+    notes.forEach((n, i) => {
+      const isLast = i === notes.length - 1;
+      scheduleTone(n.f, n.d, 'sine', 0.25, n.delay, session, isLast ? 400 : 150);
+    });
 
   } else if (sound.id === 'alarm-classic') {
     [880, 880, 880].forEach((f, i) => {
@@ -696,7 +807,6 @@ function playSound(soundId) {
     scheduleTone(880, 300, 'sine', 0.25, 0, session);
   }
 
-  // 全長ぶん待ってからフラグを落とす (この間はトーストのビープを抑制)
   const mySession = session;
   setTimeout(() => {
     if (mySession === playSession) {
@@ -774,7 +884,6 @@ function selectSound(id) {
   const s = SOUNDS.find(x => x.id === id);
   soundSelectName.textContent = s ? s.name : 'ビープ音';
   closeSoundDropdown();
-  // 選んだ音を最初から最後まで再生
   playSound(id);
   toast('🔊 通知音を「' + (s ? s.name : '') + '」に変更', false);
 }
@@ -794,13 +903,11 @@ soundSearch.addEventListener('input', () => {
 
 soundDropdown.onclick = (e) => e.stopPropagation();
 
-// 試聴: 最後まで再生
 soundTest.onclick = () => {
   playSound(currentSoundId);
   toast('🔊 試聴中...', false);
 };
 
-// 停止ボタン
 soundStopBtn.onclick = () => {
   stopAllSounds();
   toast('■ 停止しました', false);
@@ -814,7 +921,7 @@ const initialSound = SOUNDS.find(s => s.id === currentSoundId);
 if (initialSound) soundSelectName.textContent = initialSound.name;
 
 /* =========================================================
-   通知設定 (ON/OFF 切り替え + localStorage 保存)
+   通知設定 (ON/OFF 切り替え)
 ========================================================= */
 const notifToggle     = document.getElementById('notifToggle');
 const notifStatusText = document.getElementById('notifStatusText');
@@ -840,9 +947,7 @@ function renderNotifPanel() {
     notifRequest.disabled = true;
     return;
   }
-
   notifToggle.classList.toggle('on', notifEnabled);
-
   if (!notifEnabled) {
     notifStatusText.textContent = 'OFF';
     notifStatusText.className = 'status-text off';
@@ -871,15 +976,10 @@ notifToggle.onclick = () => {
   notifEnabled = !notifEnabled;
   localStorage.setItem(NOTIF_PREF_KEY, notifEnabled ? 'on' : 'off');
   renderNotifPanel();
-
   if (notifEnabled) {
-    if (Notification.permission === 'default') {
-      requestNotifPermission();
-    } else if (Notification.permission === 'granted') {
-      toast('🔔 通知を ON にしました', false);
-    } else if (Notification.permission === 'denied') {
-      toast('⚠ ブラウザでブロックされています', false);
-    }
+    if (Notification.permission === 'default') requestNotifPermission();
+    else if (Notification.permission === 'granted') toast('🔔 通知を ON にしました', false);
+    else if (Notification.permission === 'denied') toast('⚠ ブラウザでブロックされています', false);
   } else {
     toast('🔕 通知を OFF にしました', false);
   }
@@ -899,10 +999,7 @@ notifRequest.onclick = () => {
 
 async function requestNotifPermission() {
   if (!NOTIF_SUPPORTED) return;
-  if (Notification.permission === 'denied') {
-    toast('ブラウザ設定で通知を許可してください', false);
-    return;
-  }
+  if (Notification.permission === 'denied') { toast('ブラウザ設定で通知を許可してください', false); return; }
   const res = await Notification.requestPermission();
   renderNotifPanel();
   if (res === 'granted') {
@@ -940,12 +1037,10 @@ function showDesktopNotification(title, body, opts = {}) {
 renderNotifPanel();
 
 /* =========================================================
-   画面内トースト (音は鳴らさない)
-   - 通知音は「タイマー/アラーム終了時」と「音の試聴」のみ
+   トースト
 ========================================================= */
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
-
 function toast(msg) {
   toastEl.textContent = msg;
   toastEl.classList.add('show');
@@ -953,7 +1048,6 @@ function toast(msg) {
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3500);
 }
 
-// 通知 + デスクトップ通知 + 通知音 (音は最後まで)
 function notifyAll(title, body, opts = {}) {
   showDesktopNotification(title, body, opts);
   toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''));
@@ -961,7 +1055,7 @@ function notifyAll(title, body, opts = {}) {
 }
 
 /* =========================================================
-   世界時計 (クリックでドロップダウン表示)
+   世界時計
 ========================================================= */
 const tzList = (typeof Intl.supportedValuesOf === 'function')
   ? Intl.supportedValuesOf('timeZone')
@@ -981,9 +1075,7 @@ function cityFromTz(tz) { return tz.split('/').pop().replace(/_/g, ' '); }
 function getOffsetStr(tz) {
   try {
     const now = new Date();
-    const dtf = new Intl.DateTimeFormat('en-US', {
-      timeZone: tz, timeZoneName: 'shortOffset'
-    });
+    const dtf = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
     const parts = dtf.formatToParts(now);
     const off = parts.find(p => p.type === 'timeZoneName');
     if (off) return off.value.replace('GMT', 'UTC');
@@ -1012,21 +1104,17 @@ function renderTzDropdown(filter = '') {
   } else {
     tzFiltered = [...tzList];
   }
-
   tzResults.innerHTML = '';
-
   if (tzFiltered.length === 0) {
     tzResults.innerHTML = '<div class="tz-empty">該当するタイムゾーンがありません</div>';
     return;
   }
-
   const groups = {};
   tzFiltered.forEach(tz => {
     const g = groupTz(tz);
     if (!groups[g]) groups[g] = [];
     groups[g].push(tz);
   });
-
   const order = ['アジア','ヨーロッパ','アメリカ','オセアニア','アフリカ','太平洋','大西洋','インド洋','その他'];
   const sortedGroups = Object.keys(groups).sort((a, b) => {
     const ia = order.indexOf(a), ib = order.indexOf(b);
@@ -1035,13 +1123,11 @@ function renderTzDropdown(filter = '') {
     if (ib === -1) return -1;
     return ia - ib;
   });
-
   sortedGroups.forEach(gName => {
     const header = document.createElement('div');
     header.className = 'tz-group';
     header.textContent = gName;
     tzResults.appendChild(header);
-
     groups[gName].forEach(tz => {
       const item = document.createElement('div');
       item.className = 'tz-item';
@@ -1052,10 +1138,7 @@ function renderTzDropdown(filter = '') {
         <span class="tz-offset">${getOffsetStr(tz)}</span>
       `;
       item.dataset.tz = tz;
-      item.onclick = (e) => {
-        e.stopPropagation();
-        selectTz(tz);
-      };
+      item.onclick = (e) => { e.stopPropagation(); selectTz(tz); };
       tzResults.appendChild(item);
     });
   });
@@ -1067,13 +1150,11 @@ function openTzDropdown() {
   renderTzDropdown(tzSearch.value);
   tzActiveIndex = -1;
 }
-
 function closeTzDropdown() {
   tzSearch.classList.remove('open');
   tzResults.classList.remove('open');
   tzActiveIndex = -1;
 }
-
 function selectTz(tz) {
   if (!clocks.some(c => c.tz === tz)) {
     clocks.push({ tz, label: cityFromTz(tz) });
@@ -1129,11 +1210,9 @@ tzSearch.addEventListener('input', () => {
   renderTzDropdown(tzSearch.value);
   tzActiveIndex = -1;
 });
-
 tzSearch.addEventListener('keydown', e => {
   const items = [...tzResults.querySelectorAll('.tz-item')];
   if (!items.length) return;
-
   if (e.key === 'ArrowDown') {
     e.preventDefault();
     tzActiveIndex = Math.min(tzActiveIndex + 1, items.length - 1);
@@ -1144,26 +1223,19 @@ tzSearch.addEventListener('keydown', e => {
     updateActiveItem(items);
   } else if (e.key === 'Enter') {
     e.preventDefault();
-    if (tzActiveIndex >= 0 && items[tzActiveIndex]) {
-      selectTz(items[tzActiveIndex].dataset.tz);
-    }
+    if (tzActiveIndex >= 0 && items[tzActiveIndex]) selectTz(items[tzActiveIndex].dataset.tz);
   } else if (e.key === 'Escape') {
     closeTzDropdown();
     tzSearch.blur();
   }
 });
-
 function updateActiveItem(items) {
   items.forEach((it, i) => it.classList.toggle('active', i === tzActiveIndex));
   if (items[tzActiveIndex]) items[tzActiveIndex].scrollIntoView({ block: 'nearest' });
 }
-
 document.addEventListener('click', e => {
-  if (!tzSearch.contains(e.target) && !tzResults.contains(e.target)) {
-    closeTzDropdown();
-  }
+  if (!tzSearch.contains(e.target) && !tzResults.contains(e.target)) closeTzDropdown();
 });
-
 renderClocks();
 
 /* =========================================================
@@ -1215,8 +1287,7 @@ document.getElementById('timerStart').onclick = () => {
     if (timerRemaining <= 0) {
       clearInterval(timerId);
       timerRunning = false;
-      // 音はここで1回だけ鳴らす(最後まで)
-      notifyAll('⏱ タイマー終了', '設定した時間になりました', { tag: 'timer', requireInteraction: true, icon: '⏱' });
+      notifyAll('タイマー終了', '設定した時間になりました', { tag: 'timer', requireInteraction: true });
     }
   }, 1000);
 };
@@ -1225,7 +1296,6 @@ document.getElementById('timerStop').onclick = () => {
   clearInterval(timerId);
   timerRunning = false;
 };
-
 document.getElementById('timerReset').onclick = () => {
   clearInterval(timerId);
   timerRunning = false;
@@ -1352,11 +1422,11 @@ setInterval(() => {
 
     const timeStr = `${String(a.h).padStart(2,'0')}:${String(a.m).padStart(2,'0')}`;
     if (a.days.length === 0) {
-      notifyAll('⏰ アラーム', `${timeStr} (1回のみ)`, { tag: 'alarm-' + a.id, requireInteraction: true, icon: '⏰' });
+      notifyAll('アラーム', `${timeStr} (1回のみ)`, { tag: 'alarm-' + a.id, requireInteraction: true });
       a.enabled = false;
       renderAlarms();
     } else if (a.days.includes(d)) {
-      notifyAll('⏰ アラーム', `${timeStr} (${DAY_NAMES[d]}曜日)`, { tag: 'alarm-' + a.id, requireInteraction: true, icon: '⏰' });
+      notifyAll('アラーム', `${timeStr} (${DAY_NAMES[d]}曜日)`, { tag: 'alarm-' + a.id, requireInteraction: true });
     }
     a.lastTriggered = key;
   });
@@ -1364,43 +1434,80 @@ setInterval(() => {
 
 /* =========================================================
    インターバルタイマー
+   - 各ステップ: 時:分:秒 の3マス
+   - ラウンド数指定
+   - ステップごとに「リピート開始」「リピートしない」フラグ
 ========================================================= */
 let intervals = [
-  { id: 1, h: 0, m: 0, s: 10 },
-  { id: 2, h: 0, m: 0, s: 5 }
+  { id: 1, h: 0, m: 0, s: 10, repeatStart: false, repeatStop: false },
+  { id: 2, h: 0, m: 0, s: 5,  repeatStart: true,  repeatStop: false },
+  { id: 3, h: 0, m: 0, s: 10, repeatStart: false, repeatStop: true },
 ];
-let ivSeq = 1;
+let ivSeq = 3;
 let ivRunning = false;
 let ivCurrentIndex = -1;
+let ivCurrentRound = 0;       // 現在のラウンド (1始まり)
+let ivTotalRounds = 1;
 let ivRemaining = 0;
 let ivId = null;
 
 const ivList = document.getElementById('intervalList');
+const roundCountInput = document.getElementById('roundCount');
+const roundInfoEl = document.getElementById('roundInfo');
+
+// ラウンド数の入力チェック
+roundCountInput.addEventListener('input', () => {
+  let v = parseInt(roundCountInput.value) || 1;
+  if (v < 1) v = 1;
+  if (v > 999) v = 999;
+  roundCountInput.value = v;
+  updateRoundInfo();
+});
+
+function updateRoundInfo() {
+  if (ivRunning) {
+    roundInfoEl.textContent = `ラウンド ${ivCurrentRound} / ${ivTotalRounds}`;
+  } else {
+    roundInfoEl.textContent = `ラウンド 0 / ${parseInt(roundCountInput.value) || 1}`;
+  }
+}
 
 function renderIntervals() {
   ivList.innerHTML = '';
   if (intervals.length === 0) {
-    ivList.innerHTML = '<div class="hint">インターバルを追加してください</div>';
+    ivList.innerHTML = '<div class="hint" style="margin:8px 0;">インターバルを追加してください</div>';
     return;
   }
+
   intervals.forEach((iv, i) => {
     const el = document.createElement('div');
-    el.className = 'interval-item' + (ivRunning && i === ivCurrentIndex ? ' active' : '');
+    const isActive = ivRunning && i === ivCurrentIndex;
+    el.className = 'interval-item' + (isActive ? ' active' : '');
+
     el.innerHTML = `
       <div class="idx">${i+1}</div>
       <div class="time-input">
-        <input type="number" min="0" max="23" value="${iv.h}" data-iv="${iv.id}" data-f="h" style="width:52px;font-size:1.2rem;">
-        <span class="colon" style="font-size:1.2rem;">:</span>
-        <input type="number" min="0" max="59" value="${iv.m}" data-iv="${iv.id}" data-f="m" style="width:52px;font-size:1.2rem;">
-        <span class="colon" style="font-size:1.2rem;">:</span>
-        <input type="number" min="0" max="59" value="${iv.s}" data-iv="${iv.id}" data-f="s" style="width:52px;font-size:1.2rem;">
+        <input type="number" min="0" max="23" value="${iv.h}" data-iv="${iv.id}" data-f="h" style="width:52px;font-size:1.3rem;">
+        <span class="colon" style="font-size:1.3rem;">:</span>
+        <input type="number" min="0" max="59" value="${iv.m}" data-iv="${iv.id}" data-f="m" style="width:52px;font-size:1.3rem;">
+        <span class="colon" style="font-size:1.3rem;">:</span>
+        <input type="number" min="0" max="59" value="${iv.s}" data-iv="${iv.id}" data-f="s" style="width:52px;font-size:1.3rem;">
       </div>
-      <div class="hint" style="flex:1;" data-ivdisp="${iv.id}"></div>
+      <div class="step-flags">
+        <div class="flag-toggle repeat-start ${iv.repeatStart ? 'on' : ''}" data-iv-flag="${iv.id}" data-flag="repeatStart" title="ここからリピート開始">
+          <span class="flag-dot"></span>▶開始
+        </div>
+        <div class="flag-toggle ${iv.repeatStop ? 'on' : ''}" data-iv-flag="${iv.id}" data-flag="repeatStop" title="ここでリピートしない">
+          <span class="flag-dot"></span>✕終了
+        </div>
+      </div>
+      <div class="step-display" data-ivdisp="${iv.id}"></div>
       <button class="pink small" data-ivdel="${iv.id}">削除</button>
     `;
     ivList.appendChild(el);
   });
 
+  // 時間入力
   ivList.querySelectorAll('input[data-iv]').forEach(inp => {
     inp.oninput = () => {
       const id = +inp.dataset.iv;
@@ -1414,6 +1521,19 @@ function renderIntervals() {
     };
   });
 
+  // フラグトグル
+  ivList.querySelectorAll('[data-iv-flag]').forEach(t => {
+    t.onclick = () => {
+      if (ivRunning) { toast('実行中は変更できません'); return; }
+      const id = +t.dataset.ivFlag;
+      const flag = t.dataset.flag;
+      const iv = intervals.find(x => x.id === id);
+      iv[flag] = !iv[flag];
+      renderIntervals();
+    };
+  });
+
+  // 削除
   ivList.querySelectorAll('[data-ivdel]').forEach(btn => {
     btn.onclick = () => {
       if (ivRunning) { toast('実行中は削除できません'); return; }
@@ -1433,7 +1553,6 @@ function updateIvDisplays() {
       el.textContent = '▶ ' + fmtHMS(ivRemaining);
       el.style.color = 'var(--neon-green)';
       el.style.textShadow = '0 0 8px var(--neon-green)';
-      el.style.opacity = 1;
     } else {
       el.textContent = '';
     }
@@ -1442,29 +1561,103 @@ function updateIvDisplays() {
 
 document.getElementById('ivAdd').onclick = () => {
   if (ivRunning) { toast('実行中は追加できません'); return; }
-  intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10 });
+  intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10, repeatStart: false, repeatStop: false });
   renderIntervals();
 };
 
 document.getElementById('ivStart').onclick = () => {
   if (ivRunning) return;
   if (intervals.length === 0) { toast('インターバルを追加してください'); return; }
+
+  ivTotalRounds = Math.max(1, parseInt(roundCountInput.value) || 1);
   ivRunning = true;
   ivCurrentIndex = 0;
+  ivCurrentRound = 1;
+  updateRoundInfo();
   runIvStep();
 };
 
+document.getElementById('ivStop').onclick = () => {
+  clearInterval(ivId);
+  ivRunning = false;
+  updateRoundInfo();
+};
+
+document.getElementById('ivReset').onclick = () => {
+  clearInterval(ivId);
+  ivRunning = false;
+  ivCurrentIndex = -1;
+  ivCurrentRound = 0;
+  ivRemaining = 0;
+  renderIntervals();
+  updateRoundInfo();
+};
+
+/* =========================================================
+   ステップ実行ロジック
+   - repeatStop があるステップを終えると1ラウンド完了
+   - repeatStop が無ければ末尾が暗黙のラウンド終端
+   - 次のラウンドは repeatStart フラグの位置から開始
+     無ければ先頭から
+========================================================= */
+function findRoundEndIndex() {
+  // 最初に見つかった repeatStop の位置、無ければ末尾
+  for (let i = 0; i < intervals.length; i++) {
+    if (intervals[i].repeatStop) return i;
+  }
+  return intervals.length - 1;
+}
+
+function findRoundStartIndex() {
+  // repeatStart の位置、無ければ 0
+  for (let i = 0; i < intervals.length; i++) {
+    if (intervals[i].repeatStart) return i;
+  }
+  return 0;
+}
+
 function runIvStep() {
-  if (ivCurrentIndex >= intervals.length) {
+  // 全ラウンド終了判定
+  if (ivCurrentRound > ivTotalRounds) {
     ivRunning = false;
     ivCurrentIndex = -1;
-    notifyAll('🔁 インターバル完了', '全ステップが終了しました', { tag: 'interval', requireInteraction: true, icon: '🔁' });
+    notifyAll('インターバル完了', `全 ${ivTotalRounds} ラウンド終了しました`, { tag: 'interval', requireInteraction: true });
     renderIntervals();
+    updateRoundInfo();
     return;
   }
+
+  const roundEnd = findRoundEndIndex();
+
+  // 現在のラウンドで末尾まで来た → 次ラウンドへ
+  if (ivCurrentIndex > roundEnd) {
+    ivCurrentRound++;
+    if (ivCurrentRound > ivTotalRounds) {
+      ivRunning = false;
+      ivCurrentIndex = -1;
+      notifyAll('インターバル完了', `全 ${ivTotalRounds} ラウンド終了しました`, { tag: 'interval', requireInteraction: true });
+      renderIntervals();
+      updateRoundInfo();
+      return;
+    }
+    // 次ラウンドの開始位置へ
+    ivCurrentIndex = findRoundStartIndex();
+    updateRoundInfo();
+    // 少し間を置いて次のラウンドへ
+    setTimeout(() => { if (ivRunning) runIvStep(); }, 500);
+    return;
+  }
+
   const iv = intervals[ivCurrentIndex];
   ivRemaining = iv.h*3600 + iv.m*60 + iv.s;
-  if (ivRemaining <= 0) { ivCurrentIndex++; runIvStep(); return; }
+
+  if (ivRemaining <= 0) {
+    // 0秒ステップはスキップ
+    ivCurrentIndex++;
+    runIvStep();
+    return;
+  }
+
   renderIntervals();
   updateIvDisplays();
 
@@ -1474,33 +1667,23 @@ function runIvStep() {
     updateIvDisplays();
     if (ivRemaining <= 0) {
       clearInterval(ivId);
+      const stepNum = ivCurrentIndex + 1;
+      const totalSteps = intervals.length;
       showDesktopNotification(
-        `🔔 ステップ ${ivCurrentIndex+1} 完了`,
-        `次はステップ ${ivCurrentIndex+2} です`,
+        `ステップ ${stepNum} / ${totalSteps} 完了`,
+        `ラウンド ${ivCurrentRound} / ${ivTotalRounds}`,
         { tag: 'iv-step-' + ivCurrentIndex, icon: '🔔' }
       );
-      toast(`🔔 ステップ ${ivCurrentIndex+1} 完了`);
-      playSound(currentSoundId); // 音は最後まで
+      toast(`ステップ ${stepNum} / ${totalSteps} 完了 (ラウンド ${ivCurrentRound}/${ivTotalRounds})`);
+      playSound(currentSoundId);
       ivCurrentIndex++;
       setTimeout(() => { if (ivRunning) runIvStep(); }, 400);
     }
   }, 1000);
 }
 
-document.getElementById('ivStop').onclick = () => {
-  clearInterval(ivId);
-  ivRunning = false;
-};
-
-document.getElementById('ivReset').onclick = () => {
-  clearInterval(ivId);
-  ivRunning = false;
-  ivCurrentIndex = -1;
-  ivRemaining = 0;
-  renderIntervals();
-};
-
 renderIntervals();
+updateRoundInfo();
 
 /* 初期表示 */
 updateSW();
