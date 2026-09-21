@@ -400,41 +400,6 @@
     background: rgba(57,255,20,0.08);
   }
 
-  .flag-toggle {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 0.72rem; cursor: pointer;
-    color: #8a8aa8; user-select: none;
-    padding: 4px 8px; border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(0,0,0,0.3);
-    transition: all 0.15s;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .flag-toggle:hover { border-color: rgba(0,240,255,0.4); }
-  .flag-toggle.on {
-    color: var(--neon-cyan);
-    border-color: var(--neon-cyan);
-    background: rgba(0,240,255,0.15);
-    text-shadow: 0 0 5px var(--neon-cyan);
-    box-shadow: 0 0 8px rgba(0,240,255,0.5);
-  }
-  .flag-toggle .flag-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #444; transition: all 0.15s;
-  }
-  .flag-toggle.on .flag-dot { background: currentColor; box-shadow: 0 0 6px currentColor; }
-
-  .interval-item .step-display {
-    flex: 1;
-    min-width: 100px;
-    font-size: 0.9rem;
-    color: var(--neon-green);
-    text-shadow: 0 0 8px var(--neon-green);
-    font-variant-numeric: tabular-nums;
-    text-align: center;
-  }
-
   #roundControl {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     padding: 12px 14px;
@@ -659,8 +624,7 @@
     <button id="ivReset">停止(リセット)</button>
   </div>
   <div class="hint">
-    各マスごとに時間入力 / 上から順に実行<br>
-    ▶開始 = ここからリピート開始(このステップ以降を繰り返す)
+    各マスごとに時間入力 / 上から順に全ステップ実行 = 1ラウンド
   </div>
 </div>
 
@@ -715,7 +679,6 @@ function stopAllSounds() {
   soundPlaying = false;
 }
 
-// duration は「メインの音」の長さ。release は余韻(フェードアウト)の長さ。
 function scheduleTone(freq, durationMs, type, volume, startDelay, session, releaseMs = 150) {
   try {
     const ctx = getAudioCtx();
@@ -754,7 +717,6 @@ function getSoundDuration(soundId) {
     case 'iphone-marimba':      return 180 * 3 + 300 + 200;
     case 'iphone-xylophone':    return 160 * 3 + 250 + 150;
     case 'iphone-opens':        return 200 * 3 + 400 + 200;
-    // ファミマ原曲: 12音 + 最後の伸ばし + 余韻
     case 'famima':              return 220 * 12 + 440 + 500;
     case 'alarm-classic':       return 300 * 2 + 200 + 200;
     case 'alarm-digital':       return 150 * 3 + 100 + 100;
@@ -808,22 +770,20 @@ function playSound(soundId) {
   } else if (sound.id === 'famima') {
     // 本家ファミマ入店音「大盛況」- 原曲キー(ニ長調/Dメジャー)
     // ミ→ド→ソ(低)→ド→レ→ソ(高)→(休符)→ソ(低)→レ→ミ→レ→ソ(低)→ド
-    // (Dメジャー読み替え: ミ=F#4, ド=D4, ソ(低)=A3, レ=E4, ソ(高)=A4)
-    const q = 220;  // 4分音符
+    const q = 220;
     const notes = [
-      { f: 369.99, d: q,       delay: q * 0  },   // ファ# (F#4) = ミ
-      { f: 293.66, d: q,       delay: q * 1  },   // レ (D4)     = ド
-      { f: 220.00, d: q,       delay: q * 2  },   // ラ (A3)     = ソ(低)
-      { f: 293.66, d: q,       delay: q * 3  },   // レ (D4)     = ド
-      { f: 329.63, d: q,       delay: q * 4  },   // ミ (E4)     = レ
-      { f: 440.00, d: q,       delay: q * 5  },   // ラ (A4)     = ソ(高)
-      // 休符 (q * 6) は無音
-      { f: 220.00, d: q,       delay: q * 7  },   // ラ (A3)     = ソ(低)
-      { f: 293.66, d: q,       delay: q * 8  },   // レ (D4)     = ド
-      { f: 369.99, d: q,       delay: q * 9  },   // ファ# (F#4) = ミ
-      { f: 293.66, d: q,       delay: q * 10 },   // レ (D4)     = ド
-      { f: 220.00, d: q,       delay: q * 11 },   // ラ (A3)     = ソ(低)
-      { f: 293.66, d: q * 2,   delay: q * 12 },   // レ (D4)     = ド (最後は伸ばす)
+      { f: 369.99, d: q,       delay: q * 0  },
+      { f: 293.66, d: q,       delay: q * 1  },
+      { f: 220.00, d: q,       delay: q * 2  },
+      { f: 293.66, d: q,       delay: q * 3  },
+      { f: 329.63, d: q,       delay: q * 4  },
+      { f: 440.00, d: q,       delay: q * 5  },
+      { f: 220.00, d: q,       delay: q * 7  },
+      { f: 293.66, d: q,       delay: q * 8  },
+      { f: 369.99, d: q,       delay: q * 9  },
+      { f: 293.66, d: q,       delay: q * 10 },
+      { f: 220.00, d: q,       delay: q * 11 },
+      { f: 293.66, d: q * 2,   delay: q * 12 },
     ];
     notes.forEach((n, i) => {
       const isLast = i === notes.length - 1;
@@ -1476,15 +1436,13 @@ setInterval(() => {
 
 /* =========================================================
    インターバルタイマー
-   - 各ステップ: 時:分:秒 の3マス
-   - ラウンド数指定
-   - ステップごとに「▶開始」フラグ(ここからリピート開始)
-   - スタートで入力欄が隠れてタイマー表示に切り替わる
+   - 全ステップを1周 = 1ラウンド
+   - ラウンド数を指定して繰り返し
 ========================================================= */
 let intervals = [
-  { id: 1, h: 0, m: 0, s: 10, repeatStart: false },
-  { id: 2, h: 0, m: 0, s: 5,  repeatStart: true  },
-  { id: 3, h: 0, m: 0, s: 10, repeatStart: false },
+  { id: 1, h: 0, m: 0, s: 10 },
+  { id: 2, h: 0, m: 0, s: 5  },
+  { id: 3, h: 0, m: 0, s: 10 },
 ];
 let ivSeq = 3;
 let ivRunning = false;
@@ -1504,19 +1462,44 @@ const ivRoundLabel = document.getElementById('ivRoundLabel');
 const ivTimeBig = document.getElementById('ivTimeBig');
 const ivNextInfo = document.getElementById('ivNextInfo');
 
+// ラウンド数の入力チェック
+// - 入力中は空文字を許容(1を消して入力し直せるように)
+// - blur時・実行時に空/無効なら1に補正
 roundCountInput.addEventListener('input', () => {
-  let v = parseInt(roundCountInput.value) || 1;
+  const raw = roundCountInput.value;
+  if (raw === '') {
+    updateRoundInfo();
+    return;
+  }
+  let v = parseInt(raw, 10);
+  if (isNaN(v)) return;
   if (v < 1) v = 1;
   if (v > 999) v = 999;
-  roundCountInput.value = v;
+  if (String(v) !== raw) {
+    roundCountInput.value = v;
+  }
+  updateRoundInfo();
+});
+
+roundCountInput.addEventListener('blur', () => {
+  if (roundCountInput.value.trim() === '') {
+    roundCountInput.value = 1;
+  } else {
+    let v = parseInt(roundCountInput.value, 10);
+    if (isNaN(v) || v < 1) v = 1;
+    if (v > 999) v = 999;
+    roundCountInput.value = v;
+  }
   updateRoundInfo();
 });
 
 function updateRoundInfo() {
+  const rawVal = parseInt(roundCountInput.value, 10);
+  const displayTotal = (!isNaN(rawVal) && rawVal >= 1) ? rawVal : 1;
   if (ivRunning) {
     roundInfoEl.textContent = `ラウンド ${ivCurrentRound} / ${ivTotalRounds}`;
   } else {
-    roundInfoEl.textContent = `ラウンド 0 / ${parseInt(roundCountInput.value) || 1}`;
+    roundInfoEl.textContent = `ラウンド 0 / ${displayTotal}`;
   }
 }
 
@@ -1541,9 +1524,6 @@ function renderIntervals() {
         <span class="colon" style="font-size:1.3rem;">:</span>
         <input type="number" min="0" max="59" value="${iv.s}" data-iv="${iv.id}" data-f="s" style="width:52px;font-size:1.3rem;">
       </div>
-      <div class="flag-toggle ${iv.repeatStart ? 'on' : ''}" data-iv-flag="${iv.id}" title="ここからリピート開始">
-        <span class="flag-dot"></span>▶開始
-      </div>
       <button class="pink small" data-ivdel="${iv.id}">削除</button>
     `;
     ivList.appendChild(el);
@@ -1562,16 +1542,6 @@ function renderIntervals() {
     };
   });
 
-  ivList.querySelectorAll('[data-iv-flag]').forEach(t => {
-    t.onclick = () => {
-      if (ivRunning) { toast('実行中は変更できません'); return; }
-      const id = +t.dataset.ivFlag;
-      const iv = intervals.find(x => x.id === id);
-      iv.repeatStart = !iv.repeatStart;
-      renderIntervals();
-    };
-  });
-
   ivList.querySelectorAll('[data-ivdel]').forEach(btn => {
     btn.onclick = () => {
       if (ivRunning) { toast('実行中は削除できません'); return; }
@@ -1584,7 +1554,7 @@ function renderIntervals() {
 
 document.getElementById('ivAdd').onclick = () => {
   if (ivRunning) { toast('実行中は追加できません'); return; }
-  intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10, repeatStart: false });
+  intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10 });
   renderIntervals();
 };
 
@@ -1592,7 +1562,13 @@ document.getElementById('ivStart').onclick = () => {
   if (ivRunning) return;
   if (intervals.length === 0) { toast('インターバルを追加してください'); return; }
 
-  ivTotalRounds = Math.max(1, parseInt(roundCountInput.value) || 1);
+  // 空なら1として扱う
+  let rv = parseInt(roundCountInput.value, 10);
+  if (isNaN(rv) || rv < 1) rv = 1;
+  if (rv > 999) rv = 999;
+  roundCountInput.value = rv;
+  ivTotalRounds = rv;
+
   ivRunning = true;
   ivCurrentIndex = 0;
   ivCurrentRound = 1;
@@ -1627,18 +1603,6 @@ document.getElementById('ivReset').onclick = () => {
   updateRoundInfo();
 };
 
-/* =========================================================
-   ステップ実行ロジック
-   - repeatStart の位置から末尾までが1ラウンドの範囲
-   - 無ければ先頭から末尾まで
-========================================================= */
-function findRoundStartIndex() {
-  for (let i = 0; i < intervals.length; i++) {
-    if (intervals[i].repeatStart) return i;
-  }
-  return 0;
-}
-
 function updateIvRunningPanel() {
   if (!ivRunning) return;
   const cur = intervals[ivCurrentIndex];
@@ -1653,12 +1617,18 @@ function updateIvRunningPanel() {
     const nx = intervals[nextIdx];
     const nxSec = nx.h*3600 + nx.m*60 + nx.s;
     ivNextInfo.textContent = `次のステップ: ${fmtHMS(nxSec)}`;
+  } else if (ivCurrentRound < ivTotalRounds) {
+    ivNextInfo.textContent = `次: ラウンド ${ivCurrentRound + 1} の先頭ステップ`;
   } else {
-    ivNextInfo.textContent = 'このラウンドの最後のステップ';
+    ivNextInfo.textContent = '最後のステップです';
   }
 }
 
+/* =========================================================
+   ステップ実行ロジック (ラウンド = 全ステップを1周)
+========================================================= */
 function runIvStep() {
+  // 全ラウンド終了判定
   if (ivCurrentRound > ivTotalRounds) {
     ivRunning = false;
     ivCurrentIndex = -1;
@@ -1673,6 +1643,7 @@ function runIvStep() {
     return;
   }
 
+  // 1ラウンドの全ステップが終わった → 次ラウンドへ
   if (ivCurrentIndex >= intervals.length) {
     ivCurrentRound++;
     if (ivCurrentRound > ivTotalRounds) {
@@ -1688,7 +1659,8 @@ function runIvStep() {
       updateRoundInfo();
       return;
     }
-    ivCurrentIndex = findRoundStartIndex();
+    // 次ラウンドの先頭へ
+    ivCurrentIndex = 0;
     updateRoundInfo();
     renderIntervals();
     setTimeout(() => { if (ivRunning) runIvStep(); }, 500);
@@ -1719,7 +1691,7 @@ function runIvStep() {
       showDesktopNotification(
         `ステップ ${stepNum} / ${totalSteps} 完了`,
         `ラウンド ${ivCurrentRound} / ${ivTotalRounds}`,
-        { tag: 'iv-step-' + ivCurrentIndex }
+        { tag: 'iv-step-' + ivCurrentIndex + '-' + ivCurrentRound }
       );
       toast(`ステップ ${stepNum} / ${totalSteps} 完了 (ラウンド ${ivCurrentRound}/${ivTotalRounds})`);
       playSound(currentSoundId);
