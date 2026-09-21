@@ -399,34 +399,25 @@
     box-shadow: 0 0 15px rgba(57,255,20,0.5);
     background: rgba(57,255,20,0.08);
   }
-  .interval-item .step-flags {
-    display: flex; flex-direction: column; gap: 4px;
-    flex-shrink: 0;
-  }
+
   .flag-toggle {
     display: flex; align-items: center; gap: 5px;
-    font-size: 0.7rem; cursor: pointer;
+    font-size: 0.72rem; cursor: pointer;
     color: #8a8aa8; user-select: none;
-    padding: 2px 6px; border-radius: 4px;
+    padding: 4px 8px; border-radius: 6px;
     border: 1px solid rgba(255,255,255,0.15);
     background: rgba(0,0,0,0.3);
     transition: all 0.15s;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .flag-toggle:hover { border-color: rgba(0,240,255,0.4); }
   .flag-toggle.on {
-    color: var(--neon-green);
-    border-color: var(--neon-green);
-    background: rgba(57,255,20,0.15);
-    text-shadow: 0 0 5px var(--neon-green);
-    box-shadow: 0 0 6px rgba(57,255,20,0.4);
-  }
-  .flag-toggle.repeat-start.on {
     color: var(--neon-cyan);
     border-color: var(--neon-cyan);
     background: rgba(0,240,255,0.15);
     text-shadow: 0 0 5px var(--neon-cyan);
-    box-shadow: 0 0 6px rgba(0,240,255,0.4);
+    box-shadow: 0 0 8px rgba(0,240,255,0.5);
   }
   .flag-toggle .flag-dot {
     width: 8px; height: 8px; border-radius: 50%;
@@ -486,6 +477,45 @@
     border-radius: 20px;
     border: 1px solid rgba(0,240,255,0.4);
     background: rgba(0,240,255,0.06);
+  }
+
+  #ivRunningPanel {
+    display: none;
+    background: rgba(57,255,20,0.05);
+    border: 1px solid rgba(57,255,20,0.4);
+    border-radius: 12px;
+    padding: 20px 18px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(57,255,20,0.2);
+    margin-bottom: 12px;
+  }
+  #ivRunningPanel.show { display: block; }
+  #ivRunningPanel .iv-current-step {
+    font-size: 0.9rem;
+    color: var(--neon-purple);
+    text-shadow: 0 0 8px var(--neon-purple);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  #ivRunningPanel .iv-current-round {
+    font-size: 0.8rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px var(--neon-cyan);
+    margin-bottom: 12px;
+  }
+  #ivRunningPanel .iv-time-big {
+    font-size: 4rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--neon-green);
+    text-shadow: 0 0 15px var(--neon-green), 0 0 40px rgba(57,255,20,0.6);
+    letter-spacing: 4px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  #ivRunningPanel .iv-next-info {
+    font-size: 0.8rem;
+    color: #8a8aa8;
+    margin-top: 10px;
   }
 
   ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -609,7 +639,18 @@
     <div class="round-info" id="roundInfo">ラウンド 0 / 1</div>
   </div>
 
-  <div id="intervalList"></div>
+  <!-- 実行中のタイマー表示 -->
+  <div id="ivRunningPanel">
+    <div class="iv-current-step" id="ivStepLabel">ステップ 1 / 3</div>
+    <div class="iv-current-round" id="ivRoundLabel">ラウンド 1 / 1</div>
+    <div class="iv-time-big" id="ivTimeBig">00:00:00</div>
+    <div class="iv-next-info" id="ivNextInfo"></div>
+  </div>
+
+  <!-- 入力リスト(実行中は非表示) -->
+  <div id="ivInputList">
+    <div id="intervalList"></div>
+  </div>
 
   <div class="row" style="margin-top:10px;">
     <button class="green" id="ivAdd">＋ 追加</button>
@@ -619,7 +660,7 @@
   </div>
   <div class="hint">
     各マスごとに時間入力 / 上から順に実行<br>
-    各ステップのフラグ: <span style="color:var(--neon-cyan);">▶開始</span> = ここからリピート開始 / <span style="color:var(--neon-green);">✕終了</span> = ここでリピートしない(このラウンドの最後)
+    ▶開始 = ここからリピート開始(このステップ以降を繰り返す)
   </div>
 </div>
 
@@ -687,7 +728,6 @@ function scheduleTone(freq, durationMs, type, volume, startDelay, session, relea
     osc.type = type;
     osc.frequency.value = freq;
 
-    // アタック → サステイン → 余韻
     gain.gain.setValueAtTime(0.0001, t0);
     gain.gain.exponentialRampToValueAtTime(volume, t0 + 0.01);
     gain.gain.setValueAtTime(volume, mainEnd);
@@ -714,7 +754,8 @@ function getSoundDuration(soundId) {
     case 'iphone-marimba':      return 180 * 3 + 300 + 200;
     case 'iphone-xylophone':    return 160 * 3 + 250 + 150;
     case 'iphone-opens':        return 200 * 3 + 400 + 200;
-    case 'famima':              return 250 * 10 + 250 + 400;  // 11音(休符含む) + 最後の音 + 余韻
+    // ファミマ原曲: 12音 + 最後の伸ばし + 余韻
+    case 'famima':              return 220 * 12 + 440 + 500;
     case 'alarm-classic':       return 300 * 2 + 200 + 200;
     case 'alarm-digital':       return 150 * 3 + 100 + 100;
     case 'chime':               return 650 + 800 + 300;
@@ -765,27 +806,28 @@ function playSound(soundId) {
     });
 
   } else if (sound.id === 'famima') {
-    // ファミマ入店音「大盛況」
-    // シ→ソ→レ→ソ→ラ→レ→(休符)→レ→ラ→シ→ラ
-    const q = 250;
+    // 本家ファミマ入店音「大盛況」- 原曲キー(ニ長調/Dメジャー)
+    // ミ→ド→ソ(低)→ド→レ→ソ(高)→(休符)→ソ(低)→レ→ミ→レ→ソ(低)→ド
+    // (Dメジャー読み替え: ミ=F#4, ド=D4, ソ(低)=A3, レ=E4, ソ(高)=A4)
+    const q = 220;  // 4分音符
     const notes = [
-      { f: 493.88, d: q, delay: q * 0 },   // シ
-      { f: 392.00, d: q, delay: q * 1 },   // ソ
-      { f: 293.66, d: q, delay: q * 2 },   // レ
-      { f: 392.00, d: q, delay: q * 3 },   // ソ
-      { f: 440.00, d: q, delay: q * 4 },   // ラ
-      { f: 587.33, d: q, delay: q * 5 },   // レ
-      // 休符 (q * 6) - 何も鳴らさない
-      { f: 587.33, d: q, delay: q * 7 },   // レ
-      { f: 440.00, d: q, delay: q * 8 },   // ラ
-      { f: 493.88, d: q, delay: q * 9 },   // シ
-      { f: 440.00, d: q, delay: q * 10 },  // ラ
-      { f: 440.00, d: q * 1.5, delay: q * 11 },  // ラ (最後の伸ばし)
+      { f: 369.99, d: q,       delay: q * 0  },   // ファ# (F#4) = ミ
+      { f: 293.66, d: q,       delay: q * 1  },   // レ (D4)     = ド
+      { f: 220.00, d: q,       delay: q * 2  },   // ラ (A3)     = ソ(低)
+      { f: 293.66, d: q,       delay: q * 3  },   // レ (D4)     = ド
+      { f: 329.63, d: q,       delay: q * 4  },   // ミ (E4)     = レ
+      { f: 440.00, d: q,       delay: q * 5  },   // ラ (A4)     = ソ(高)
+      // 休符 (q * 6) は無音
+      { f: 220.00, d: q,       delay: q * 7  },   // ラ (A3)     = ソ(低)
+      { f: 293.66, d: q,       delay: q * 8  },   // レ (D4)     = ド
+      { f: 369.99, d: q,       delay: q * 9  },   // ファ# (F#4) = ミ
+      { f: 293.66, d: q,       delay: q * 10 },   // レ (D4)     = ド
+      { f: 220.00, d: q,       delay: q * 11 },   // ラ (A3)     = ソ(低)
+      { f: 293.66, d: q * 2,   delay: q * 12 },   // レ (D4)     = ド (最後は伸ばす)
     ];
-    // 最後の音は余韻長めに
     notes.forEach((n, i) => {
       const isLast = i === notes.length - 1;
-      scheduleTone(n.f, n.d, 'sine', 0.25, n.delay, session, isLast ? 400 : 150);
+      scheduleTone(n.f, n.d, 'sine', 0.25, n.delay, session, isLast ? 500 : 150);
     });
 
   } else if (sound.id === 'alarm-classic') {
@@ -1436,17 +1478,18 @@ setInterval(() => {
    インターバルタイマー
    - 各ステップ: 時:分:秒 の3マス
    - ラウンド数指定
-   - ステップごとに「リピート開始」「リピートしない」フラグ
+   - ステップごとに「▶開始」フラグ(ここからリピート開始)
+   - スタートで入力欄が隠れてタイマー表示に切り替わる
 ========================================================= */
 let intervals = [
-  { id: 1, h: 0, m: 0, s: 10, repeatStart: false, repeatStop: false },
-  { id: 2, h: 0, m: 0, s: 5,  repeatStart: true,  repeatStop: false },
-  { id: 3, h: 0, m: 0, s: 10, repeatStart: false, repeatStop: true },
+  { id: 1, h: 0, m: 0, s: 10, repeatStart: false },
+  { id: 2, h: 0, m: 0, s: 5,  repeatStart: true  },
+  { id: 3, h: 0, m: 0, s: 10, repeatStart: false },
 ];
 let ivSeq = 3;
 let ivRunning = false;
 let ivCurrentIndex = -1;
-let ivCurrentRound = 0;       // 現在のラウンド (1始まり)
+let ivCurrentRound = 0;
 let ivTotalRounds = 1;
 let ivRemaining = 0;
 let ivId = null;
@@ -1454,8 +1497,13 @@ let ivId = null;
 const ivList = document.getElementById('intervalList');
 const roundCountInput = document.getElementById('roundCount');
 const roundInfoEl = document.getElementById('roundInfo');
+const ivRunningPanel = document.getElementById('ivRunningPanel');
+const ivInputList = document.getElementById('ivInputList');
+const ivStepLabel = document.getElementById('ivStepLabel');
+const ivRoundLabel = document.getElementById('ivRoundLabel');
+const ivTimeBig = document.getElementById('ivTimeBig');
+const ivNextInfo = document.getElementById('ivNextInfo');
 
-// ラウンド数の入力チェック
 roundCountInput.addEventListener('input', () => {
   let v = parseInt(roundCountInput.value) || 1;
   if (v < 1) v = 1;
@@ -1493,21 +1541,14 @@ function renderIntervals() {
         <span class="colon" style="font-size:1.3rem;">:</span>
         <input type="number" min="0" max="59" value="${iv.s}" data-iv="${iv.id}" data-f="s" style="width:52px;font-size:1.3rem;">
       </div>
-      <div class="step-flags">
-        <div class="flag-toggle repeat-start ${iv.repeatStart ? 'on' : ''}" data-iv-flag="${iv.id}" data-flag="repeatStart" title="ここからリピート開始">
-          <span class="flag-dot"></span>▶開始
-        </div>
-        <div class="flag-toggle ${iv.repeatStop ? 'on' : ''}" data-iv-flag="${iv.id}" data-flag="repeatStop" title="ここでリピートしない">
-          <span class="flag-dot"></span>✕終了
-        </div>
+      <div class="flag-toggle ${iv.repeatStart ? 'on' : ''}" data-iv-flag="${iv.id}" title="ここからリピート開始">
+        <span class="flag-dot"></span>▶開始
       </div>
-      <div class="step-display" data-ivdisp="${iv.id}"></div>
       <button class="pink small" data-ivdel="${iv.id}">削除</button>
     `;
     ivList.appendChild(el);
   });
 
-  // 時間入力
   ivList.querySelectorAll('input[data-iv]').forEach(inp => {
     inp.oninput = () => {
       const id = +inp.dataset.iv;
@@ -1521,19 +1562,16 @@ function renderIntervals() {
     };
   });
 
-  // フラグトグル
   ivList.querySelectorAll('[data-iv-flag]').forEach(t => {
     t.onclick = () => {
       if (ivRunning) { toast('実行中は変更できません'); return; }
       const id = +t.dataset.ivFlag;
-      const flag = t.dataset.flag;
       const iv = intervals.find(x => x.id === id);
-      iv[flag] = !iv[flag];
+      iv.repeatStart = !iv.repeatStart;
       renderIntervals();
     };
   });
 
-  // 削除
   ivList.querySelectorAll('[data-ivdel]').forEach(btn => {
     btn.onclick = () => {
       if (ivRunning) { toast('実行中は削除できません'); return; }
@@ -1542,26 +1580,11 @@ function renderIntervals() {
       renderIntervals();
     };
   });
-
-  updateIvDisplays();
-}
-
-function updateIvDisplays() {
-  ivList.querySelectorAll('[data-ivdisp]').forEach(el => {
-    const id = +el.dataset.ivdisp;
-    if (ivRunning && ivCurrentIndex >= 0 && intervals[ivCurrentIndex] && intervals[ivCurrentIndex].id === id) {
-      el.textContent = '▶ ' + fmtHMS(ivRemaining);
-      el.style.color = 'var(--neon-green)';
-      el.style.textShadow = '0 0 8px var(--neon-green)';
-    } else {
-      el.textContent = '';
-    }
-  });
 }
 
 document.getElementById('ivAdd').onclick = () => {
   if (ivRunning) { toast('実行中は追加できません'); return; }
-  intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10, repeatStart: false, repeatStop: false });
+  intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10, repeatStart: false });
   renderIntervals();
 };
 
@@ -1573,7 +1596,13 @@ document.getElementById('ivStart').onclick = () => {
   ivRunning = true;
   ivCurrentIndex = 0;
   ivCurrentRound = 1;
+
+  ivInputList.style.display = 'none';
+  ivRunningPanel.classList.add('show');
+  roundCountInput.disabled = true;
+
   updateRoundInfo();
+  updateIvRunningPanel();
   runIvStep();
 };
 
@@ -1589,61 +1618,79 @@ document.getElementById('ivReset').onclick = () => {
   ivCurrentIndex = -1;
   ivCurrentRound = 0;
   ivRemaining = 0;
+
+  ivInputList.style.display = 'block';
+  ivRunningPanel.classList.remove('show');
+  roundCountInput.disabled = false;
+
   renderIntervals();
   updateRoundInfo();
 };
 
 /* =========================================================
    ステップ実行ロジック
-   - repeatStop があるステップを終えると1ラウンド完了
-   - repeatStop が無ければ末尾が暗黙のラウンド終端
-   - 次のラウンドは repeatStart フラグの位置から開始
-     無ければ先頭から
+   - repeatStart の位置から末尾までが1ラウンドの範囲
+   - 無ければ先頭から末尾まで
 ========================================================= */
-function findRoundEndIndex() {
-  // 最初に見つかった repeatStop の位置、無ければ末尾
-  for (let i = 0; i < intervals.length; i++) {
-    if (intervals[i].repeatStop) return i;
-  }
-  return intervals.length - 1;
-}
-
 function findRoundStartIndex() {
-  // repeatStart の位置、無ければ 0
   for (let i = 0; i < intervals.length; i++) {
     if (intervals[i].repeatStart) return i;
   }
   return 0;
 }
 
+function updateIvRunningPanel() {
+  if (!ivRunning) return;
+  const cur = intervals[ivCurrentIndex];
+  if (cur) {
+    ivStepLabel.textContent = `ステップ ${ivCurrentIndex + 1} / ${intervals.length}`;
+    ivTimeBig.textContent = fmtHMS(ivRemaining);
+  }
+  ivRoundLabel.textContent = `ラウンド ${ivCurrentRound} / ${ivTotalRounds}`;
+
+  const nextIdx = ivCurrentIndex + 1;
+  if (nextIdx < intervals.length && intervals[nextIdx]) {
+    const nx = intervals[nextIdx];
+    const nxSec = nx.h*3600 + nx.m*60 + nx.s;
+    ivNextInfo.textContent = `次のステップ: ${fmtHMS(nxSec)}`;
+  } else {
+    ivNextInfo.textContent = 'このラウンドの最後のステップ';
+  }
+}
+
 function runIvStep() {
-  // 全ラウンド終了判定
   if (ivCurrentRound > ivTotalRounds) {
     ivRunning = false;
     ivCurrentIndex = -1;
     notifyAll('インターバル完了', `全 ${ivTotalRounds} ラウンド終了しました`, { tag: 'interval', requireInteraction: true });
+
+    ivInputList.style.display = 'block';
+    ivRunningPanel.classList.remove('show');
+    roundCountInput.disabled = false;
+
     renderIntervals();
     updateRoundInfo();
     return;
   }
 
-  const roundEnd = findRoundEndIndex();
-
-  // 現在のラウンドで末尾まで来た → 次ラウンドへ
-  if (ivCurrentIndex > roundEnd) {
+  if (ivCurrentIndex >= intervals.length) {
     ivCurrentRound++;
     if (ivCurrentRound > ivTotalRounds) {
       ivRunning = false;
       ivCurrentIndex = -1;
       notifyAll('インターバル完了', `全 ${ivTotalRounds} ラウンド終了しました`, { tag: 'interval', requireInteraction: true });
+
+      ivInputList.style.display = 'block';
+      ivRunningPanel.classList.remove('show');
+      roundCountInput.disabled = false;
+
       renderIntervals();
       updateRoundInfo();
       return;
     }
-    // 次ラウンドの開始位置へ
     ivCurrentIndex = findRoundStartIndex();
     updateRoundInfo();
-    // 少し間を置いて次のラウンドへ
+    renderIntervals();
     setTimeout(() => { if (ivRunning) runIvStep(); }, 500);
     return;
   }
@@ -1652,19 +1699,19 @@ function runIvStep() {
   ivRemaining = iv.h*3600 + iv.m*60 + iv.s;
 
   if (ivRemaining <= 0) {
-    // 0秒ステップはスキップ
     ivCurrentIndex++;
     runIvStep();
     return;
   }
 
   renderIntervals();
-  updateIvDisplays();
+  updateIvRunningPanel();
 
   clearInterval(ivId);
   ivId = setInterval(() => {
     ivRemaining--;
-    updateIvDisplays();
+    ivTimeBig.textContent = fmtHMS(ivRemaining);
+
     if (ivRemaining <= 0) {
       clearInterval(ivId);
       const stepNum = ivCurrentIndex + 1;
@@ -1672,7 +1719,7 @@ function runIvStep() {
       showDesktopNotification(
         `ステップ ${stepNum} / ${totalSteps} 完了`,
         `ラウンド ${ivCurrentRound} / ${ivTotalRounds}`,
-        { tag: 'iv-step-' + ivCurrentIndex, icon: '🔔' }
+        { tag: 'iv-step-' + ivCurrentIndex }
       );
       toast(`ステップ ${stepNum} / ${totalSteps} 完了 (ラウンド ${ivCurrentRound}/${ivTotalRounds})`);
       playSound(currentSoundId);
