@@ -97,9 +97,7 @@
     color: var(--neon-green);
     text-shadow: 0 0 6px var(--neon-green);
   }
-  #notifPanel .status-text.off {
-    color: #888;
-  }
+  #notifPanel .status-text.off { color: #888; }
   #notifPanel .status-text.blocked {
     color: var(--neon-pink);
     text-shadow: 0 0 6px var(--neon-pink);
@@ -142,6 +140,144 @@
   .big-switch.disabled {
     opacity: 0.35;
     cursor: not-allowed;
+  }
+
+  /* ===== サウンド選択 ===== */
+  #soundPanel {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    background: rgba(0,240,255,0.06);
+    border: 1px solid rgba(0,240,255,0.35);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 15px rgba(0,240,255,0.15);
+  }
+
+  #soundPanel .sound-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #d6f7ff;
+    text-shadow: 0 0 6px rgba(0,240,255,0.4);
+    letter-spacing: 1px;
+  }
+
+  #soundPanel .sound-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 6px var(--neon-cyan));
+  }
+
+  .sound-select-wrap {
+    position: relative;
+    min-width: 220px;
+  }
+
+  .sound-select-display {
+    padding: 9px 14px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 8px;
+    color: var(--neon-cyan);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 8px rgba(0,240,255,0.2);
+    transition: all 0.2s;
+  }
+  .sound-select-display:hover,
+  .sound-select-display.open {
+    box-shadow: 0 0 14px var(--neon-cyan);
+  }
+  .sound-select-display .arrow {
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+  }
+  .sound-select-display.open .arrow {
+    transform: rotate(180deg);
+  }
+
+  .sound-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: rgba(10,10,25,0.98);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 60;
+    display: none;
+    box-shadow: 0 0 25px rgba(0,240,255,0.5);
+  }
+  .sound-dropdown.open { display: block; }
+
+  .sound-search {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    border-bottom: 1px solid rgba(0,240,255,0.3);
+    color: #e6f7ff;
+    font-size: 0.85rem;
+    outline: none;
+  }
+  .sound-search::placeholder { color: rgba(230,247,255,0.35); }
+
+  .sound-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(0,240,255,0.08);
+    transition: background 0.12s;
+  }
+  .sound-item:last-child { border-bottom: none; }
+  .sound-item:hover,
+  .sound-item.active {
+    background: rgba(0,240,255,0.15);
+    color: var(--neon-cyan);
+    text-shadow: 0 0 6px var(--neon-cyan);
+  }
+  .sound-item.selected::after {
+    content: '✓';
+    color: var(--neon-green);
+    text-shadow: 0 0 6px var(--neon-green);
+    font-weight: bold;
+  }
+  .sound-item .sound-cat {
+    font-size: 0.7rem;
+    opacity: 0.5;
+    margin-left: 8px;
+  }
+
+  .sound-dropdown .sound-group {
+    padding: 6px 14px;
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 5px var(--neon-pink);
+    background: rgba(255,0,229,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .sound-dropdown .sound-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 0.82rem;
+    opacity: 0.6;
   }
 
   /* ===== 世界時計 ===== */
@@ -429,6 +565,27 @@
   <button class="pink small" id="notifRequest">ブラウザで許可</button>
 </div>
 
+<!-- ========== サウンド選択パネル ========== -->
+<div id="soundPanel">
+  <div class="sound-label">
+    <span class="sound-icon">🔊</span>
+    通知音
+  </div>
+  <div class="sound-select-wrap" id="soundSelectWrap">
+    <div class="sound-select-display" id="soundSelectDisplay">
+      <span id="soundSelectName">ビープ音</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="sound-dropdown" id="soundDropdown">
+      <input type="text" class="sound-search" id="soundSearch" placeholder="音を検索..." autocomplete="off">
+      <div id="soundList"></div>
+    </div>
+  </div>
+  <button class="small" id="soundTest">▶ 試聴</button>
+  <div class="spacer"></div>
+  <div class="hint" style="margin:0;">タイマー / アラーム終了時に鳴ります</div>
+</div>
+
 <!-- ========== 世界時計 ========== -->
 <div class="panel">
   <div class="panel-title">🌍 世界時計</div>
@@ -510,6 +667,251 @@
 
 <script>
 /* =========================================================
+   サウンド定義
+========================================================= */
+// 音の定義 (種類: beep / iphone / melody)
+const SOUNDS = [
+  { id: 'beep', name: 'ビープ音', cat: '基本', type: 'beep' },
+  { id: 'iphone-reflection', name: 'Reflection (iPhone)', cat: 'iPhone', type: 'iphone' },
+  { id: 'iphone-ripple', name: 'Ripple (iPhone)', cat: 'iPhone', type: 'iphone' },
+  { id: 'iphone-marimba', name: 'Marimba (iPhone)', cat: 'iPhone', type: 'iphone' },
+  { id: 'iphone-xylophone', name: 'Xylophone (iPhone)', cat: 'iPhone', type: 'iphone' },
+  { id: 'iphone-opens', name: 'Opening (iPhone)', cat: 'iPhone', type: 'iphone' },
+  { id: 'famima', name: 'ファミマ入店音', cat: 'ファミマ', type: 'melody' },
+  { id: 'alarm-classic', name: 'クラシックアラーム', cat: 'アラーム', type: 'iphone' },
+  { id: 'alarm-digital', name: 'デジタルアラーム', cat: 'アラーム', type: 'beep' },
+  { id: 'chime', name: 'チャイム', cat: 'チャイム', type: 'iphone' },
+];
+
+// 現在選択中のサウンドID
+let currentSoundId = 'beep';
+try {
+  const saved = localStorage.getItem('neon-timer-sound');
+  if (saved && SOUNDS.some(s => s.id === saved)) currentSoundId = saved;
+} catch(e) {}
+
+/* =========================================================
+   音生成エンジン (Web Audio API)
+========================================================= */
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// 単音を鳴らす
+function playTone(freq, durationMs, type = 'sine', volume = 0.25, startDelay = 0) {
+  try {
+    const ctx = getAudioCtx();
+    const t0 = ctx.currentTime + startDelay / 1000;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(volume, t0 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + durationMs / 1000);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + durationMs / 1000 + 0.02);
+  } catch(e) {}
+}
+
+// 休符
+function rest(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// 各サウンドの再生
+async function playSound(soundId) {
+  const sound = SOUNDS.find(s => s.id === soundId) || SOUNDS[0];
+
+  if (sound.id === 'beep') {
+    // 基本のビープ: 880Hz x2
+    playTone(880, 300, 'sine', 0.25, 0);
+    playTone(880, 300, 'sine', 0.25, 350);
+
+  } else if (sound.id === 'iphone-reflection') {
+    // Reflection風: 柔らかい下降音
+    playTone(659.25, 400, 'sine', 0.2, 0);     // E5
+    playTone(523.25, 400, 'sine', 0.2, 400);   // C5
+    playTone(440.00, 600, 'sine', 0.2, 800);   // A4
+
+  } else if (sound.id === 'iphone-ripple') {
+    // Ripple風: 水滴のような音
+    playTone(880, 200, 'sine', 0.2, 0);
+    playTone(1174.66, 200, 'sine', 0.2, 200);  // D6
+    playTone(880, 400, 'sine', 0.2, 400);
+
+  } else if (sound.id === 'iphone-marimba') {
+    // Marimba風: 木琴の連打
+    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+      playTone(f, 300, 'triangle', 0.2, i * 180);
+    });
+
+  } else if (sound.id === 'iphone-xylophone') {
+    // Xylophone風
+    [659.25, 783.99, 987.77, 1318.51].forEach((f, i) => {
+      playTone(f, 250, 'sine', 0.2, i * 160);
+    });
+
+  } else if (sound.id === 'iphone-opens') {
+    // Opening風: 上昇する音
+    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+      playTone(f, 400, 'sine', 0.2, i * 200);
+    });
+
+  } else if (sound.id === 'famima') {
+    // ファミマの入店音「大盛況」
+    // B4 → G4 → D4 → G4 → A4 → D5 → (休符) → D5 → A4 → B4 → A4 ...
+    const R = 1000; // 基準リズム
+    const q = R / 4; // 四分音符
+
+    playTone(493.88, q, 'sine', 0.25, 0);      // シ (B4)
+    playTone(392.00, q, 'sine', 0.25, q);      // ソ (G4)
+    playTone(293.66, q, 'sine', 0.25, q * 2);  // レ (D4)
+    playTone(392.00, q, 'sine', 0.25, q * 3);  // ソ (G4)
+    playTone(440.00, q, 'sine', 0.25, q * 4);  // ラ (A4)
+    playTone(587.33, q, 'sine', 0.25, q * 5);  // レ (D5)
+    // 休符
+    playTone(587.33, q, 'sine', 0.25, q * 7);  // レ (D5)
+    playTone(440.00, q, 'sine', 0.25, q * 8);  // ラ (A4)
+    playTone(493.88, q, 'sine', 0.25, q * 9);  // シ (B4)
+    playTone(440.00, q, 'sine', 0.25, q * 10); // ラ (A4)
+
+  } else if (sound.id === 'alarm-classic') {
+    // クラシックアラーム: ベル音
+    [880, 880, 880].forEach((f, i) => {
+      playTone(f, 200, 'sine', 0.3, i * 300);
+      playTone(f * 1.5, 150, 'sine', 0.15, i * 300 + 100);
+    });
+
+  } else if (sound.id === 'alarm-digital') {
+    // デジタルアラーム: ピピピッ
+    [1000, 1000, 1000, 1000].forEach((f, i) => {
+      playTone(f, 100, 'square', 0.15, i * 150);
+    });
+
+  } else if (sound.id === 'chime') {
+    // チャイム: ドアホン風
+    playTone(659.25, 600, 'sine', 0.25, 0);    // E5
+    playTone(523.25, 800, 'sine', 0.25, 650);  // C5
+  } else {
+    // フォールバック
+    playTone(880, 300, 'sine', 0.25, 0);
+  }
+}
+
+/* =========================================================
+   サウンド選択 UI
+========================================================= */
+const soundSelectDisplay = document.getElementById('soundSelectDisplay');
+const soundDropdown      = document.getElementById('soundDropdown');
+const soundSearch        = document.getElementById('soundSearch');
+const soundListEl        = document.getElementById('soundList');
+const soundSelectName    = document.getElementById('soundSelectName');
+const soundTest          = document.getElementById('soundTest');
+
+function renderSoundList(filter = '') {
+  const q = filter.trim().toLowerCase();
+  const filtered = q
+    ? SOUNDS.filter(s => s.name.toLowerCase().includes(q) || s.cat.toLowerCase().includes(q))
+    : SOUNDS;
+
+  soundListEl.innerHTML = '';
+
+  if (filtered.length === 0) {
+    soundListEl.innerHTML = '<div class="sound-empty">該当する音がありません</div>';
+    return;
+  }
+
+  // カテゴリごとにグループ化
+  const groups = {};
+  filtered.forEach(s => {
+    if (!groups[s.cat]) groups[s.cat] = [];
+    groups[s.cat].push(s);
+  });
+
+  Object.keys(groups).forEach(cat => {
+    const header = document.createElement('div');
+    header.className = 'sound-group';
+    header.textContent = cat;
+    soundListEl.appendChild(header);
+
+    groups[cat].forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'sound-item';
+      if (s.id === currentSoundId) item.classList.add('selected');
+      item.innerHTML = `<span>${s.name}</span>`;
+      item.dataset.id = s.id;
+      item.onclick = (e) => {
+        e.stopPropagation();
+        selectSound(s.id);
+      };
+      soundListEl.appendChild(item);
+    });
+  });
+}
+
+function openSoundDropdown() {
+  soundSelectDisplay.classList.add('open');
+  soundDropdown.classList.add('open');
+  renderSoundList(soundSearch.value);
+}
+
+function closeSoundDropdown() {
+  soundSelectDisplay.classList.remove('open');
+  soundDropdown.classList.remove('open');
+  soundSearch.value = '';
+}
+
+function selectSound(id) {
+  currentSoundId = id;
+  try { localStorage.setItem('neon-timer-sound', id); } catch(e) {}
+  const s = SOUNDS.find(x => x.id === id);
+  soundSelectName.textContent = s ? s.name : 'ビープ音';
+  closeSoundDropdown();
+  // 選んだ音を即試聴
+  playSound(id);
+  toast('🔊 通知音を「' + (s ? s.name : '') + '」に変更');
+}
+
+// 選択表示クリックで開閉
+soundSelectDisplay.onclick = (e) => {
+  e.stopPropagation();
+  if (soundDropdown.classList.contains('open')) {
+    closeSoundDropdown();
+  } else {
+    openSoundDropdown();
+  }
+};
+
+// 検索
+soundSearch.addEventListener('input', () => {
+  renderSoundList(soundSearch.value);
+});
+
+// ドロップダウン内クリックで閉じないように
+soundDropdown.onclick = (e) => e.stopPropagation();
+
+// 試聴ボタン
+soundTest.onclick = () => {
+  playSound(currentSoundId);
+  toast('🔊 試聴中...');
+};
+
+// 外側クリックで閉じる
+document.addEventListener('click', () => {
+  closeSoundDropdown();
+});
+
+// 初期表示
+const initialSound = SOUNDS.find(s => s.id === currentSoundId);
+if (initialSound) soundSelectName.textContent = initialSound.name;
+
+/* =========================================================
    通知設定 (ON/OFF 切り替え + localStorage 保存)
 ========================================================= */
 const notifToggle     = document.getElementById('notifToggle');
@@ -520,15 +922,13 @@ const notifRequest    = document.getElementById('notifRequest');
 const NOTIF_SUPPORTED = 'Notification' in window;
 const NOTIF_PREF_KEY  = 'neon-timer-notif-enabled';
 
-// ON/OFF 設定 (ユーザーがトグルで切り替える) を localStorage から復元
-let notifEnabled = (localStorage.getItem(NOTIF_PREF_KEY) !== 'off'); // デフォルト ON
+let notifEnabled = (localStorage.getItem(NOTIF_PREF_KEY) !== 'off');
 
 function isNotifActuallyActive() {
   return NOTIF_SUPPORTED && notifEnabled && Notification.permission === 'granted';
 }
 
 function renderNotifPanel() {
-  // トグルの見た目
   if (!NOTIF_SUPPORTED) {
     notifToggle.classList.remove('on');
     notifToggle.classList.add('disabled');
@@ -557,7 +957,6 @@ function renderNotifPanel() {
     notifTest.disabled = true;
     notifRequest.disabled = false;
   } else {
-    // permission === 'default'
     notifStatusText.textContent = '要許可';
     notifStatusText.className = 'status-text blocked';
     notifTest.disabled = true;
@@ -565,7 +964,6 @@ function renderNotifPanel() {
   }
 }
 
-// トグルクリック
 notifToggle.onclick = () => {
   if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です'); return; }
   notifEnabled = !notifEnabled;
@@ -573,30 +971,24 @@ notifToggle.onclick = () => {
   renderNotifPanel();
 
   if (notifEnabled) {
-    // ONにした時にまだ許可されていなければリクエスト
     if (Notification.permission === 'default') {
       requestNotifPermission();
     } else if (Notification.permission === 'granted') {
       toast('🔔 通知を ON にしました');
     } else if (Notification.permission === 'denied') {
-      toast('⚠ ブラウザでブロックされています。「ブラウザで許可」から設定してください');
+      toast('⚠ ブラウザでブロックされています');
     }
   } else {
     toast('🔕 通知を OFF にしました');
   }
 };
 
-// テスト通知
 notifTest.onclick = () => {
-  if (!isNotifActuallyActive()) {
-    toast('通知が有効ではありません');
-    return;
-  }
+  if (!isNotifActuallyActive()) { toast('通知が有効ではありません'); return; }
   showDesktopNotification('🔔 テスト通知', 'Neon Multi Timer からの通知テストです');
   toast('テスト通知を送信しました');
 };
 
-// ブラウザで許可
 notifRequest.onclick = () => {
   if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です'); return; }
   if (Notification.permission === 'granted') { toast('すでに許可されています'); return; }
@@ -619,7 +1011,6 @@ async function requestNotifPermission() {
   }
 }
 
-// デスクトップ通知送信 (設定 + 許可 をチェック)
 function showDesktopNotification(title, body, opts = {}) {
   if (!isNotifActuallyActive()) return;
   try {
@@ -647,41 +1038,22 @@ function showDesktopNotification(title, body, opts = {}) {
 renderNotifPanel();
 
 /* =========================================================
-   画面内トースト + ビープ音
+   画面内トースト + サウンド再生
 ========================================================= */
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
-function toast(msg) {
+
+function toast(msg, withSound = true) {
   toastEl.textContent = msg;
   toastEl.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3500);
-  beep();
-}
-
-function beep(times = 1) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    for (let i = 0; i < times; i++) {
-      const t = ctx.currentTime + i * 0.35;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.start(t); osc.stop(t + 0.32);
-    }
-  } catch(e) {}
+  if (withSound) playSound(currentSoundId);
 }
 
 function notifyAll(title, body, opts = {}) {
-  // デスクトップ通知は showDesktopNotification 内でON/OFF判定される
   showDesktopNotification(title, body, opts);
-  // 画面内トーストは常に表示(通知ON/OFFとは独立)
-  toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''));
+  toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''), true);
 }
 
 /* =========================================================
@@ -718,18 +1090,10 @@ function getOffsetStr(tz) {
 function groupTz(tz) {
   const region = tz.split('/')[0];
   const map = {
-    'Africa': 'アフリカ',
-    'America': 'アメリカ',
-    'Antarctica': '南極',
-    'Arctic': '北極',
-    'Asia': 'アジア',
-    'Atlantic': '大西洋',
-    'Australia': 'オーストラリア',
-    'Europe': 'ヨーロッパ',
-    'Indian': 'インド洋',
-    'Pacific': '太平洋',
-    'Etc': 'その他',
-    'US': 'アメリカ(旧)',
+    'Africa': 'アフリカ', 'America': 'アメリカ', 'Antarctica': '南極',
+    'Arctic': '北極', 'Asia': 'アジア', 'Atlantic': '大西洋',
+    'Australia': 'オーストラリア', 'Europe': 'ヨーロッパ', 'Indian': 'インド洋',
+    'Pacific': '太平洋', 'Etc': 'その他', 'US': 'アメリカ(旧)',
   };
   return map[region] || region;
 }
@@ -739,7 +1103,6 @@ let tzActiveIndex = -1;
 
 function renderTzDropdown(filter = '') {
   const q = filter.trim().toLowerCase();
-
   if (q) {
     tzFiltered = tzList.filter(tz => tz.toLowerCase().includes(q));
   } else {
@@ -812,7 +1175,7 @@ function selectTz(tz) {
     clocks.push({ tz, label: cityFromTz(tz) });
     renderClocks();
   } else {
-    toast('そのタイムゾーンは既に追加されています');
+    toast('そのタイムゾーンは既に追加されています', false);
   }
   tzSearch.value = '';
   renderTzDropdown('');
@@ -935,7 +1298,7 @@ document.getElementById('timerStart').onclick = () => {
   if (timerRunning) return;
   if (timerRemaining === 0) {
     timerRemaining = getTimerInputSec();
-    if (timerRemaining <= 0) { toast('時間を入力してください'); return; }
+    if (timerRemaining <= 0) { toast('時間を入力してください', false); return; }
   }
   timerRunning = true;
   timerInputWrap.style.display = 'none';
@@ -949,7 +1312,6 @@ document.getElementById('timerStart').onclick = () => {
       clearInterval(timerId);
       timerRunning = false;
       notifyAll('⏱ タイマー終了', '設定した時間になりました', { tag: 'timer', requireInteraction: true, icon: '⏱' });
-      beep(2);
     }
   }, 1000);
 };
@@ -1091,7 +1453,6 @@ setInterval(() => {
     } else if (a.days.includes(d)) {
       notifyAll('⏰ アラーム', `${timeStr} (${DAY_NAMES[d]}曜日)`, { tag: 'alarm-' + a.id, requireInteraction: true, icon: '⏰' });
     }
-    beep(2);
     a.lastTriggered = key;
   });
 }, 1000);
@@ -1150,7 +1511,7 @@ function renderIntervals() {
 
   ivList.querySelectorAll('[data-ivdel]').forEach(btn => {
     btn.onclick = () => {
-      if (ivRunning) { toast('実行中は削除できません'); return; }
+      if (ivRunning) { toast('実行中は削除できません', false); return; }
       const id = +btn.dataset.ivdel;
       intervals = intervals.filter(x => x.id !== id);
       renderIntervals();
@@ -1175,14 +1536,14 @@ function updateIvDisplays() {
 }
 
 document.getElementById('ivAdd').onclick = () => {
-  if (ivRunning) { toast('実行中は追加できません'); return; }
+  if (ivRunning) { toast('実行中は追加できません', false); return; }
   intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10 });
   renderIntervals();
 };
 
 document.getElementById('ivStart').onclick = () => {
   if (ivRunning) return;
-  if (intervals.length === 0) { toast('インターバルを追加してください'); return; }
+  if (intervals.length === 0) { toast('インターバルを追加してください', false); return; }
   ivRunning = true;
   ivCurrentIndex = 0;
   runIvStep();
@@ -1193,7 +1554,6 @@ function runIvStep() {
     ivRunning = false;
     ivCurrentIndex = -1;
     notifyAll('🔁 インターバル完了', '全ステップが終了しました', { tag: 'interval', requireInteraction: true, icon: '🔁' });
-    beep(2);
     renderIntervals();
     return;
   }
@@ -1214,8 +1574,7 @@ function runIvStep() {
         `次はステップ ${ivCurrentIndex+2} です`,
         { tag: 'iv-step-' + ivCurrentIndex, icon: '🔔' }
       );
-      toast(`🔔 ステップ ${ivCurrentIndex+1} 完了`);
-      beep();
+      toast(`🔔 ステップ ${ivCurrentIndex+1} 完了`, true);
       ivCurrentIndex++;
       setTimeout(() => { if (ivRunning) runIvStep(); }, 400);
     }
