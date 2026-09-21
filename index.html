@@ -56,39 +56,93 @@
     margin-bottom: 12px;
   }
 
-  /* ===== 通知許可バナー ===== */
-  #notifBanner {
-    display: none;
-    background: rgba(255,0,229,0.1);
-    border: 1px solid var(--neon-pink);
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 0 18px rgba(255,0,229,0.3);
+  /* ===== 通知設定パネル ===== */
+  #notifPanel {
+    display: flex;
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
+    background: rgba(255,0,229,0.06);
+    border: 1px solid rgba(255,0,229,0.35);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 15px rgba(255,0,229,0.15);
   }
-  #notifBanner.show { display: flex; }
-  #notifBanner .msg {
-    flex: 1;
+
+  #notifPanel .notif-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 0.9rem;
     color: #ffd6f7;
-    text-shadow: 0 0 6px rgba(255,0,229,0.5);
+    text-shadow: 0 0 6px rgba(255,0,229,0.4);
+    letter-spacing: 1px;
   }
-  #notifBanner .msg small { display:block; opacity: 0.7; margin-top: 4px; font-size: 0.78rem; }
 
-  .notif-status {
+  #notifPanel .notif-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 6px var(--neon-pink));
+  }
+
+  #notifPanel .status-text {
     font-size: 0.75rem;
     padding: 3px 10px;
     border-radius: 20px;
     border: 1px solid currentColor;
     letter-spacing: 1px;
+    white-space: nowrap;
   }
-  .notif-status.granted { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
-  .notif-status.denied  { color: var(--neon-pink); text-shadow: 0 0 6px var(--neon-pink); }
-  .notif-status.default { color: var(--neon-yellow); text-shadow: 0 0 6px var(--neon-yellow); }
-  .notif-status.unsupported { color: #888; }
+  #notifPanel .status-text.on {
+    color: var(--neon-green);
+    text-shadow: 0 0 6px var(--neon-green);
+  }
+  #notifPanel .status-text.off {
+    color: #888;
+  }
+  #notifPanel .status-text.blocked {
+    color: var(--neon-pink);
+    text-shadow: 0 0 6px var(--neon-pink);
+  }
+
+  #notifPanel .spacer { flex: 1; }
+
+  /* ===== 大きなトグルスイッチ ===== */
+  .big-switch {
+    position: relative;
+    width: 68px;
+    height: 34px;
+    border-radius: 17px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid #555;
+    cursor: pointer;
+    transition: all 0.25s;
+    flex-shrink: 0;
+  }
+  .big-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #666;
+    transition: all 0.25s;
+    box-shadow: 0 0 6px rgba(0,0,0,0.6);
+  }
+  .big-switch.on {
+    background: rgba(57,255,20,0.2);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 14px var(--neon-green), inset 0 0 12px rgba(57,255,20,0.3);
+  }
+  .big-switch.on::after {
+    left: 37px;
+    background: var(--neon-green);
+    box-shadow: 0 0 14px var(--neon-green);
+  }
+  .big-switch.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
 
   /* ===== 世界時計 ===== */
   #clockList { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
@@ -177,9 +231,7 @@
     text-shadow: 0 0 5px var(--neon-purple);
     font-variant-numeric: tabular-nums;
   }
-  #tzResults .tz-item.added {
-    opacity: 0.45;
-  }
+  #tzResults .tz-item.added { opacity: 0.45; }
   #tzResults .tz-item.added .tz-name::after {
     content: ' ✓';
     color: var(--neon-green);
@@ -364,23 +416,24 @@
 
 <h1>◆ NEON MULTI TIMER ◆</h1>
 
-<!-- ========== 通知許可バナー ========== -->
-<div id="notifBanner">
-  <div class="msg">
-    🔔 デスクトップ通知を有効にしますか?
-    <small>タイマー・アラーム・インターバル終了時に通知が届きます</small>
+<!-- ========== 通知設定パネル ========== -->
+<div id="notifPanel">
+  <div class="notif-label">
+    <span class="notif-icon">🔔</span>
+    デスクトップ通知
   </div>
-  <span id="notifStatus" class="notif-status default">未確認</span>
-  <button class="green small" id="notifAllow">許可する</button>
+  <div class="big-switch on" id="notifToggle"></div>
+  <span class="status-text on" id="notifStatusText">ON</span>
+  <div class="spacer"></div>
   <button class="small" id="notifTest">テスト通知</button>
-  <button class="pink small" id="notifDismiss">後で</button>
+  <button class="pink small" id="notifRequest">ブラウザで許可</button>
 </div>
 
 <!-- ========== 世界時計 ========== -->
 <div class="panel">
   <div class="panel-title">🌍 世界時計</div>
   <div class="search-wrap">
-    <input type="text" id="tzSearch" placeholder="クリックしてタイムゾーンを選択 / 入力で絞り込み" autocomplete="off" readonly>
+    <input type="text" id="tzSearch" placeholder="クリックしてタイムゾーンを選択 / 入力で絞り込み" autocomplete="off">
     <div id="tzResults"></div>
   </div>
   <div id="clockList"></div>
@@ -457,49 +510,118 @@
 
 <script>
 /* =========================================================
-   デスクトップ通知 (Notification API)
+   通知設定 (ON/OFF 切り替え + localStorage 保存)
 ========================================================= */
-const notifBanner  = document.getElementById('notifBanner');
-const notifStatus  = document.getElementById('notifStatus');
-const notifAllow   = document.getElementById('notifAllow');
-const notifTest    = document.getElementById('notifTest');
-const notifDismiss = document.getElementById('notifDismiss');
+const notifToggle     = document.getElementById('notifToggle');
+const notifStatusText = document.getElementById('notifStatusText');
+const notifTest       = document.getElementById('notifTest');
+const notifRequest    = document.getElementById('notifRequest');
 
 const NOTIF_SUPPORTED = 'Notification' in window;
+const NOTIF_PREF_KEY  = 'neon-timer-notif-enabled';
 
-function updateNotifStatus() {
-  if (!NOTIF_SUPPORTED) {
-    notifStatus.textContent = '非対応';
-    notifStatus.className = 'notif-status unsupported';
-    notifAllow.disabled = true;
-    notifTest.disabled = true;
-    return;
-  }
-  const p = Notification.permission;
-  notifStatus.textContent = p === 'granted' ? '許可済み' : p === 'denied' ? '拒否' : '未確認';
-  notifStatus.className = 'notif-status ' + p;
-  notifAllow.disabled = (p === 'granted');
-  notifTest.disabled = (p !== 'granted');
+// ON/OFF 設定 (ユーザーがトグルで切り替える) を localStorage から復元
+let notifEnabled = (localStorage.getItem(NOTIF_PREF_KEY) !== 'off'); // デフォルト ON
+
+function isNotifActuallyActive() {
+  return NOTIF_SUPPORTED && notifEnabled && Notification.permission === 'granted';
 }
 
-async function requestNotifPermission() {
+function renderNotifPanel() {
+  // トグルの見た目
+  if (!NOTIF_SUPPORTED) {
+    notifToggle.classList.remove('on');
+    notifToggle.classList.add('disabled');
+    notifStatusText.textContent = '非対応';
+    notifStatusText.className = 'status-text blocked';
+    notifTest.disabled = true;
+    notifRequest.disabled = true;
+    return;
+  }
+
+  notifToggle.classList.toggle('on', notifEnabled);
+
+  if (!notifEnabled) {
+    notifStatusText.textContent = 'OFF';
+    notifStatusText.className = 'status-text off';
+    notifTest.disabled = true;
+    notifRequest.disabled = false;
+  } else if (Notification.permission === 'granted') {
+    notifStatusText.textContent = 'ON';
+    notifStatusText.className = 'status-text on';
+    notifTest.disabled = false;
+    notifRequest.disabled = true;
+  } else if (Notification.permission === 'denied') {
+    notifStatusText.textContent = 'ブロック中';
+    notifStatusText.className = 'status-text blocked';
+    notifTest.disabled = true;
+    notifRequest.disabled = false;
+  } else {
+    // permission === 'default'
+    notifStatusText.textContent = '要許可';
+    notifStatusText.className = 'status-text blocked';
+    notifTest.disabled = true;
+    notifRequest.disabled = false;
+  }
+}
+
+// トグルクリック
+notifToggle.onclick = () => {
   if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です'); return; }
-  if (Notification.permission === 'granted') return;
-  if (Notification.permission === 'denied') { toast('通知が拒否されています(ブラウザ設定で許可してください)'); return; }
+  notifEnabled = !notifEnabled;
+  localStorage.setItem(NOTIF_PREF_KEY, notifEnabled ? 'on' : 'off');
+  renderNotifPanel();
+
+  if (notifEnabled) {
+    // ONにした時にまだ許可されていなければリクエスト
+    if (Notification.permission === 'default') {
+      requestNotifPermission();
+    } else if (Notification.permission === 'granted') {
+      toast('🔔 通知を ON にしました');
+    } else if (Notification.permission === 'denied') {
+      toast('⚠ ブラウザでブロックされています。「ブラウザで許可」から設定してください');
+    }
+  } else {
+    toast('🔕 通知を OFF にしました');
+  }
+};
+
+// テスト通知
+notifTest.onclick = () => {
+  if (!isNotifActuallyActive()) {
+    toast('通知が有効ではありません');
+    return;
+  }
+  showDesktopNotification('🔔 テスト通知', 'Neon Multi Timer からの通知テストです');
+  toast('テスト通知を送信しました');
+};
+
+// ブラウザで許可
+notifRequest.onclick = () => {
+  if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です'); return; }
+  if (Notification.permission === 'granted') { toast('すでに許可されています'); return; }
+  requestNotifPermission();
+};
+
+async function requestNotifPermission() {
+  if (!NOTIF_SUPPORTED) return;
+  if (Notification.permission === 'denied') {
+    toast('ブラウザ設定で通知を許可してください');
+    return;
+  }
   const res = await Notification.requestPermission();
-  updateNotifStatus();
+  renderNotifPanel();
   if (res === 'granted') {
     toast('🔔 通知を許可しました');
     showDesktopNotification('通知が有効になりました', 'Neon Multi Timer');
-    setTimeout(() => { notifBanner.classList.remove('show'); }, 800);
   } else {
     toast('通知が許可されませんでした');
   }
 }
 
+// デスクトップ通知送信 (設定 + 許可 をチェック)
 function showDesktopNotification(title, body, opts = {}) {
-  if (!NOTIF_SUPPORTED) return;
-  if (Notification.permission !== 'granted') return;
+  if (!isNotifActuallyActive()) return;
   try {
     const n = new Notification(title, {
       body: body || '',
@@ -522,20 +644,7 @@ function showDesktopNotification(title, body, opts = {}) {
   } catch (e) {}
 }
 
-if (NOTIF_SUPPORTED && Notification.permission === 'default') {
-  setTimeout(() => notifBanner.classList.add('show'), 600);
-} else if (NOTIF_SUPPORTED && Notification.permission === 'denied') {
-  notifBanner.classList.add('show');
-}
-updateNotifStatus();
-
-notifAllow.onclick   = requestNotifPermission;
-notifDismiss.onclick = () => notifBanner.classList.remove('show');
-notifTest.onclick    = () => {
-  if (Notification.permission !== 'granted') { requestNotifPermission(); return; }
-  showDesktopNotification('🔔 テスト通知', 'Neon Multi Timer からの通知テストです');
-  toast('テスト通知を送信しました');
-};
+renderNotifPanel();
 
 /* =========================================================
    画面内トースト + ビープ音
@@ -569,7 +678,9 @@ function beep(times = 1) {
 }
 
 function notifyAll(title, body, opts = {}) {
+  // デスクトップ通知は showDesktopNotification 内でON/OFF判定される
   showDesktopNotification(title, body, opts);
+  // 画面内トーストは常に表示(通知ON/OFFとは独立)
   toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''));
 }
 
@@ -591,7 +702,6 @@ let clocks = [
 
 function cityFromTz(tz) { return tz.split('/').pop().replace(/_/g, ' '); }
 
-// UTCオフセット文字列を取得 (+09:00 など)
 function getOffsetStr(tz) {
   try {
     const now = new Date();
@@ -605,7 +715,6 @@ function getOffsetStr(tz) {
   return '';
 }
 
-// タイムゾーンを「地域」でグループ化
 function groupTz(tz) {
   const region = tz.split('/')[0];
   const map = {
@@ -625,20 +734,18 @@ function groupTz(tz) {
   return map[region] || region;
 }
 
-let tzFiltered = [];      // 現在表示中の候補
-let tzActiveIndex = -1;   // キーボードナビ用
+let tzFiltered = [];
+let tzActiveIndex = -1;
 
 function renderTzDropdown(filter = '') {
   const q = filter.trim().toLowerCase();
 
-  // 候補抽出
   if (q) {
     tzFiltered = tzList.filter(tz => tz.toLowerCase().includes(q));
   } else {
     tzFiltered = [...tzList];
   }
 
-  // 表示
   tzResults.innerHTML = '';
 
   if (tzFiltered.length === 0) {
@@ -646,7 +753,6 @@ function renderTzDropdown(filter = '') {
     return;
   }
 
-  // グループ化して表示
   const groups = {};
   tzFiltered.forEach(tz => {
     const g = groupTz(tz);
@@ -654,7 +760,6 @@ function renderTzDropdown(filter = '') {
     groups[g].push(tz);
   });
 
-  // よく使う地域を先頭に
   const order = ['アジア','ヨーロッパ','アメリカ','オセアニア','アフリカ','太平洋','大西洋','インド洋','その他'];
   const sortedGroups = Object.keys(groups).sort((a, b) => {
     const ia = order.indexOf(a), ib = order.indexOf(b);
@@ -710,7 +815,6 @@ function selectTz(tz) {
     toast('そのタイムゾーンは既に追加されています');
   }
   tzSearch.value = '';
-  // 追加後も開いたまま再描画(連続追加しやすく)
   renderTzDropdown('');
 }
 
@@ -751,20 +855,14 @@ function updateClocks() {
 }
 setInterval(updateClocks, 1000);
 
-/* --- イベント --- */
 tzSearch.addEventListener('focus', openTzDropdown);
 tzSearch.addEventListener('click', openTzDropdown);
-
-// readonlyだと input イベントが発火しないため、入力可能に戻す場合はここを有効化
-// ここでは「クリックで全表示」＋「タイプで絞り込み」を両立
-tzSearch.removeAttribute('readonly');
 tzSearch.addEventListener('input', () => {
   if (!tzResults.classList.contains('open')) openTzDropdown();
   renderTzDropdown(tzSearch.value);
   tzActiveIndex = -1;
 });
 
-// キーボードナビ
 tzSearch.addEventListener('keydown', e => {
   const items = [...tzResults.querySelectorAll('.tz-item')];
   if (!items.length) return;
@@ -793,7 +891,6 @@ function updateActiveItem(items) {
   if (items[tzActiveIndex]) items[tzActiveIndex].scrollIntoView({ block: 'nearest' });
 }
 
-// 外側クリックで閉じる
 document.addEventListener('click', e => {
   if (!tzSearch.contains(e.target) && !tzResults.contains(e.target)) {
     closeTzDropdown();
@@ -840,7 +937,6 @@ document.getElementById('timerStart').onclick = () => {
     timerRemaining = getTimerInputSec();
     if (timerRemaining <= 0) { toast('時間を入力してください'); return; }
   }
-  if (NOTIF_SUPPORTED && Notification.permission === 'default') requestNotifPermission();
   timerRunning = true;
   timerInputWrap.style.display = 'none';
   timerDisplay.style.display = 'block';
@@ -925,7 +1021,6 @@ function getSelectedDays() {
   return [...alDaysEl.querySelectorAll('.day-btn.active')].map(b => +b.dataset.d);
 }
 document.getElementById('alAdd').onclick = () => {
-  if (NOTIF_SUPPORTED && Notification.permission === 'default') requestNotifPermission();
   const h = Math.min(23, Math.max(0, parseInt(document.getElementById('alH').value)||0));
   const m = Math.min(59, Math.max(0, parseInt(document.getElementById('alM').value)||0));
   const days = getSelectedDays();
@@ -1088,7 +1183,6 @@ document.getElementById('ivAdd').onclick = () => {
 document.getElementById('ivStart').onclick = () => {
   if (ivRunning) return;
   if (intervals.length === 0) { toast('インターバルを追加してください'); return; }
-  if (NOTIF_SUPPORTED && Notification.permission === 'default') requestNotifPermission();
   ivRunning = true;
   ivCurrentIndex = 0;
   runIvStep();
