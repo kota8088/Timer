@@ -69,215 +69,115 @@
     margin-bottom: 18px;
     box-shadow: 0 0 15px rgba(255,0,229,0.15);
   }
-
   #notifPanel .notif-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.9rem;
-    color: #ffd6f7;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.9rem; color: #ffd6f7;
     text-shadow: 0 0 6px rgba(255,0,229,0.4);
     letter-spacing: 1px;
   }
-
-  #notifPanel .notif-icon {
-    font-size: 1.2rem;
-    filter: drop-shadow(0 0 6px var(--neon-pink));
-  }
-
+  #notifPanel .notif-icon { font-size: 1.2rem; filter: drop-shadow(0 0 6px var(--neon-pink)); }
   #notifPanel .status-text {
-    font-size: 0.75rem;
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 1px solid currentColor;
-    letter-spacing: 1px;
-    white-space: nowrap;
+    font-size: 0.75rem; padding: 3px 10px; border-radius: 20px;
+    border: 1px solid currentColor; letter-spacing: 1px; white-space: nowrap;
   }
-  #notifPanel .status-text.on {
-    color: var(--neon-green);
-    text-shadow: 0 0 6px var(--neon-green);
-  }
+  #notifPanel .status-text.on { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
   #notifPanel .status-text.off { color: #888; }
-  #notifPanel .status-text.blocked {
-    color: var(--neon-pink);
-    text-shadow: 0 0 6px var(--neon-pink);
-  }
-
+  #notifPanel .status-text.blocked { color: var(--neon-pink); text-shadow: 0 0 6px var(--neon-pink); }
   #notifPanel .spacer { flex: 1; }
 
   /* ===== 大きなトグルスイッチ ===== */
   .big-switch {
-    position: relative;
-    width: 68px;
-    height: 34px;
-    border-radius: 17px;
-    background: rgba(0,0,0,0.55);
-    border: 1px solid #555;
-    cursor: pointer;
-    transition: all 0.25s;
-    flex-shrink: 0;
+    position: relative; width: 68px; height: 34px; border-radius: 17px;
+    background: rgba(0,0,0,0.55); border: 1px solid #555;
+    cursor: pointer; transition: all 0.25s; flex-shrink: 0;
   }
   .big-switch::after {
-    content: '';
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    background: #666;
-    transition: all 0.25s;
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #666; transition: all 0.25s;
     box-shadow: 0 0 6px rgba(0,0,0,0.6);
   }
   .big-switch.on {
-    background: rgba(57,255,20,0.2);
-    border-color: var(--neon-green);
+    background: rgba(57,255,20,0.2); border-color: var(--neon-green);
     box-shadow: 0 0 14px var(--neon-green), inset 0 0 12px rgba(57,255,20,0.3);
   }
   .big-switch.on::after {
-    left: 37px;
-    background: var(--neon-green);
+    left: 37px; background: var(--neon-green);
     box-shadow: 0 0 14px var(--neon-green);
   }
-  .big-switch.disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
+  .big-switch.disabled { opacity: 0.35; cursor: not-allowed; }
 
   /* ===== サウンド選択 ===== */
   #soundPanel {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
     background: rgba(0,240,255,0.06);
     border: 1px solid rgba(0,240,255,0.35);
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 18px;
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;
     box-shadow: 0 0 15px rgba(0,240,255,0.15);
   }
-
   #soundPanel .sound-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.9rem;
-    color: #d6f7ff;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.9rem; color: #d6f7ff;
     text-shadow: 0 0 6px rgba(0,240,255,0.4);
     letter-spacing: 1px;
   }
+  #soundPanel .sound-icon { font-size: 1.2rem; filter: drop-shadow(0 0 6px var(--neon-cyan)); }
 
-  #soundPanel .sound-icon {
-    font-size: 1.2rem;
-    filter: drop-shadow(0 0 6px var(--neon-cyan));
-  }
-
-  .sound-select-wrap {
-    position: relative;
-    min-width: 220px;
-  }
+  .sound-select-wrap { position: relative; min-width: 220px; }
 
   .sound-select-display {
-    padding: 9px 14px;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--neon-cyan);
-    border-radius: 8px;
-    color: var(--neon-cyan);
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 0 8px rgba(0,240,255,0.2);
-    transition: all 0.2s;
+    padding: 9px 14px; background: rgba(0,0,0,0.5);
+    border: 1px solid var(--neon-cyan); border-radius: 8px;
+    color: var(--neon-cyan); font-size: 0.9rem; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    box-shadow: 0 0 8px rgba(0,240,255,0.2); transition: all 0.2s;
   }
   .sound-select-display:hover,
-  .sound-select-display.open {
-    box-shadow: 0 0 14px var(--neon-cyan);
-  }
-  .sound-select-display .arrow {
-    font-size: 0.7rem;
-    transition: transform 0.2s;
-  }
-  .sound-select-display.open .arrow {
-    transform: rotate(180deg);
-  }
+  .sound-select-display.open { box-shadow: 0 0 14px var(--neon-cyan); }
+  .sound-select-display .arrow { font-size: 0.7rem; transition: transform 0.2s; }
+  .sound-select-display.open .arrow { transform: rotate(180deg); }
 
   .sound-dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    left: 0;
-    right: 0;
-    background: rgba(10,10,25,0.98);
-    border: 1px solid var(--neon-cyan);
-    border-radius: 10px;
-    max-height: 280px;
-    overflow-y: auto;
-    z-index: 60;
-    display: none;
-    box-shadow: 0 0 25px rgba(0,240,255,0.5);
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+    background: rgba(10,10,25,0.98); border: 1px solid var(--neon-cyan);
+    border-radius: 10px; max-height: 280px; overflow-y: auto;
+    z-index: 60; display: none; box-shadow: 0 0 25px rgba(0,240,255,0.5);
   }
   .sound-dropdown.open { display: block; }
 
   .sound-search {
-    width: 100%;
-    padding: 10px 12px;
+    width: 100%; padding: 10px 12px;
     background: rgba(0,0,0,0.6);
-    border: none;
-    border-bottom: 1px solid rgba(0,240,255,0.3);
-    color: #e6f7ff;
-    font-size: 0.85rem;
-    outline: none;
+    border: none; border-bottom: 1px solid rgba(0,240,255,0.3);
+    color: #e6f7ff; font-size: 0.85rem; outline: none;
   }
   .sound-search::placeholder { color: rgba(230,247,255,0.35); }
 
   .sound-item {
-    padding: 10px 14px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid rgba(0,240,255,0.08);
-    transition: background 0.12s;
+    padding: 10px 14px; cursor: pointer; font-size: 0.85rem;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    border-bottom: 1px solid rgba(0,240,255,0.08); transition: background 0.12s;
   }
   .sound-item:last-child { border-bottom: none; }
   .sound-item:hover,
   .sound-item.active {
-    background: rgba(0,240,255,0.15);
-    color: var(--neon-cyan);
+    background: rgba(0,240,255,0.15); color: var(--neon-cyan);
     text-shadow: 0 0 6px var(--neon-cyan);
   }
   .sound-item.selected::after {
-    content: '✓';
-    color: var(--neon-green);
-    text-shadow: 0 0 6px var(--neon-green);
-    font-weight: bold;
-  }
-  .sound-item .sound-cat {
-    font-size: 0.7rem;
-    opacity: 0.5;
-    margin-left: 8px;
+    content: '✓'; color: var(--neon-green);
+    text-shadow: 0 0 6px var(--neon-green); font-weight: bold;
   }
 
   .sound-dropdown .sound-group {
-    padding: 6px 14px;
-    font-size: 0.68rem;
-    letter-spacing: 1.5px;
-    color: var(--neon-pink);
-    text-shadow: 0 0 5px var(--neon-pink);
+    padding: 6px 14px; font-size: 0.68rem; letter-spacing: 1.5px;
+    color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink);
     background: rgba(255,0,229,0.06);
-    position: sticky;
-    top: 0;
-    z-index: 2;
+    position: sticky; top: 0; z-index: 2;
   }
 
   .sound-dropdown .sound-empty {
-    padding: 16px;
-    text-align: center;
-    font-size: 0.82rem;
-    opacity: 0.6;
+    padding: 16px; text-align: center; font-size: 0.82rem; opacity: 0.6;
   }
 
   /* ===== 世界時計 ===== */
@@ -286,11 +186,8 @@
   .clock-card {
     background: rgba(0,0,0,0.35);
     border: 1px solid rgba(176,38,255,0.4);
-    border-radius: 10px;
-    padding: 10px 14px;
-    min-width: 170px;
-    position: relative;
-    box-shadow: 0 0 10px rgba(176,38,255,0.25);
+    border-radius: 10px; padding: 10px 14px; min-width: 170px;
+    position: relative; box-shadow: 0 0 10px rgba(176,38,255,0.25);
   }
   .clock-card .city { font-size: 0.8rem; color: var(--neon-purple); text-shadow: 0 0 6px var(--neon-purple); letter-spacing: 1px; }
   .clock-card .time { font-size: 1.6rem; font-variant-numeric: tabular-nums; color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
@@ -301,37 +198,22 @@
   .search-wrap { position: relative; }
 
   #tzSearch {
-    width: 100%;
-    padding: 12px 14px;
+    width: 100%; padding: 12px 14px;
     background: rgba(0,0,0,0.5);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: #e6f7ff;
-    font-size: 0.95rem;
-    outline: none;
-    box-shadow: 0 0 8px rgba(0,240,255,0.2);
-    cursor: pointer;
+    border: 1px solid var(--border); border-radius: 8px;
+    color: #e6f7ff; font-size: 0.95rem; outline: none;
+    box-shadow: 0 0 8px rgba(0,240,255,0.2); cursor: pointer;
     transition: all 0.2s;
   }
   #tzSearch:focus,
-  #tzSearch.open {
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 14px var(--neon-cyan);
-  }
+  #tzSearch.open { border-color: var(--neon-cyan); box-shadow: 0 0 14px var(--neon-cyan); }
   #tzSearch::placeholder { color: rgba(230, 247, 255, 0.4); }
 
   #tzResults {
-    position: absolute;
-    top: calc(100% + 6px);
-    left: 0;
-    right: 0;
-    background: rgba(10,10,25,0.98);
-    border: 1px solid var(--neon-cyan);
-    border-radius: 10px;
-    max-height: 320px;
-    overflow-y: auto;
-    z-index: 50;
-    display: none;
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+    background: rgba(10,10,25,0.98); border: 1px solid var(--neon-cyan);
+    border-radius: 10px; max-height: 320px; overflow-y: auto;
+    z-index: 50; display: none;
     box-shadow: 0 0 25px rgba(0,240,255,0.5), inset 0 0 20px rgba(0,240,255,0.05);
     animation: dropIn 0.18s ease-out;
   }
@@ -343,56 +225,34 @@
   }
 
   #tzResults .tz-item {
-    padding: 9px 14px;
-    cursor: pointer;
-    font-size: 0.85rem;
+    padding: 9px 14px; cursor: pointer; font-size: 0.85rem;
     border-bottom: 1px solid rgba(0,240,255,0.08);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
     transition: background 0.12s;
   }
   #tzResults .tz-item:last-child { border-bottom: none; }
   #tzResults .tz-item:hover,
   #tzResults .tz-item.active {
-    background: rgba(0,240,255,0.15);
-    color: var(--neon-cyan);
+    background: rgba(0,240,255,0.15); color: var(--neon-cyan);
     text-shadow: 0 0 6px var(--neon-cyan);
   }
   #tzResults .tz-item .tz-name { flex: 1; }
   #tzResults .tz-item .tz-offset {
-    font-size: 0.72rem;
-    color: var(--neon-purple);
+    font-size: 0.72rem; color: var(--neon-purple);
     text-shadow: 0 0 5px var(--neon-purple);
     font-variant-numeric: tabular-nums;
   }
   #tzResults .tz-item.added { opacity: 0.45; }
   #tzResults .tz-item.added .tz-name::after {
-    content: ' ✓';
-    color: var(--neon-green);
-    text-shadow: 0 0 6px var(--neon-green);
+    content: ' ✓'; color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green);
   }
-
   #tzResults .tz-group {
-    padding: 6px 14px;
-    font-size: 0.68rem;
-    letter-spacing: 1.5px;
-    color: var(--neon-pink);
-    text-shadow: 0 0 5px var(--neon-pink);
+    padding: 6px 14px; font-size: 0.68rem; letter-spacing: 1.5px;
+    color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink);
     background: rgba(255,0,229,0.06);
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    backdrop-filter: blur(4px);
+    position: sticky; top: 0; z-index: 2; backdrop-filter: blur(4px);
   }
-
-  #tzResults .tz-empty {
-    padding: 16px;
-    text-align: center;
-    font-size: 0.82rem;
-    opacity: 0.6;
-  }
+  #tzResults .tz-empty { padding: 16px; text-align: center; font-size: 0.82rem; opacity: 0.6; }
 
   /* ===== ボタン ===== */
   button {
@@ -422,9 +282,8 @@
     width: 60px; text-align: center; font-size: 2rem;
     font-variant-numeric: tabular-nums;
     background: rgba(0,0,0,0.5);
-    border: 1px solid var(--neon-cyan);
-    border-radius: 8px; color: var(--neon-cyan);
-    text-shadow: 0 0 8px var(--neon-cyan);
+    border: 1px solid var(--neon-cyan); border-radius: 8px;
+    color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan);
     padding: 4px; outline: none;
     box-shadow: inset 0 0 10px rgba(0,240,255,0.2);
     font-family: inherit;
@@ -432,7 +291,6 @@
   .time-input input::-webkit-outer-spin-button,
   .time-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .time-input input[type=number] { -moz-appearance: textfield; }
-
   .time-input input:focus {
     border-color: var(--neon-pink); color: var(--neon-pink);
     text-shadow: 0 0 8px var(--neon-pink);
@@ -483,7 +341,6 @@
     border-radius: 10px; margin-bottom: 8px;
     background: rgba(0,0,0,0.3);
   }
-
   .alarm-item .alarm-days { display: flex; gap: 4px; font-size: 0.75rem; }
   .alarm-item .alarm-days span { padding: 2px 5px; border-radius: 5px; background: rgba(176,38,255,0.15); color: #8a8aa8; }
   .alarm-item .alarm-days span.on { background: rgba(176,38,255,0.5); color: #fff; text-shadow: 0 0 5px var(--neon-purple); }
@@ -491,9 +348,8 @@
   .alarm-time-inputs input {
     width: 48px; text-align: center; font-size: 1.2rem;
     background: rgba(0,0,0,0.5);
-    border: 1px solid var(--neon-cyan);
-    border-radius: 6px; color: var(--neon-cyan);
-    padding: 4px; outline: none; font-family: inherit;
+    border: 1px solid var(--neon-cyan); border-radius: 6px;
+    color: var(--neon-cyan); padding: 4px; outline: none; font-family: inherit;
   }
   .alarm-time-inputs input::-webkit-outer-spin-button,
   .alarm-time-inputs input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -503,8 +359,7 @@
     position: relative; width: 42px; height: 22px; border-radius: 11px;
     background: rgba(0,0,0,0.5);
     border: 1px solid var(--neon-cyan);
-    cursor: pointer; transition: 0.2s;
-    flex-shrink: 0;
+    cursor: pointer; transition: 0.2s; flex-shrink: 0;
   }
   .switch::after {
     content: ''; position: absolute; top: 2px; left: 2px;
@@ -526,8 +381,7 @@
     font-size: 1rem; box-shadow: 0 0 25px var(--neon-pink);
     text-shadow: 0 0 8px var(--neon-pink);
     transition: transform 0.4s;
-    z-index: 999; pointer-events: none;
-    max-width: 90vw;
+    z-index: 999; pointer-events: none; max-width: 90vw;
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -537,8 +391,7 @@
     background: rgba(176,38,255,0.25);
     border: 1px solid var(--neon-purple);
     color: #fff; font-size: 0.8rem;
-    box-shadow: 0 0 8px rgba(176,38,255,0.5);
-    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(176,38,255,0.5); flex-shrink: 0;
   }
   .interval-item.active { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57,255,20,0.4); }
 
@@ -582,8 +435,9 @@
     </div>
   </div>
   <button class="small" id="soundTest">▶ 試聴</button>
+  <button class="pink small" id="soundStop">■ 停止</button>
   <div class="spacer"></div>
-  <div class="hint" style="margin:0;">タイマー / アラーム終了時に鳴ります</div>
+  <div class="hint" style="margin:0;">タイマー / アラーム終了時に最後まで鳴ります</div>
 </div>
 
 <!-- ========== 世界時計 ========== -->
@@ -669,21 +523,19 @@
 /* =========================================================
    サウンド定義
 ========================================================= */
-// 音の定義 (種類: beep / iphone / melody)
 const SOUNDS = [
-  { id: 'beep', name: 'ビープ音', cat: '基本', type: 'beep' },
-  { id: 'iphone-reflection', name: 'Reflection (iPhone)', cat: 'iPhone', type: 'iphone' },
-  { id: 'iphone-ripple', name: 'Ripple (iPhone)', cat: 'iPhone', type: 'iphone' },
-  { id: 'iphone-marimba', name: 'Marimba (iPhone)', cat: 'iPhone', type: 'iphone' },
-  { id: 'iphone-xylophone', name: 'Xylophone (iPhone)', cat: 'iPhone', type: 'iphone' },
-  { id: 'iphone-opens', name: 'Opening (iPhone)', cat: 'iPhone', type: 'iphone' },
-  { id: 'famima', name: 'ファミマ入店音', cat: 'ファミマ', type: 'melody' },
-  { id: 'alarm-classic', name: 'クラシックアラーム', cat: 'アラーム', type: 'iphone' },
-  { id: 'alarm-digital', name: 'デジタルアラーム', cat: 'アラーム', type: 'beep' },
-  { id: 'chime', name: 'チャイム', cat: 'チャイム', type: 'iphone' },
+  { id: 'beep',                name: 'ビープ音',              cat: '基本',    type: 'beep' },
+  { id: 'iphone-reflection',   name: 'Reflection (iPhone)',   cat: 'iPhone',  type: 'iphone' },
+  { id: 'iphone-ripple',       name: 'Ripple (iPhone)',       cat: 'iPhone',  type: 'iphone' },
+  { id: 'iphone-marimba',      name: 'Marimba (iPhone)',      cat: 'iPhone',  type: 'iphone' },
+  { id: 'iphone-xylophone',    name: 'Xylophone (iPhone)',    cat: 'iPhone',  type: 'iphone' },
+  { id: 'iphone-opens',        name: 'Opening (iPhone)',      cat: 'iPhone',  type: 'iphone' },
+  { id: 'famima',              name: 'ファミマ入店音',         cat: 'ファミマ', type: 'melody' },
+  { id: 'alarm-classic',       name: 'クラシックアラーム',       cat: 'アラーム', type: 'iphone' },
+  { id: 'alarm-digital',       name: 'デジタルアラーム',         cat: 'アラーム', type: 'beep' },
+  { id: 'chime',               name: 'チャイム',              cat: 'チャイム', type: 'iphone' },
 ];
 
-// 現在選択中のサウンドID
 let currentSoundId = 'beep';
 try {
   const saved = localStorage.getItem('neon-timer-sound');
@@ -692,8 +544,14 @@ try {
 
 /* =========================================================
    音生成エンジン (Web Audio API)
+   - 再生中ノードを管理し、新しい再生時に前の音を停止
+   - 「最後まで流す」ために playSound は Promise を返す
 ========================================================= */
 let audioCtx = null;
+let activeNodes = [];       // { osc, gain }
+let playSession = 0;        // 世代番号 - 新しい再生で古いタイマーを無効化
+let soundPlaying = false;   // 通知音再生中フラグ (トーストのビープ抑制用)
+
 function getAudioCtx() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -702,8 +560,19 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-// 単音を鳴らす
-function playTone(freq, durationMs, type = 'sine', volume = 0.25, startDelay = 0) {
+// 再生中の音をすべて止める
+function stopAllSounds() {
+  playSession++;  // 世代を進める → 予約済みの setTimeout を無効化
+  activeNodes.forEach(({ osc }) => {
+    try { osc.stop(); } catch(e) {}
+    try { osc.disconnect(); } catch(e) {}
+  });
+  activeNodes = [];
+  soundPlaying = false;
+}
+
+// 単音をスケジュール (Promise を返さない低レベル関数)
+function scheduleTone(freq, durationMs, type, volume, startDelay, session) {
   try {
     const ctx = getAudioCtx();
     const t0 = ctx.currentTime + startDelay / 1000;
@@ -717,91 +586,123 @@ function playTone(freq, durationMs, type = 'sine', volume = 0.25, startDelay = 0
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(t0);
-    osc.stop(t0 + durationMs / 1000 + 0.02);
+    osc.stop(t0 + durationMs / 1000 + 0.05);
+
+    // セッションが変わっていたら追加しない(停止済み扱い)
+    if (session === playSession) {
+      activeNodes.push({ osc, gain });
+    } else {
+      try { osc.stop(); } catch(e) {}
+    }
   } catch(e) {}
 }
 
-// 休符
-function rest(ms) { return new Promise(r => setTimeout(r, ms)); }
+// サウンドごとの「総再生時間(ミリ秒)」を計算
+function getSoundDuration(soundId) {
+  switch (soundId) {
+    case 'beep':                return 650;
+    case 'iphone-reflection':   return 1400;
+    case 'iphone-ripple':       return 800;
+    case 'iphone-marimba':      return 180 * 3 + 300;
+    case 'iphone-xylophone':    return 160 * 3 + 250;
+    case 'iphone-opens':        return 200 * 3 + 400;
+    case 'famima':              return 2750;  // 11音 × 250ms
+    case 'alarm-classic':       return 300 * 2 + 200;
+    case 'alarm-digital':       return 150 * 3 + 100;
+    case 'chime':               return 650 + 800;
+    default:                    return 700;
+  }
+}
 
-// 各サウンドの再生
-async function playSound(soundId) {
+// サウンドを再生 - 最後まで流れる
+function playSound(soundId) {
   const sound = SOUNDS.find(s => s.id === soundId) || SOUNDS[0];
+  const session = ++playSession;
+
+  // 前の音を停止
+  activeNodes.forEach(({ osc }) => {
+    try { osc.stop(); } catch(e) {}
+    try { osc.disconnect(); } catch(e) {}
+  });
+  activeNodes = [];
+
+  soundPlaying = true;
+  const dur = getSoundDuration(sound.id);
 
   if (sound.id === 'beep') {
-    // 基本のビープ: 880Hz x2
-    playTone(880, 300, 'sine', 0.25, 0);
-    playTone(880, 300, 'sine', 0.25, 350);
+    scheduleTone(880, 300, 'sine', 0.25, 0,     session);
+    scheduleTone(880, 300, 'sine', 0.25, 350,   session);
 
   } else if (sound.id === 'iphone-reflection') {
-    // Reflection風: 柔らかい下降音
-    playTone(659.25, 400, 'sine', 0.2, 0);     // E5
-    playTone(523.25, 400, 'sine', 0.2, 400);   // C5
-    playTone(440.00, 600, 'sine', 0.2, 800);   // A4
+    scheduleTone(659.25, 400, 'sine', 0.2, 0,   session);
+    scheduleTone(523.25, 400, 'sine', 0.2, 400, session);
+    scheduleTone(440.00, 600, 'sine', 0.2, 800, session);
 
   } else if (sound.id === 'iphone-ripple') {
-    // Ripple風: 水滴のような音
-    playTone(880, 200, 'sine', 0.2, 0);
-    playTone(1174.66, 200, 'sine', 0.2, 200);  // D6
-    playTone(880, 400, 'sine', 0.2, 400);
+    scheduleTone(880,    200, 'sine', 0.2, 0,   session);
+    scheduleTone(1174.66,200, 'sine', 0.2, 200, session);
+    scheduleTone(880,    400, 'sine', 0.2, 400, session);
 
   } else if (sound.id === 'iphone-marimba') {
-    // Marimba風: 木琴の連打
     [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-      playTone(f, 300, 'triangle', 0.2, i * 180);
+      scheduleTone(f, 300, 'triangle', 0.2, i * 180, session);
     });
 
   } else if (sound.id === 'iphone-xylophone') {
-    // Xylophone風
     [659.25, 783.99, 987.77, 1318.51].forEach((f, i) => {
-      playTone(f, 250, 'sine', 0.2, i * 160);
+      scheduleTone(f, 250, 'sine', 0.2, i * 160, session);
     });
 
   } else if (sound.id === 'iphone-opens') {
-    // Opening風: 上昇する音
     [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-      playTone(f, 400, 'sine', 0.2, i * 200);
+      scheduleTone(f, 400, 'sine', 0.2, i * 200, session);
     });
 
   } else if (sound.id === 'famima') {
-    // ファミマの入店音「大盛況」
-    // B4 → G4 → D4 → G4 → A4 → D5 → (休符) → D5 → A4 → B4 → A4 ...
-    const R = 1000; // 基準リズム
-    const q = R / 4; // 四分音符
-
-    playTone(493.88, q, 'sine', 0.25, 0);      // シ (B4)
-    playTone(392.00, q, 'sine', 0.25, q);      // ソ (G4)
-    playTone(293.66, q, 'sine', 0.25, q * 2);  // レ (D4)
-    playTone(392.00, q, 'sine', 0.25, q * 3);  // ソ (G4)
-    playTone(440.00, q, 'sine', 0.25, q * 4);  // ラ (A4)
-    playTone(587.33, q, 'sine', 0.25, q * 5);  // レ (D5)
-    // 休符
-    playTone(587.33, q, 'sine', 0.25, q * 7);  // レ (D5)
-    playTone(440.00, q, 'sine', 0.25, q * 8);  // ラ (A4)
-    playTone(493.88, q, 'sine', 0.25, q * 9);  // シ (B4)
-    playTone(440.00, q, 'sine', 0.25, q * 10); // ラ (A4)
+    // ファミマ入店音「大盛況」
+    // シ→ソ→レ→ソ→ラ→レ→(休符)→レ→ラ→シ→ラ
+    const q = 250; // 四分音符
+    const notes = [
+      { f: 493.88, d: q, delay: q * 0 },
+      { f: 392.00, d: q, delay: q * 1 },
+      { f: 293.66, d: q, delay: q * 2 },
+      { f: 392.00, d: q, delay: q * 3 },
+      { f: 440.00, d: q, delay: q * 4 },
+      { f: 587.33, d: q, delay: q * 5 },
+      // 休符 (q * 6 は無音)
+      { f: 587.33, d: q, delay: q * 7 },
+      { f: 440.00, d: q, delay: q * 8 },
+      { f: 493.88, d: q, delay: q * 9 },
+      { f: 440.00, d: q, delay: q * 10 },
+    ];
+    notes.forEach(n => scheduleTone(n.f, n.d, 'sine', 0.25, n.delay, session));
 
   } else if (sound.id === 'alarm-classic') {
-    // クラシックアラーム: ベル音
     [880, 880, 880].forEach((f, i) => {
-      playTone(f, 200, 'sine', 0.3, i * 300);
-      playTone(f * 1.5, 150, 'sine', 0.15, i * 300 + 100);
+      scheduleTone(f, 200, 'sine', 0.3, i * 300, session);
+      scheduleTone(f * 1.5, 150, 'sine', 0.15, i * 300 + 100, session);
     });
 
   } else if (sound.id === 'alarm-digital') {
-    // デジタルアラーム: ピピピッ
     [1000, 1000, 1000, 1000].forEach((f, i) => {
-      playTone(f, 100, 'square', 0.15, i * 150);
+      scheduleTone(f, 100, 'square', 0.15, i * 150, session);
     });
 
   } else if (sound.id === 'chime') {
-    // チャイム: ドアホン風
-    playTone(659.25, 600, 'sine', 0.25, 0);    // E5
-    playTone(523.25, 800, 'sine', 0.25, 650);  // C5
+    scheduleTone(659.25, 600, 'sine', 0.25, 0,   session);
+    scheduleTone(523.25, 800, 'sine', 0.25, 650, session);
+
   } else {
-    // フォールバック
-    playTone(880, 300, 'sine', 0.25, 0);
+    scheduleTone(880, 300, 'sine', 0.25, 0, session);
   }
+
+  // 全長ぶん待ってからフラグを落とす (この間はトーストのビープを抑制)
+  const mySession = session;
+  setTimeout(() => {
+    if (mySession === playSession) {
+      soundPlaying = false;
+    }
+  }, dur + 100);
 }
 
 /* =========================================================
@@ -813,6 +714,7 @@ const soundSearch        = document.getElementById('soundSearch');
 const soundListEl        = document.getElementById('soundList');
 const soundSelectName    = document.getElementById('soundSelectName');
 const soundTest          = document.getElementById('soundTest');
+const soundStopBtn       = document.getElementById('soundStop');
 
 function renderSoundList(filter = '') {
   const q = filter.trim().toLowerCase();
@@ -827,7 +729,6 @@ function renderSoundList(filter = '') {
     return;
   }
 
-  // カテゴリごとにグループ化
   const groups = {};
   filtered.forEach(s => {
     if (!groups[s.cat]) groups[s.cat] = [];
@@ -873,12 +774,11 @@ function selectSound(id) {
   const s = SOUNDS.find(x => x.id === id);
   soundSelectName.textContent = s ? s.name : 'ビープ音';
   closeSoundDropdown();
-  // 選んだ音を即試聴
+  // 選んだ音を最初から最後まで再生
   playSound(id);
-  toast('🔊 通知音を「' + (s ? s.name : '') + '」に変更');
+  toast('🔊 通知音を「' + (s ? s.name : '') + '」に変更', false);
 }
 
-// 選択表示クリックで開閉
 soundSelectDisplay.onclick = (e) => {
   e.stopPropagation();
   if (soundDropdown.classList.contains('open')) {
@@ -888,26 +788,28 @@ soundSelectDisplay.onclick = (e) => {
   }
 };
 
-// 検索
 soundSearch.addEventListener('input', () => {
   renderSoundList(soundSearch.value);
 });
 
-// ドロップダウン内クリックで閉じないように
 soundDropdown.onclick = (e) => e.stopPropagation();
 
-// 試聴ボタン
+// 試聴: 最後まで再生
 soundTest.onclick = () => {
   playSound(currentSoundId);
-  toast('🔊 試聴中...');
+  toast('🔊 試聴中...', false);
 };
 
-// 外側クリックで閉じる
+// 停止ボタン
+soundStopBtn.onclick = () => {
+  stopAllSounds();
+  toast('■ 停止しました', false);
+};
+
 document.addEventListener('click', () => {
   closeSoundDropdown();
 });
 
-// 初期表示
 const initialSound = SOUNDS.find(s => s.id === currentSoundId);
 if (initialSound) soundSelectName.textContent = initialSound.name;
 
@@ -965,7 +867,7 @@ function renderNotifPanel() {
 }
 
 notifToggle.onclick = () => {
-  if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です'); return; }
+  if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です', false); return; }
   notifEnabled = !notifEnabled;
   localStorage.setItem(NOTIF_PREF_KEY, notifEnabled ? 'on' : 'off');
   renderNotifPanel();
@@ -974,40 +876,40 @@ notifToggle.onclick = () => {
     if (Notification.permission === 'default') {
       requestNotifPermission();
     } else if (Notification.permission === 'granted') {
-      toast('🔔 通知を ON にしました');
+      toast('🔔 通知を ON にしました', false);
     } else if (Notification.permission === 'denied') {
-      toast('⚠ ブラウザでブロックされています');
+      toast('⚠ ブラウザでブロックされています', false);
     }
   } else {
-    toast('🔕 通知を OFF にしました');
+    toast('🔕 通知を OFF にしました', false);
   }
 };
 
 notifTest.onclick = () => {
-  if (!isNotifActuallyActive()) { toast('通知が有効ではありません'); return; }
+  if (!isNotifActuallyActive()) { toast('通知が有効ではありません', false); return; }
   showDesktopNotification('🔔 テスト通知', 'Neon Multi Timer からの通知テストです');
-  toast('テスト通知を送信しました');
+  toast('テスト通知を送信しました', false);
 };
 
 notifRequest.onclick = () => {
-  if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です'); return; }
-  if (Notification.permission === 'granted') { toast('すでに許可されています'); return; }
+  if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です', false); return; }
+  if (Notification.permission === 'granted') { toast('すでに許可されています', false); return; }
   requestNotifPermission();
 };
 
 async function requestNotifPermission() {
   if (!NOTIF_SUPPORTED) return;
   if (Notification.permission === 'denied') {
-    toast('ブラウザ設定で通知を許可してください');
+    toast('ブラウザ設定で通知を許可してください', false);
     return;
   }
   const res = await Notification.requestPermission();
   renderNotifPanel();
   if (res === 'granted') {
-    toast('🔔 通知を許可しました');
+    toast('🔔 通知を許可しました', false);
     showDesktopNotification('通知が有効になりました', 'Neon Multi Timer');
   } else {
-    toast('通知が許可されませんでした');
+    toast('通知が許可されませんでした', false);
   }
 }
 
@@ -1038,22 +940,24 @@ function showDesktopNotification(title, body, opts = {}) {
 renderNotifPanel();
 
 /* =========================================================
-   画面内トースト + サウンド再生
+   画面内トースト (音は鳴らさない)
+   - 通知音は「タイマー/アラーム終了時」と「音の試聴」のみ
 ========================================================= */
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
 
-function toast(msg, withSound = true) {
+function toast(msg) {
   toastEl.textContent = msg;
   toastEl.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3500);
-  if (withSound) playSound(currentSoundId);
 }
 
+// 通知 + デスクトップ通知 + 通知音 (音は最後まで)
 function notifyAll(title, body, opts = {}) {
   showDesktopNotification(title, body, opts);
-  toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''), true);
+  toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''));
+  playSound(currentSoundId);
 }
 
 /* =========================================================
@@ -1175,7 +1079,7 @@ function selectTz(tz) {
     clocks.push({ tz, label: cityFromTz(tz) });
     renderClocks();
   } else {
-    toast('そのタイムゾーンは既に追加されています', false);
+    toast('そのタイムゾーンは既に追加されています');
   }
   tzSearch.value = '';
   renderTzDropdown('');
@@ -1298,7 +1202,7 @@ document.getElementById('timerStart').onclick = () => {
   if (timerRunning) return;
   if (timerRemaining === 0) {
     timerRemaining = getTimerInputSec();
-    if (timerRemaining <= 0) { toast('時間を入力してください', false); return; }
+    if (timerRemaining <= 0) { toast('時間を入力してください'); return; }
   }
   timerRunning = true;
   timerInputWrap.style.display = 'none';
@@ -1311,6 +1215,7 @@ document.getElementById('timerStart').onclick = () => {
     if (timerRemaining <= 0) {
       clearInterval(timerId);
       timerRunning = false;
+      // 音はここで1回だけ鳴らす(最後まで)
       notifyAll('⏱ タイマー終了', '設定した時間になりました', { tag: 'timer', requireInteraction: true, icon: '⏱' });
     }
   }, 1000);
@@ -1511,7 +1416,7 @@ function renderIntervals() {
 
   ivList.querySelectorAll('[data-ivdel]').forEach(btn => {
     btn.onclick = () => {
-      if (ivRunning) { toast('実行中は削除できません', false); return; }
+      if (ivRunning) { toast('実行中は削除できません'); return; }
       const id = +btn.dataset.ivdel;
       intervals = intervals.filter(x => x.id !== id);
       renderIntervals();
@@ -1536,14 +1441,14 @@ function updateIvDisplays() {
 }
 
 document.getElementById('ivAdd').onclick = () => {
-  if (ivRunning) { toast('実行中は追加できません', false); return; }
+  if (ivRunning) { toast('実行中は追加できません'); return; }
   intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10 });
   renderIntervals();
 };
 
 document.getElementById('ivStart').onclick = () => {
   if (ivRunning) return;
-  if (intervals.length === 0) { toast('インターバルを追加してください', false); return; }
+  if (intervals.length === 0) { toast('インターバルを追加してください'); return; }
   ivRunning = true;
   ivCurrentIndex = 0;
   runIvStep();
@@ -1574,7 +1479,8 @@ function runIvStep() {
         `次はステップ ${ivCurrentIndex+2} です`,
         { tag: 'iv-step-' + ivCurrentIndex, icon: '🔔' }
       );
-      toast(`🔔 ステップ ${ivCurrentIndex+1} 完了`, true);
+      toast(`🔔 ステップ ${ivCurrentIndex+1} 完了`);
+      playSound(currentSoundId); // 音は最後まで
       ivCurrentIndex++;
       setTimeout(() => { if (ivRunning) runIvStep(); }, 400);
     }
