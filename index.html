@@ -3,1073 +3,923 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON TIMER - 多機能タイマー</title>
+<title>Neon Multi Timer</title>
 <style>
-/* ===== 全体デザイン（宇宙・ネオン） ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', 'Orbitron', sans-serif;
-}
+  :root {
+    --neon-cyan: #00f0ff;
+    --neon-pink: #ff00e5;
+    --neon-purple: #b026ff;
+    --neon-green: #39ff14;
+    --neon-yellow: #ffe600;
+    --bg: #0a0a12;
+    --panel: rgba(20, 20, 35, 0.75);
+    --border: rgba(0, 240, 255, 0.35);
+  }
 
-body {
-  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-  min-height: 100vh;
-  color: #fff;
-  overflow-x: hidden;
-  position: relative;
-}
+  * { box-sizing: border-box; }
 
-/* 星の背景（少し明るめに調整） */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-image: 
-    radial-gradient(2px 2px at 20px 30px, #eee, transparent),
-    radial-gradient(2px 2px at 40px 70px, #fff, transparent),
-    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
-    radial-gradient(2px 2px at 130px 80px, #eee, transparent),
-    radial-gradient(2px 2px at 160px 120px, #fff, transparent),
-    radial-gradient(1px 1px at 200px 50px, #fff, transparent);
-  background-size: 250px 250px;
-  opacity: 0.4;
-  animation: twinkle 5s infinite alternate;
-  pointer-events: none;
-}
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 10%, #1a0b2e 0%, #0a0a12 55%, #05050a 100%);
+    color: #e6f7ff;
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    padding: 20px;
+    overflow-x: hidden;
+  }
 
-@keyframes twinkle {
-  from { opacity: 0.3; }
-  to { opacity: 0.6; }
-}
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    letter-spacing: 4px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 40px rgba(0,240,255,0.4);
+    margin: 0 0 20px;
+  }
 
-.container {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 20px;
-  position: relative;
-  z-index: 1;
-}
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 15px rgba(0,240,255,0.15), inset 0 0 20px rgba(0,240,255,0.05);
+    backdrop-filter: blur(6px);
+  }
 
-h1 {
-  text-align: center;
-  font-size: 2.5rem;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: #00d4ff;
-  text-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff, 0 0 40px #00d4ff;
-  margin-bottom: 30px;
-}
+  .panel-title {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--neon-pink);
+    text-shadow: 0 0 6px var(--neon-pink), 0 0 12px rgba(255,0,229,0.5);
+    margin-bottom: 12px;
+  }
 
-h2 {
-  color: #ff007f;
-  text-shadow: 0 0 8px #ff007f, 0 0 15px #ff007f;
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  border-bottom: 1px solid rgba(255, 0, 127, 0.3);
-  padding-bottom: 5px;
-}
+  /* ===== 通知許可バナー ===== */
+  #notifBanner {
+    display: none;
+    background: rgba(255,0,229,0.1);
+    border: 1px solid var(--neon-pink);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 18px rgba(255,0,229,0.3);
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  #notifBanner.show { display: flex; }
+  #notifBanner .msg {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #ffd6f7;
+    text-shadow: 0 0 6px rgba(255,0,229,0.5);
+  }
+  #notifBanner .msg small { display:block; opacity: 0.7; margin-top: 4px; font-size: 0.78rem; }
 
-/* 各セクションの共通カード */
-.card {
-  background: rgba(20, 30, 50, 0.7);
-  border: 1px solid #00d4ff;
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 30px;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3), inset 0 0 10px rgba(0, 212, 255, 0.1);
-  backdrop-filter: blur(5px);
-}
+  /* ===== 通知テストボタン ===== */
+  .notif-status {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid currentColor;
+    letter-spacing: 1px;
+  }
+  .notif-status.granted { color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); }
+  .notif-status.denied  { color: var(--neon-pink); text-shadow: 0 0 6px var(--neon-pink); }
+  .notif-status.default { color: var(--neon-yellow); text-shadow: 0 0 6px var(--neon-yellow); }
+  .notif-status.unsupported { color: #888; }
 
-/* ===== 世界時計 ===== */
-.world-clock {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+  /* ===== 世界時計 ===== */
+  #clockList { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
 
-.clock-search {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-}
+  .clock-card {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(176,38,255,0.4);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 170px;
+    position: relative;
+    box-shadow: 0 0 10px rgba(176,38,255,0.25);
+  }
+  .clock-card .city { font-size: 0.8rem; color: var(--neon-purple); text-shadow: 0 0 6px var(--neon-purple); letter-spacing: 1px; }
+  .clock-card .time { font-size: 1.6rem; font-variant-numeric: tabular-nums; color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
+  .clock-card .date { font-size: 0.7rem; opacity: 0.6; }
+  .clock-card .remove { position: absolute; top: 4px; right: 8px; cursor: pointer; color: var(--neon-pink); font-size: 1rem; }
 
-.clock-search input[type="text"] {
-  flex: 1;
-  padding: 10px 15px;
-  border: 2px solid #00d4ff;
-  border-radius: 30px;
-  background: rgba(0, 212, 255, 0.1);
-  color: #fff;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.3s;
-}
+  /* ===== 検索ボックス ===== */
+  .search-wrap { position: relative; }
+  #tzSearch {
+    width: 100%; padding: 10px 12px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px; color: #e6f7ff; font-size: 0.95rem; outline: none;
+    box-shadow: 0 0 8px rgba(0,240,255,0.2);
+  }
+  #tzSearch:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px var(--neon-cyan); }
 
-.clock-search input[type="text"]:focus {
-  box-shadow: 0 0 15px #00d4ff;
-}
+  #tzResults {
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: rgba(10,10,25,0.98);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 8px; max-height: 220px; overflow-y: auto;
+    z-index: 50; display: none;
+    box-shadow: 0 0 20px rgba(0,240,255,0.4);
+  }
+  #tzResults div { padding: 8px 12px; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid rgba(0,240,255,0.1); }
+  #tzResults div:hover { background: rgba(0,240,255,0.15); color: var(--neon-cyan); }
 
-.clock-search select {
-  padding: 10px;
-  border: 2px solid #00d4ff;
-  border-radius: 30px;
-  background: #1B2735;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-}
+  /* ===== ボタン ===== */
+  button {
+    font-family: inherit; padding: 9px 18px; border-radius: 8px;
+    border: 1px solid var(--neon-cyan);
+    background: rgba(0,240,255,0.08);
+    color: var(--neon-cyan); cursor: pointer; font-size: 0.9rem; letter-spacing: 1px;
+    text-shadow: 0 0 6px var(--neon-cyan);
+    box-shadow: 0 0 8px rgba(0,240,255,0.3), inset 0 0 8px rgba(0,240,255,0.1);
+    transition: all 0.2s;
+  }
+  button:hover { background: rgba(0,240,255,0.25); box-shadow: 0 0 16px var(--neon-cyan), inset 0 0 12px rgba(0,240,255,0.3); }
+  button:active { transform: scale(0.96); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
 
-.clock-display {
-  text-align: center;
-  font-size: 3rem;
-  font-weight: bold;
-  color: #39ff14;
-  text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14, 0 0 40px #39ff14;
-  letter-spacing: 3px;
-}
+  button.pink { border-color: var(--neon-pink); color: var(--neon-pink); text-shadow: 0 0 6px var(--neon-pink); box-shadow: 0 0 8px rgba(255,0,229,0.3); background: rgba(255,0,229,0.08); }
+  button.pink:hover { background: rgba(255,0,229,0.22); box-shadow: 0 0 16px var(--neon-pink); }
 
-.clock-city {
-  text-align: center;
-  color: #00d4ff;
-  font-size: 1.2rem;
-  margin-top: 5px;
-}
+  button.green { border-color: var(--neon-green); color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); box-shadow: 0 0 8px rgba(57,255,20,0.3); background: rgba(57,255,20,0.08); }
+  button.green:hover { background: rgba(57,255,20,0.22); box-shadow: 0 0 16px var(--neon-green); }
 
-/* ===== ストップウォッチ ===== */
-.stopwatch-display {
-  font-size: 3rem;
-  text-align: center;
-  color: #ff007f;
-  text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
-  margin: 20px 0;
-  letter-spacing: 3px;
-}
+  button.small { padding: 5px 10px; font-size: 0.78rem; }
 
-.btn-group {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+  /* ===== 時間入力マス ===== */
+  .time-input { display: inline-flex; align-items: center; gap: 4px; }
+  .time-input input {
+    width: 60px; text-align: center; font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 8px; color: var(--neon-cyan);
+    text-shadow: 0 0 8px var(--neon-cyan);
+    padding: 4px; outline: none;
+    box-shadow: inset 0 0 10px rgba(0,240,255,0.2);
+    font-family: inherit;
+  }
+  .time-input input:focus {
+    border-color: var(--neon-pink); color: var(--neon-pink);
+    text-shadow: 0 0 8px var(--neon-pink);
+    box-shadow: inset 0 0 10px rgba(255,0,229,0.25);
+  }
+  .time-input .colon { font-size: 2rem; color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple); }
 
-.btn {
-  padding: 12px 30px;
-  border: 2px solid #00d4ff;
-  border-radius: 50px;
-  background: transparent;
-  color: #00d4ff;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-shadow: 0 0 5px #00d4ff;
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
+  .time-display {
+    font-size: 2.6rem; font-variant-numeric: tabular-nums;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green), 0 0 25px rgba(57,255,20,0.5);
+    letter-spacing: 2px;
+  }
 
-.btn:hover {
-  background: #00d4ff;
-  color: #000;
-  box-shadow: 0 0 30px #00d4ff;
-}
+  .row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 
-.btn-green {
-  border-color: #39ff14;
-  color: #39ff14;
-  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-  text-shadow: 0 0 5px #39ff14;
-}
+  /* ===== ストップウォッチ ===== */
+  #swDisplay {
+    font-size: 3rem; font-variant-numeric: tabular-nums;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 10px var(--neon-yellow), 0 0 25px rgba(255,230,0,0.5);
+    letter-spacing: 2px;
+  }
+  #swDisplay .ms { font-size: 1.6rem; opacity: 0.85; }
 
-.btn-green:hover {
-  background: #39ff14;
-  color: #000;
-  box-shadow: 0 0 30px #39ff14;
-}
+  /* ===== 曜日選択 ===== */
+  .days { display: flex; gap: 6px; flex-wrap: wrap; }
+  .day-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(176,38,255,0.5);
+    background: rgba(0,0,0,0.4);
+    color: #8a8aa8; cursor: pointer; font-size: 0.9rem;
+    transition: all 0.15s; user-select: none;
+  }
+  .day-btn.active {
+    color: #fff; border-color: var(--neon-purple);
+    background: rgba(176,38,255,0.3);
+    box-shadow: 0 0 12px var(--neon-purple), inset 0 0 10px rgba(176,38,255,0.4);
+    text-shadow: 0 0 6px #fff;
+  }
 
-.btn-pink {
-  border-color: #ff007f;
-  color: #ff007f;
-  box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
-  text-shadow: 0 0 5px #ff007f;
-}
+  /* ===== アラーム/インターバルリスト ===== */
+  .alarm-item, .interval-item {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px;
+    border: 1px solid rgba(0,240,255,0.2);
+    border-radius: 10px; margin-bottom: 8px;
+    background: rgba(0,0,0,0.3);
+  }
 
-.btn-pink:hover {
-  background: #ff007f;
-  color: #000;
-  box-shadow: 0 0 30px #ff007f;
-}
+  .alarm-item .alarm-days { display: flex; gap: 4px; font-size: 0.75rem; }
+  .alarm-item .alarm-days span { padding: 2px 5px; border-radius: 5px; background: rgba(176,38,255,0.15); color: #8a8aa8; }
+  .alarm-item .alarm-days span.on { background: rgba(176,38,255,0.5); color: #fff; text-shadow: 0 0 5px var(--neon-purple); }
 
-/* ===== 通常タイマー ===== */
-.timer-display {
-  font-size: 3rem;
-  text-align: center;
-  color: #00d4ff;
-  text-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
-  margin: 20px 0;
-  letter-spacing: 3px;
-}
+  .alarm-time-inputs input {
+    width: 48px; text-align: center; font-size: 1.2rem;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 6px; color: var(--neon-cyan);
+    padding: 4px; outline: none; font-family: inherit;
+  }
 
-.timer-setup {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-}
+  .switch {
+    position: relative; width: 42px; height: 22px; border-radius: 11px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--neon-cyan);
+    cursor: pointer; transition: 0.2s;
+  }
+  .switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #556; transition: 0.2s;
+  }
+  .switch.on { background: rgba(57,255,20,0.25); border-color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+  .switch.on::after { left: 22px; background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
 
-.timer-setup input[type="text"] {
-  font-size: 1.5rem;
-  width: 180px;
-  padding: 8px 15px;
-  border: 2px solid #00d4ff;
-  border-radius: 15px;
-  background: rgba(0, 212, 255, 0.1);
-  color: #fff;
-  text-align: center;
-  outline: none;
-}
+  label { font-size: 0.85rem; opacity: 0.85; }
+  .hint { font-size: 0.78rem; opacity: 0.55; margin-top: 6px; }
 
-.timer-setup input[type="text"]:focus {
-  box-shadow: 0 0 15px #00d4ff;
-}
+  #toast {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(20,10,40,0.95);
+    border: 1px solid var(--neon-pink);
+    color: #fff; padding: 14px 28px; border-radius: 10px;
+    font-size: 1rem; box-shadow: 0 0 25px var(--neon-pink);
+    text-shadow: 0 0 8px var(--neon-pink);
+    transition: transform 0.4s;
+    z-index: 999; pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
 
-/* ===== アラーム ===== */
-.alarm-setup {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 20px;
-}
+  .interval-item .idx {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(176,38,255,0.25);
+    border: 1px solid var(--neon-purple);
+    color: #fff; font-size: 0.8rem;
+    box-shadow: 0 0 8px rgba(176,38,255,0.5);
+  }
+  .interval-item.active { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57,255,20,0.4); }
 
-.alarm-time-input {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.alarm-time-input input[type="number"] {
-  width: 70px;
-  padding: 8px;
-  border: 2px solid #ff007f;
-  border-radius: 10px;
-  background: rgba(255, 0, 127, 0.1);
-  color: #fff;
-  font-size: 1.2rem;
-  text-align: center;
-  outline: none;
-}
-
-.alarm-time-input input[type="number"]:focus {
-  box-shadow: 0 0 10px #ff007f;
-}
-
-.alarm-days {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.day-check {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 10px;
-  border: 1px solid #00d4ff;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.day-check:hover {
-  background: rgba(0, 212, 255, 0.1);
-}
-
-.day-check input[type="checkbox"] {
-  accent-color: #00d4ff;
-}
-
-.alarm-status {
-  margin-top: 10px;
-  color: #39ff14;
-  font-size: 1.1rem;
-  text-align: center;
-}
-
-/* ===== ポモドーロ ===== */
-.pomodoro-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.pomodoro-card {
-  background: rgba(10, 20, 30, 0.8);
-  border: 2px solid #39ff14;
-  border-radius: 15px;
-  padding: 15px;
-  box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
-  position: relative;
-}
-
-.pomodoro-card h3 {
-  color: #39ff14;
-  text-shadow: 0 0 8px #39ff14;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
-}
-
-.pomodoro-settings {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-  align-items: center;
-}
-
-.pomodoro-settings label {
-  color: #ccc;
-  font-size: 0.9rem;
-}
-
-/* 時間入力フォーム（00:00:00形式） */
-.time-input {
-  font-size: 1.2rem;
-  width: 130px;
-  padding: 5px 10px;
-  border: 1px solid #39ff14;
-  border-radius: 8px;
-  background: rgba(57, 255, 20, 0.1);
-  color: #fff;
-  text-align: center;
-  outline: none;
-}
-
-.time-input:focus {
-  box-shadow: 0 0 10px #39ff14;
-}
-
-.pomodoro-settings select {
-  padding: 5px;
-  border: 1px solid #39ff14;
-  border-radius: 5px;
-  background: #1B2735;
-  color: #fff;
-}
-
-.pomodoro-display {
-  font-size: 2.5rem;
-  text-align: center;
-  color: #fff;
-  text-shadow: 0 0 15px #39ff14;
-  margin: 15px 0;
-  font-weight: bold;
-}
-
-.pomodoro-controls {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.pomodoro-status {
-  text-align: center;
-  margin-top: 10px;
-  color: #ff007f;
-  font-size: 0.9rem;
-}
-
-/* 追加ボタン */
-.add-pomodoro-btn {
-  display: block;
-  margin: 20px auto;
-  padding: 15px 40px;
-  font-size: 1.2rem;
-  border: 2px dashed #ff007f;
-  background: transparent;
-  color: #ff007f;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-shadow: 0 0 5px #ff007f;
-}
-
-.add-pomodoro-btn:hover {
-  background: rgba(255, 0, 127, 0.1);
-  box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
-}
-
-/* ===== 通知設定 ===== */
-.notification-controls {
-  text-align: center;
-  margin: 20px 0;
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.notification-controls button {
-  padding: 10px 20px;
-  border: 2px solid #ff007f;
-  border-radius: 30px;
-  background: transparent;
-  color: #ff007f;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.notification-controls button:hover {
-  background: rgba(255, 0, 127, 0.1);
-}
-
-.notification-controls .active {
-  background: #ff007f;
-  color: #000;
-}
-
-/* レスポンシブ */
-@media (max-width: 768px) {
-  h1 { font-size: 1.8rem; }
-  .clock-display { font-size: 2rem; }
-  .stopwatch-display { font-size: 2rem; }
-  .timer-display { font-size: 2rem; }
-  .pomodoro-grid { grid-template-columns: 1fr; }
-}
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.4); border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>⚡ NEON TIMER ⚡</h1>
 
-  <!-- 通知設定 -->
-  <div class="notification-controls">
-    <button id="requestPermissionBtn">🔔 通知を許可</button>
-    <button id="notificationOn" class="active">通知ON</button>
-    <button id="notificationOff">通知OFF</button>
+<h1>◆ NEON MULTI TIMER ◆</h1>
+
+<!-- ========== 通知許可バナー ========== -->
+<div id="notifBanner">
+  <div class="msg">
+    🔔 デスクトップ通知を有効にしますか?
+    <small>タイマー・アラーム・インターバル終了時に通知が届きます</small>
   </div>
+  <span id="notifStatus" class="notif-status default">未確認</span>
+  <button class="green small" id="notifAllow">許可する</button>
+  <button class="small" id="notifTest">テスト通知</button>
+  <button class="pink small" id="notifDismiss">後で</button>
+</div>
 
-  <!-- ===== 世界時計 ===== -->
-  <div class="card">
-    <h2>🌍 世界時計</h2>
-    <div class="world-clock">
-      <div class="clock-search">
-        <input type="text" id="citySearch" placeholder="都市名で検索...">
-        <select id="citySelect" size="1"></select>
-      </div>
-      <div class="clock-display" id="worldClockTime">00:00:00</div>
-      <div class="clock-city" id="worldClockCity">東京</div>
-    </div>
+<!-- ========== 世界時計 ========== -->
+<div class="panel">
+  <div class="panel-title">🌍 世界時計</div>
+  <div class="search-wrap">
+    <input type="text" id="tzSearch" placeholder="タイムゾーン/都市を検索 (例: Tokyo, New York)" autocomplete="off">
+    <div id="tzResults"></div>
   </div>
+  <div id="clockList"></div>
+</div>
 
-  <!-- ===== 通常タイマー ===== -->
-  <div class="card">
-    <h2>⏳ タイマー</h2>
-    <div class="timer-setup">
-      <input type="text" id="timerInput" value="00:05:00" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}">
-      <button class="btn btn-green" id="timerStart">スタート</button>
-      <button class="btn btn-pink" id="timerPause">一時停止</button>
-      <button class="btn" id="timerReset">リセット</button>
-    </div>
-    <div class="timer-display" id="timerDisplay">00:05:00</div>
+<!-- ========== タイマー ========== -->
+<div class="panel">
+  <div class="panel-title">⏱ タイマー</div>
+  <div class="time-input" style="margin-bottom:12px;">
+    <input type="number" id="tH" min="0" max="23" value="0" placeholder="00">
+    <span class="colon">:</span>
+    <input type="number" id="tM" min="0" max="59" value="0" placeholder="00">
+    <span class="colon">:</span>
+    <input type="number" id="tS" min="0" max="59" value="0" placeholder="00">
   </div>
-
-  <!-- ===== ストップウォッチ ===== -->
-  <div class="card">
-    <h2>⏱️ ストップウォッチ</h2>
-    <div class="stopwatch-display" id="stopwatchDisplay">00:00.00</div>
-    <div class="btn-group">
-      <button class="btn btn-green" id="swStart">スタート</button>
-      <button class="btn btn-pink" id="swStop">ストップ</button>
-      <button class="btn" id="swReset">リセット</button>
-    </div>
+  <div class="time-display" id="timerDisplay" style="display:none;">00:00:00</div>
+  <div class="row">
+    <button class="green" id="timerStart">スタート</button>
+    <button class="pink" id="timerStop">ストップ</button>
+    <button id="timerReset">停止(リセット)</button>
   </div>
+  <div class="hint">上限 23:59:59 / 「停止」で元の入力時間に戻ります</div>
+</div>
 
-  <!-- ===== アラーム ===== -->
-  <div class="card">
-    <h2>⏰ アラーム</h2>
-    <div class="alarm-setup">
-      <div class="alarm-time-input">
-        <input type="number" id="alarmHour" min="0" max="23" value="7" placeholder="時">
-        <span>:</span>
-        <input type="number" id="alarmMin" min="0" max="59" value="0" placeholder="分">
-      </div>
-      <div class="alarm-days" id="alarmDays">
-        <label class="day-check"><input type="checkbox" value="0">日</label>
-        <label class="day-check"><input type="checkbox" value="1">月</label>
-        <label class="day-check"><input type="checkbox" value="2">火</label>
-        <label class="day-check"><input type="checkbox" value="3">水</label>
-        <label class="day-check"><input type="checkbox" value="4">木</label>
-        <label class="day-check"><input type="checkbox" value="5">金</label>
-        <label class="day-check"><input type="checkbox" value="6">土</label>
-      </div>
-      <button class="btn btn-pink" id="alarmSetBtn">アラーム設定</button>
-    </div>
-    <div class="alarm-status" id="alarmStatus">アラーム未設定</div>
-  </div>
-
-  <!-- ===== ポモドーロタイマー ===== -->
-  <div class="card">
-    <h2>🍅 ポモドーロタイマー</h2>
-    <div class="pomodoro-grid" id="pomodoroGrid">
-      <!-- 初期2基はJSで生成 -->
-    </div>
-    <button class="add-pomodoro-btn" id="addPomodoroBtn">+ ポモドーロタイマーを追加</button>
+<!-- ========== ストップウォッチ ========== -->
+<div class="panel">
+  <div class="panel-title">⏲ ストップウォッチ</div>
+  <div id="swDisplay">00:00:00<span class="ms">.00</span></div>
+  <div class="row" style="margin-top:12px;">
+    <button class="green" id="swStart">スタート</button>
+    <button class="pink" id="swStop">ストップ</button>
+    <button id="swReset">リセット</button>
   </div>
 </div>
 
+<!-- ========== アラーム ========== -->
+<div class="panel">
+  <div class="panel-title">⏰ アラーム (週周期 / 1回のみ)</div>
+  <div class="row" style="margin-bottom:10px;">
+    <div class="alarm-time-inputs">
+      <input type="number" id="alH" min="0" max="23" value="7" placeholder="00">
+      <span style="color:var(--neon-purple);">:</span>
+      <input type="number" id="alM" min="0" max="59" value="0" placeholder="00">
+    </div>
+    <div class="days" id="alDays">
+      <div class="day-btn" data-d="1">月</div>
+      <div class="day-btn" data-d="2">火</div>
+      <div class="day-btn" data-d="3">水</div>
+      <div class="day-btn" data-d="4">木</div>
+      <div class="day-btn" data-d="5">金</div>
+      <div class="day-btn" data-d="6">土</div>
+      <div class="day-btn" data-d="0">日</div>
+    </div>
+    <button class="green small" id="alAdd">＋ 追加</button>
+  </div>
+  <div class="hint" style="margin-bottom:10px;">曜日を選択しない = 1回のみ / 選択 = 週周期</div>
+  <div id="alarmList"></div>
+</div>
+
+<!-- ========== インターバルタイマー ========== -->
+<div class="panel">
+  <div class="panel-title">🔁 インターバルタイマー</div>
+  <div id="intervalList"></div>
+  <div class="row" style="margin-top:10px;">
+    <button class="green" id="ivAdd">＋ 追加</button>
+    <button class="green" id="ivStart">スタート</button>
+    <button class="pink" id="ivStop">ストップ</button>
+    <button id="ivReset">停止(リセット)</button>
+  </div>
+  <div class="hint">各マスごとに時間入力 / 上から順に実行</div>
+</div>
+
+<div id="toast"></div>
+
 <script>
-// ============================================================
-// グローバル設定
-// ============================================================
-const MAX_LIMIT_SECONDS = 23 * 3600 + 59 * 60 + 59; // 23:59:59の秒数
+/* =========================================================
+   デスクトップ通知 (Notification API)
+========================================================= */
+const notifBanner  = document.getElementById('notifBanner');
+const notifStatus  = document.getElementById('notifStatus');
+const notifAllow   = document.getElementById('notifAllow');
+const notifTest    = document.getElementById('notifTest');
+const notifDismiss = document.getElementById('notifDismiss');
 
-// 共通：秒数を「HH:MM:SS」形式に変換
-function formatHMS(seconds) {
-  seconds = Math.max(0, Math.floor(seconds));
-  if (seconds > MAX_LIMIT_SECONDS) seconds = MAX_LIMIT_SECONDS; // ガード
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+const NOTIF_SUPPORTED = 'Notification' in window;
+
+function updateNotifStatus() {
+  if (!NOTIF_SUPPORTED) {
+    notifStatus.textContent = '非対応';
+    notifStatus.className = 'notif-status unsupported';
+    notifAllow.disabled = true;
+    notifTest.disabled = true;
+    return;
+  }
+  const p = Notification.permission;
+  notifStatus.textContent = p === 'granted' ? '許可済み' : p === 'denied' ? '拒否' : '未確認';
+  notifStatus.className = 'notif-status ' + p;
+  notifAllow.disabled = (p === 'granted');
+  notifTest.disabled = (p !== 'granted');
 }
 
-// 共通：秒数を「MM:SS.ss」形式に変換（ストップウォッチ用）
-function formatStopwatch(centiseconds) {
-  const cs = Math.floor(centiseconds % 100);
-  const totalSeconds = Math.floor(centiseconds / 100);
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
-  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+async function requestNotifPermission() {
+  if (!NOTIF_SUPPORTED) { toast('このブラウザは通知非対応です'); return; }
+  if (Notification.permission === 'granted') return;
+  if (Notification.permission === 'denied') { toast('通知が拒否されています(ブラウザ設定で許可してください)'); return; }
+  const res = await Notification.requestPermission();
+  updateNotifStatus();
+  if (res === 'granted') {
+    toast('🔔 通知を許可しました');
+    showDesktopNotification('通知が有効になりました', 'Neon Multi Timer');
+    setTimeout(() => { notifBanner.classList.remove('show'); }, 800);
+  } else {
+    toast('通知が許可されませんでした');
+  }
 }
 
-// 「HH:MM:SS」形式の文字列を秒数に変換する関数
-function parseTimeToSeconds(timeStr) {
-  const parts = timeStr.split(':');
-  if (parts.length !== 3) return 0;
-  const h = parseInt(parts[0]) || 0;
-  const m = parseInt(parts[1]) || 0;
-  const s = parseInt(parts[2]) || 0;
-  let total = h * 3600 + m * 60 + s;
-  if (total > MAX_LIMIT_SECONDS) total = MAX_LIMIT_SECONDS; // ガード
-  return total;
-}
-
-// 通知設定（グローバル）
-let notificationEnabled = true; // 通知ON/OFF
-
-// デスクトップ通知を送信する関数
-function sendNotification(title, body) {
-  if (!notificationEnabled) return;
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'granted') {
-    new Notification(title, { body: body });
-  } else if (Notification.permission !== 'denied') {
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        new Notification(title, { body: body });
-      }
+// デスクトップ通知を送る (許可済みなら)
+function showDesktopNotification(title, body, opts = {}) {
+  if (!NOTIF_SUPPORTED) return;
+  if (Notification.permission !== 'granted') return;
+  try {
+    const n = new Notification(title, {
+      body: body || '',
+      icon: 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+           <rect width="128" height="128" rx="24" fill="#0a0a12"/>
+           <circle cx="64" cy="64" r="44" fill="none" stroke="#00f0ff" stroke-width="6"/>
+           <line x1="64" y1="64" x2="64" y2="36" stroke="#00f0ff" stroke-width="6" stroke-linecap="round"/>
+           <line x1="64" y1="64" x2="88" y2="72" stroke="#ff00e5" stroke-width="6" stroke-linecap="round"/>
+         </svg>`
+      ),
+      tag: opts.tag || 'neon-timer',
+      requireInteraction: opts.requireInteraction || false,
+      silent: true, // 自前のビープ音と二重にならないように
     });
-  }
+    n.onclick = () => { window.focus(); n.close(); };
+    if (!opts.requireInteraction) {
+      setTimeout(() => { try { n.close(); } catch(e){} }, 8000);
+    }
+  } catch (e) { /* 通知失敗は無視 */ }
 }
 
-// 通知の許可とON/OFF設定
-document.getElementById('requestPermissionBtn').addEventListener('click', () => {
-  if ('Notification' in window) {
-    Notification.requestPermission();
-  }
-});
+// 初期表示
+if (NOTIF_SUPPORTED && Notification.permission === 'default') {
+  // 少し遅らせて表示 (UX配慮)
+  setTimeout(() => notifBanner.classList.add('show'), 600);
+} else if (NOTIF_SUPPORTED && Notification.permission === 'denied') {
+  notifBanner.classList.add('show');
+}
+updateNotifStatus();
 
-document.getElementById('notificationOn').addEventListener('click', function() {
-  notificationEnabled = true;
-  this.classList.add('active');
-  document.getElementById('notificationOff').classList.remove('active');
-  sendNotification('通知ON', 'デスクトップ通知を有効にしました');
-});
+notifAllow.onclick   = requestNotifPermission;
+notifDismiss.onclick = () => notifBanner.classList.remove('show');
+notifTest.onclick    = () => {
+  if (Notification.permission !== 'granted') { requestNotifPermission(); return; }
+  showDesktopNotification('🔔 テスト通知', 'Neon Multi Timer からの通知テストです');
+  toast('テスト通知を送信しました');
+};
 
-document.getElementById('notificationOff').addEventListener('click', function() {
-  notificationEnabled = false;
-  this.classList.add('active');
-  document.getElementById('notificationOn').classList.remove('active');
-});
+/* =========================================================
+   通知トースト (画面内) + ビープ音
+========================================================= */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3500);
+  beep();
+}
 
-// ============================================================
-// 世界時計
-// ============================================================
-const cityData = [
-  { city: '東京', timezone: 'Asia/Tokyo' },
-  { city: 'ニューヨーク', timezone: 'America/New_York' },
-  { city: 'ロンドン', timezone: 'Europe/London' },
-  { city: 'パリ', timezone: 'Europe/Paris' },
-  { city: 'シドニー', timezone: 'Australia/Sydney' },
-  { city: '上海', timezone: 'Asia/Shanghai' },
-  { city: '香港', timezone: 'Asia/Hong_Kong' },
-  { city: 'ロサンゼルス', timezone: 'America/Los_Angeles' },
-  { city: 'シカゴ', timezone: 'America/Chicago' },
-  { city: 'サンフランシスコ', timezone: 'America/Los_Angeles' },
-  { city: 'マイアミ', timezone: 'America/New_York' },
-  { city: 'メキシコシティ', timezone: 'America/Mexico_City' },
-  { city: 'サンパウロ', timezone: 'America/Sao_Paulo' },
-  { city: 'ブエノスアイレス', timezone: 'America/Argentina/Buenos_Aires' },
-  { city: 'ダブリン', timezone: 'Europe/Dublin' },
-  { city: 'ベルリン', timezone: 'Europe/Berlin' },
-  { city: 'マドリード', timezone: 'Europe/Madrid' },
-  { city: 'ローマ', timezone: 'Europe/Rome' },
-  { city: 'モスクワ', timezone: 'Europe/Moscow' },
-  { city: 'ドバイ', timezone: 'Asia/Dubai' },
-  { city: 'ムンバイ', timezone: 'Asia/Kolkata' },
-  { city: 'シンガポール', timezone: 'Asia/Singapore' },
-  { city: 'ソウル', timezone: 'Asia/Seoul' },
-  { city: '台北', timezone: 'Asia/Taipei' },
-  { city: 'マニラ', timezone: 'Asia/Manila' },
-  { city: 'バンコク', timezone: 'Asia/Bangkok' },
-  { city: 'ジャカルタ', timezone: 'Asia/Jakarta' },
-  { city: 'ホノルル', timezone: 'Pacific/Honolulu' },
-  { city: 'オークランド', timezone: 'Pacific/Auckland' }
+// ビープ (音)
+function beep(times = 1) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < times; i++) {
+      const t = ctx.currentTime + i * 0.35;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.32);
+    }
+  } catch(e) {}
+}
+
+// 通知 + トースト + 音 をまとめて実行
+function notifyAll(title, body, opts = {}) {
+  showDesktopNotification(title, body, opts);
+  toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''));
+}
+
+/* =========================================================
+   世界時計
+========================================================= */
+const tzList = (typeof Intl.supportedValuesOf === 'function')
+  ? Intl.supportedValuesOf('timeZone')
+  : ['Asia/Tokyo','America/New_York','Europe/London','Europe/Paris','Asia/Seoul','Asia/Shanghai','Australia/Sydney','America/Los_Angeles','Asia/Dubai','America/Sao_Paulo'];
+
+const clockList = document.getElementById('clockList');
+const tzSearch  = document.getElementById('tzSearch');
+const tzResults = document.getElementById('tzResults');
+let clocks = [
+  { tz: 'Asia/Tokyo', label: 'Tokyo' },
+  { tz: 'America/New_York', label: 'New York' },
+  { tz: 'Europe/London', label: 'London' }
 ];
 
-const citySelect = document.getElementById('citySelect');
-const citySearch = document.getElementById('citySearch');
-const worldClockTime = document.getElementById('worldClockTime');
-const worldClockCity = document.getElementById('worldClockCity');
+function cityFromTz(tz) { return tz.split('/').pop().replace(/_/g, ' '); }
 
-function populateCitySelect(filterText = '') {
-  const filter = filterText.toLowerCase();
-  citySelect.innerHTML = '';
-  cityData.forEach(item => {
-    if (item.city.toLowerCase().includes(filter)) {
-      const option = document.createElement('option');
-      option.value = item.timezone;
-      option.textContent = item.city;
-      citySelect.appendChild(option);
+function renderClocks() {
+  clockList.innerHTML = '';
+  clocks.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'clock-card';
+    card.innerHTML = `
+      <span class="remove" data-i="${i}">✕</span>
+      <div class="city">${c.label}</div>
+      <div class="time">--:--:--</div>
+      <div class="date">---</div>
+    `;
+    clockList.appendChild(card);
+  });
+  clockList.querySelectorAll('.remove').forEach(el => {
+    el.onclick = () => { clocks.splice(+el.dataset.i, 1); renderClocks(); };
+  });
+  updateClocks();
+}
+
+function updateClocks() {
+  const now = new Date();
+  const cards = clockList.children;
+  clocks.forEach((c, i) => {
+    const card = cards[i];
+    if (!card) return;
+    try {
+      const time = now.toLocaleTimeString('ja-JP', { timeZone: c.tz, hour12: false });
+      const date = now.toLocaleDateString('ja-JP', { timeZone: c.tz, month: 'short', day: 'numeric', weekday: 'short' });
+      card.querySelector('.time').textContent = time;
+      card.querySelector('.date').textContent = date;
+    } catch(e) {
+      card.querySelector('.time').textContent = 'ERR';
     }
   });
-  if (citySelect.options.length === 0) {
-    cityData.forEach(item => {
-      const option = document.createElement('option');
-      option.value = item.timezone;
-      option.textContent = item.city;
-      citySelect.appendChild(option);
-    });
-  }
 }
+setInterval(updateClocks, 1000);
 
-populateCitySelect();
-
-citySearch.addEventListener('input', (e) => {
-  populateCitySelect(e.target.value);
+tzSearch.addEventListener('input', () => {
+  const q = tzSearch.value.trim().toLowerCase();
+  if (!q) { tzResults.style.display = 'none'; return; }
+  const matches = tzList.filter(tz => tz.toLowerCase().includes(q)).slice(0, 50);
+  if (matches.length === 0) { tzResults.style.display = 'none'; return; }
+  tzResults.innerHTML = matches.map(tz => `<div data-tz="${tz}">${tz.replace(/_/g,' ')}</div>`).join('');
+  tzResults.style.display = 'block';
+  tzResults.querySelectorAll('div').forEach(d => {
+    d.onclick = () => {
+      const tz = d.dataset.tz;
+      if (!clocks.some(c => c.tz === tz)) {
+        clocks.push({ tz, label: cityFromTz(tz) });
+        renderClocks();
+      }
+      tzSearch.value = '';
+      tzResults.style.display = 'none';
+    };
+  });
+});
+document.addEventListener('click', e => {
+  if (!tzSearch.contains(e.target) && !tzResults.contains(e.target)) {
+    tzResults.style.display = 'none';
+  }
 });
 
-citySelect.addEventListener('change', () => {
-  const selectedOption = citySelect.options[citySelect.selectedIndex];
-  if (selectedOption) {
-    worldClockCity.textContent = selectedOption.textContent;
-  }
-});
+renderClocks();
 
-function updateWorldClock() {
-  const timezone = citySelect.value;
-  if (timezone) {
-    const now = new Date();
-    const options = { timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-    const timeStr = now.toLocaleTimeString('ja-JP', options);
-    worldClockTime.textContent = timeStr;
-  }
-}
-setInterval(updateWorldClock, 1000);
-updateWorldClock();
-
-// ============================================================
-// 通常タイマー
-// ============================================================
-let timerInterval = null;
-let timerRunning = false;
-let timerRemainingSeconds = 300; // デフォルト5分
-let timerPaused = false;
-
-const timerInput = document.getElementById('timerInput');
+/* =========================================================
+   タイマー
+========================================================= */
+const tH = document.getElementById('tH');
+const tM = document.getElementById('tM');
+const tS = document.getElementById('tS');
 const timerDisplay = document.getElementById('timerDisplay');
-const timerStartBtn = document.getElementById('timerStart');
-const timerPauseBtn = document.getElementById('timerPause');
-const timerResetBtn = document.getElementById('timerReset');
+const timerInputWrap = document.querySelector('#timerDisplay').previousElementSibling; // .time-input
+let timerId = null;
+let timerRemaining = 0;
+let timerRunning = false;
 
-function updateTimerDisplay() {
-  timerDisplay.textContent = formatHMS(timerRemainingSeconds);
+function clampInput(el, max) {
+  el.addEventListener('input', () => {
+    let v = parseInt(el.value) || 0;
+    if (v < 0) v = 0;
+    if (v > max) v = max;
+    el.value = v;
+  });
+}
+clampInput(tH, 23); clampInput(tM, 59); clampInput(tS, 59);
+
+function fmtHMS(sec) {
+  const h = String(Math.floor(sec / 3600)).padStart(2,'0');
+  const m = String(Math.floor((sec % 3600) / 60)).padStart(2,'0');
+  const s = String(sec % 60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+function getTimerInputSec() {
+  return (parseInt(tH.value)||0)*3600 + (parseInt(tM.value)||0)*60 + (parseInt(tS.value)||0);
 }
 
-function startTimer() {
+document.getElementById('timerStart').onclick = async () => {
   if (timerRunning) return;
-  if (!timerPaused) {
-    timerRemainingSeconds = parseTimeToSeconds(timerInput.value);
-    if (timerRemainingSeconds <= 0) {
-      alert('時間を設定してください');
-      return;
-    }
+  if (timerRemaining === 0) {
+    timerRemaining = getTimerInputSec();
+    if (timerRemaining <= 0) { toast('時間を入力してください'); return; }
+  }
+  // 通知許可が未確認なら聞く
+  if (NOTIF_SUPPORTED && Notification.permission === 'default') {
+    requestNotifPermission();
   }
   timerRunning = true;
-  timerPaused = false;
-  timerInterval = setInterval(() => {
-    timerRemainingSeconds--;
-    if (timerRemainingSeconds <= 0) {
-      clearInterval(timerInterval);
+  timerInputWrap.style.display = 'none';
+  timerDisplay.style.display = 'block';
+  timerDisplay.textContent = fmtHMS(timerRemaining);
+
+  timerId = setInterval(() => {
+    timerRemaining--;
+    timerDisplay.textContent = fmtHMS(timerRemaining);
+    if (timerRemaining <= 0) {
+      clearInterval(timerId);
       timerRunning = false;
-      timerRemainingSeconds = 0;
-      updateTimerDisplay();
-      sendNotification('⏳ タイマー', 'タイマーが終了しました！');
+      notifyAll('⏱ タイマー終了', '設定した時間になりました', { tag: 'timer', requireInteraction: true, icon: '⏱' });
+      beep(2);
+    }
+  }, 1000);
+};
+
+document.getElementById('timerStop').onclick = () => {
+  clearInterval(timerId);
+  timerRunning = false;
+};
+
+document.getElementById('timerReset').onclick = () => {
+  clearInterval(timerId);
+  timerRunning = false;
+  timerRemaining = 0;
+  timerDisplay.style.display = 'none';
+  timerInputWrap.style.display = 'inline-flex';
+};
+
+/* =========================================================
+   ストップウォッチ
+========================================================= */
+const swDisplay = document.getElementById('swDisplay');
+let swStartTime = 0, swElapsed = 0, swId = null, swRunning = false;
+
+function fmtSW(ms) {
+  const total = Math.floor(ms);
+  const h = String(Math.floor(total / 3600000)).padStart(2,'0');
+  const m = String(Math.floor((total % 3600000) / 60000)).padStart(2,'0');
+  const s = String(Math.floor((total % 60000) / 1000)).padStart(2,'0');
+  const cs = String(Math.floor((total % 1000) / 10)).padStart(2,'0');
+  return `${h}:${m}:${s}<span class="ms">.${cs}</span>`;
+}
+function updateSW() {
+  const now = performance.now();
+  const elapsed = swElapsed + (swRunning ? now - swStartTime : 0);
+  swDisplay.innerHTML = fmtSW(elapsed);
+}
+
+document.getElementById('swStart').onclick = () => {
+  if (swRunning) return;
+  swRunning = true;
+  swStartTime = performance.now();
+  swId = setInterval(updateSW, 33);
+};
+document.getElementById('swStop').onclick = () => {
+  if (!swRunning) return;
+  swElapsed += performance.now() - swStartTime;
+  swRunning = false;
+  clearInterval(swId);
+  updateSW();
+};
+document.getElementById('swReset').onclick = () => {
+  swRunning = false;
+  clearInterval(swId);
+  swElapsed = 0;
+  swDisplay.innerHTML = fmtSW(0);
+};
+
+/* =========================================================
+   アラーム
+========================================================= */
+const alDaysEl = document.getElementById('alDays');
+let alarms = [];
+let alarmSeq = 0;
+
+alDaysEl.querySelectorAll('.day-btn').forEach(btn => {
+  btn.onclick = () => btn.classList.toggle('active');
+});
+function getSelectedDays() {
+  return [...alDaysEl.querySelectorAll('.day-btn.active')].map(b => +b.dataset.d);
+}
+document.getElementById('alAdd').onclick = async () => {
+  if (NOTIF_SUPPORTED && Notification.permission === 'default') requestNotifPermission();
+  const h = Math.min(23, Math.max(0, parseInt(document.getElementById('alH').value)||0));
+  const m = Math.min(59, Math.max(0, parseInt(document.getElementById('alM').value)||0));
+  const days = getSelectedDays();
+  alarms.push({ id: ++alarmSeq, h, m, days: [...days], enabled: true, lastTriggered: null });
+  alDaysEl.querySelectorAll('.day-btn.active').forEach(b => b.classList.remove('active'));
+  renderAlarms();
+};
+
+const DAY_NAMES = ['日','月','火','水','木','金','土'];
+
+function renderAlarms() {
+  const list = document.getElementById('alarmList');
+  list.innerHTML = '';
+  if (alarms.length === 0) {
+    list.innerHTML = '<div class="hint">アラームはまだありません</div>';
+    return;
+  }
+  alarms.forEach(a => {
+    const el = document.createElement('div');
+    el.className = 'alarm-item';
+    const daysHtml = DAY_NAMES.map((n, i) =>
+      `<span class="${a.days.includes(i) ? 'on' : ''}">${n}</span>`
+    ).join('');
+    el.innerHTML = `
+      <div class="switch ${a.enabled ? 'on' : ''}" data-toggle="${a.id}"></div>
+      <div style="font-size:1.4rem;color:var(--neon-cyan);text-shadow:0 0 8px var(--neon-cyan);font-variant-numeric:tabular-nums;">
+        ${String(a.h).padStart(2,'0')}:${String(a.m).padStart(2,'0')}
+      </div>
+      <div class="alarm-days">${daysHtml}</div>
+      <div class="hint" style="flex:1;">
+        ${a.days.length === 0 ? '1回のみ' : '週周期'}
+      </div>
+      <button class="pink small" data-del="${a.id}">削除</button>
+    `;
+    list.appendChild(el);
+  });
+  list.querySelectorAll('[data-toggle]').forEach(el => {
+    el.onclick = () => {
+      const a = alarms.find(x => x.id === +el.dataset.toggle);
+      a.enabled = !a.enabled;
+      renderAlarms();
+    };
+  });
+  list.querySelectorAll('[data-del]').forEach(el => {
+    el.onclick = () => {
+      alarms = alarms.filter(x => x.id !== +el.dataset.del);
+      renderAlarms();
+    };
+  });
+}
+renderAlarms();
+
+setInterval(() => {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes(), d = now.getDay();
+  const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${h}-${m}`;
+
+  alarms.forEach(a => {
+    if (!a.enabled) return;
+    if (a.h !== h || a.m !== m) return;
+    if (a.lastTriggered === key) return;
+
+    const timeStr = `${String(a.h).padStart(2,'0')}:${String(a.m).padStart(2,'0')}`;
+    if (a.days.length === 0) {
+      notifyAll('⏰ アラーム', `${timeStr} (1回のみ)`, { tag: 'alarm-' + a.id, requireInteraction: true, icon: '⏰' });
+      a.enabled = false;
+      renderAlarms();
+    } else if (a.days.includes(d)) {
+      notifyAll('⏰ アラーム', `${timeStr} (${DAY_NAMES[d]}曜日)`, { tag: 'alarm-' + a.id, requireInteraction: true, icon: '⏰' });
+    }
+    beep(2);
+    a.lastTriggered = key;
+  });
+}, 1000);
+
+/* =========================================================
+   インターバルタイマー
+========================================================= */
+let intervals = [
+  { id: 1, h: 0, m: 0, s: 10 },
+  { id: 2, h: 0, m: 0, s: 5 }
+];
+let ivSeq = 1;
+let ivRunning = false;
+let ivCurrentIndex = -1;
+let ivRemaining = 0;
+let ivId = null;
+
+const ivList = document.getElementById('intervalList');
+
+function renderIntervals() {
+  ivList.innerHTML = '';
+  if (intervals.length === 0) {
+    ivList.innerHTML = '<div class="hint">インターバルを追加してください</div>';
+    return;
+  }
+  intervals.forEach((iv, i) => {
+    const el = document.createElement('div');
+    el.className = 'interval-item' + (ivRunning && i === ivCurrentIndex ? ' active' : '');
+    el.innerHTML = `
+      <div class="idx">${i+1}</div>
+      <div class="time-input">
+        <input type="number" min="0" max="23" value="${iv.h}" data-iv="${iv.id}" data-f="h" style="width:52px;font-size:1.2rem;">
+        <span class="colon" style="font-size:1.2rem;">:</span>
+        <input type="number" min="0" max="59" value="${iv.m}" data-iv="${iv.id}" data-f="m" style="width:52px;font-size:1.2rem;">
+        <span class="colon" style="font-size:1.2rem;">:</span>
+        <input type="number" min="0" max="59" value="${iv.s}" data-iv="${iv.id}" data-f="s" style="width:52px;font-size:1.2rem;">
+      </div>
+      <div class="hint" style="flex:1;" data-ivdisp="${iv.id}"></div>
+      <button class="pink small" data-ivdel="${iv.id}">削除</button>
+    `;
+    ivList.appendChild(el);
+  });
+
+  ivList.querySelectorAll('input[data-iv]').forEach(inp => {
+    inp.oninput = () => {
+      const id = +inp.dataset.iv;
+      const f = inp.dataset.f;
+      const iv = intervals.find(x => x.id === id);
+      let v = parseInt(inp.value) || 0;
+      if (f === 'h') v = Math.min(23, Math.max(0, v));
+      else v = Math.min(59, Math.max(0, v));
+      inp.value = v;
+      iv[f] = v;
+    };
+  });
+
+  ivList.querySelectorAll('[data-ivdel]').forEach(btn => {
+    btn.onclick = () => {
+      if (ivRunning) { toast('実行中は削除できません'); return; }
+      const id = +btn.dataset.ivdel;
+      intervals = intervals.filter(x => x.id !== id);
+      renderIntervals();
+    };
+  });
+
+  updateIvDisplays();
+}
+
+function updateIvDisplays() {
+  ivList.querySelectorAll('[data-ivdisp]').forEach(el => {
+    const id = +el.dataset.ivdisp;
+    if (ivRunning && ivCurrentIndex >= 0 && intervals[ivCurrentIndex] && intervals[ivCurrentIndex].id === id) {
+      el.textContent = '▶ ' + fmtHMS(ivRemaining);
+      el.style.color = 'var(--neon-green)';
+      el.style.textShadow = '0 0 8px var(--neon-green)';
+      el.style.opacity = 1;
     } else {
-      updateTimerDisplay();
+      el.textContent = '';
+    }
+  });
+}
+
+document.getElementById('ivAdd').onclick = () => {
+  if (ivRunning) { toast('実行中は追加できません'); return; }
+  intervals.push({ id: ++ivSeq, h: 0, m: 0, s: 10 });
+  renderIntervals();
+};
+
+document.getElementById('ivStart').onclick = () => {
+  if (ivRunning) return;
+  if (intervals.length === 0) { toast('インターバルを追加してください'); return; }
+  if (NOTIF_SUPPORTED && Notification.permission === 'default') requestNotifPermission();
+  ivRunning = true;
+  ivCurrentIndex = 0;
+  runIvStep();
+};
+
+function runIvStep() {
+  if (ivCurrentIndex >= intervals.length) {
+    ivRunning = false;
+    ivCurrentIndex = -1;
+    notifyAll('🔁 インターバル完了', '全ステップが終了しました', { tag: 'interval', requireInteraction: true, icon: '🔁' });
+    beep(2);
+    renderIntervals();
+    return;
+  }
+  const iv = intervals[ivCurrentIndex];
+  ivRemaining = iv.h*3600 + iv.m*60 + iv.s;
+  if (ivRemaining <= 0) { ivCurrentIndex++; runIvStep(); return; }
+  renderIntervals();
+  updateIvDisplays();
+
+  clearInterval(ivId);
+  ivId = setInterval(() => {
+    ivRemaining--;
+    updateIvDisplays();
+    if (ivRemaining <= 0) {
+      clearInterval(ivId);
+      // ステップ完了通知
+      showDesktopNotification(
+        `🔔 ステップ ${ivCurrentIndex+1} 完了`,
+        `次はステップ ${ivCurrentIndex+2} です`,
+        { tag: 'iv-step-' + ivCurrentIndex, icon: '🔔' }
+      );
+      toast(`🔔 ステップ ${ivCurrentIndex+1} 完了`);
+      beep();
+      ivCurrentIndex++;
+      setTimeout(() => { if (ivRunning) runIvStep(); }, 400);
     }
   }, 1000);
 }
 
-timerStartBtn.addEventListener('click', startTimer);
+document.getElementById('ivStop').onclick = () => {
+  clearInterval(ivId);
+  ivRunning = false;
+};
 
-timerPauseBtn.addEventListener('click', () => {
-  if (timerRunning) {
-    clearInterval(timerInterval);
-    timerRunning = false;
-    timerPaused = true;
-  }
-});
+document.getElementById('ivReset').onclick = () => {
+  clearInterval(ivId);
+  ivRunning = false;
+  ivCurrentIndex = -1;
+  ivRemaining = 0;
+  renderIntervals();
+};
 
-timerResetBtn.addEventListener('click', () => {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  timerPaused = false;
-  timerRemainingSeconds = parseTimeToSeconds(timerInput.value);
-  updateTimerDisplay();
-});
+renderIntervals();
 
-timerInput.addEventListener('change', () => {
-  if (!timerRunning) {
-    timerRemainingSeconds = parseTimeToSeconds(timerInput.value);
-    updateTimerDisplay();
-  }
-});
-
-// 初期表示
-updateTimerDisplay();
-
-// ============================================================
-// ストップウォッチ
-// ============================================================
-let swInterval = null;
-let swRunning = false;
-let swStartTime = 0;
-let swElapsed = 0;
-
-const swDisplay = document.getElementById('stopwatchDisplay');
-const swStartBtn = document.getElementById('swStart');
-const swStopBtn = document.getElementById('swStop');
-const swResetBtn = document.getElementById('swReset');
-
-swStartBtn.addEventListener('click', () => {
-  if (!swRunning) {
-    swRunning = true;
-    swStartTime = Date.now() - swElapsed * 10;
-    swInterval = setInterval(() => {
-      swElapsed = Math.floor((Date.now() - swStartTime) / 10);
-      swDisplay.textContent = formatStopwatch(swElapsed);
-    }, 10);
-  }
-});
-
-swStopBtn.addEventListener('click', () => {
-  if (swRunning) {
-    swRunning = false;
-    clearInterval(swInterval);
-  }
-});
-
-swResetBtn.addEventListener('click', () => {
-  swRunning = false;
-  clearInterval(swInterval);
-  swElapsed = 0;
-  swDisplay.textContent = '00:00.00';
-});
-
-// ============================================================
-// アラーム
-// ============================================================
-let alarmActive = false;
-let alarmHour = 7;
-let alarmMin = 0;
-let alarmDays = [];
-
-const alarmStatus = document.getElementById('alarmStatus');
-const alarmSetBtn = document.getElementById('alarmSetBtn');
-
-document.querySelectorAll('#alarmDays input[type="checkbox"]').forEach(cb => {
-  cb.checked = (cb.value >= '1' && cb.value <= '5');
-});
-
-alarmSetBtn.addEventListener('click', () => {
-  alarmHour = parseInt(document.getElementById('alarmHour').value) || 0;
-  alarmMin = parseInt(document.getElementById('alarmMin').value) || 0;
-  if (alarmHour > 23) alarmHour = 23;
-  if (alarmMin > 59) alarmMin = 59;
-  
-  alarmDays = [];
-  document.querySelectorAll('#alarmDays input[type="checkbox"]:checked').forEach(cb => {
-    alarmDays.push(parseInt(cb.value));
-  });
-  
-  if (alarmDays.length === 0) {
-    alarmStatus.textContent = '⚠️ 曜日を選択してください';
-    alarmStatus.style.color = '#ff007f';
-    return;
-  }
-  
-  alarmActive = true;
-  alarmStatus.textContent = `🔔 アラーム設定済み: ${String(alarmHour).padStart(2,'0')}:${String(alarmMin).padStart(2,'0')} (${alarmDays.map(d => ['日','月','火','水','木','金','土'][d]).join(',')})`;
-  alarmStatus.style.color = '#39ff14';
-});
-
-function checkAlarm() {
-  if (!alarmActive) return;
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMin = now.getMinutes();
-  const currentDay = now.getDay();
-  
-  if (currentHour === alarmHour && currentMin === alarmMin && alarmDays.includes(currentDay)) {
-    sendNotification('⏰ アラーム', `指定時刻になりました！ (${String(alarmHour).padStart(2,'0')}:${String(alarmMin).padStart(2,'0')})`);
-    playBeep();
-    alarmActive = false;
-    alarmStatus.textContent = '⏰ アラームが鳴りました';
-    alarmStatus.style.color = '#ff007f';
-  }
-}
-setInterval(checkAlarm, 1000);
-
-function playBeep() {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-  oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-  gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-  oscillator.start(audioCtx.currentTime);
-  oscillator.stop(audioCtx.currentTime + 0.5);
-}
-
-// ============================================================
-// ポモドーロタイマー
-// ============================================================
-let pomodoroCount = 0;
-const pomodoroGrid = document.getElementById('pomodoroGrid');
-const addPomodoroBtn = document.getElementById('addPomodoroBtn');
-
-// ポモドーロタイマー生成関数
-function createPomodoroTimer() {
-  pomodoroCount++;
-  const card = document.createElement('div');
-  card.className = 'pomodoro-card';
-  card.dataset.id = pomodoroCount;
-  
-  card.innerHTML = `
-    <h3>ポモドーロ ${pomodoroCount}</h3>
-    <div class="pomodoro-settings">
-      <label>作業時間:
-        <input type="text" class="pomo-work-time time-input" value="00:25:00">
-      </label>
-      <label>休憩時間:
-        <input type="text" class="pomo-break-time time-input" value="00:05:00">
-      </label>
-      <label>ラウンド数:
-        <input type="number" class="pomo-rounds" min="1" max="10" value="4">
-      </label>
-      <label>ループ:
-        <select class="pomo-loop">
-          <option value="false">OFF</option>
-          <option value="true">ON</option>
-        </select>
-      </label>
-    </div>
-    <div class="pomodoro-display" data-phase="work">25:00</div>
-    <div class="pomodoro-controls">
-      <button class="btn btn-green pomo-start">スタート</button>
-      <button class="btn btn-pink pomo-pause">一時停止</button>
-      <button class="btn pomo-reset">リセット</button>
-      <button class="btn pomo-delete">削除</button>
-    </div>
-    <div class="pomodoro-status">ラウンド 0 / 4</div>
-  `;
-  
-  pomodoroGrid.appendChild(card);
-  initializePomodoroCard(card);
-}
-
-// ポモドーロカードの初期化
-function initializePomodoroCard(card) {
-  const display = card.querySelector('.pomodoro-display');
-  const startBtn = card.querySelector('.pomo-start');
-  const pauseBtn = card.querySelector('.pomo-pause');
-  const resetBtn = card.querySelector('.pomo-reset');
-  const deleteBtn = card.querySelector('.pomo-delete');
-  const workTimeInput = card.querySelector('.pomo-work-time');
-  const breakTimeInput = card.querySelector('.pomo-break-time');
-  const roundsInput = card.querySelector('.pomo-rounds');
-  const loopSelect = card.querySelector('.pomo-loop');
-  const statusDiv = card.querySelector('.pomodoro-status');
-  
-  // 状態変数
-  let timerInterval = null;
-  let isRunning = false;
-  let currentPhase = 'work';
-  let currentRound = 0;
-  let totalRounds = parseInt(roundsInput.value) || 1;
-  let workSeconds = parseTimeToSeconds(workTimeInput.value);
-  let breakSeconds = parseTimeToSeconds(breakTimeInput.value);
-  let remainingSeconds = workSeconds;
-  
-  // 表示更新
-  function updateDisplay() {
-    // 表示はMM:SS形式で（時間が入ると長すぎるため分表示）
-    const totalMin = Math.floor(remainingSeconds / 60);
-    const sec = remainingSeconds % 60;
-    display.textContent = `${String(totalMin).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-    statusDiv.textContent = `ラウンド ${currentRound} / ${totalRounds} (${currentPhase === 'work' ? '作業' : '休憩'})`;
-  }
-  
-  // タイマー停止
-  function stopTimer() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-    isRunning = false;
-  }
-  
-  // リセット
-  function resetTimer() {
-    stopTimer();
-    currentPhase = 'work';
-    currentRound = 0;
-    workSeconds = parseTimeToSeconds(workTimeInput.value);
-    breakSeconds = parseTimeToSeconds(breakTimeInput.value);
-    remainingSeconds = workSeconds;
-    updateDisplay();
-  }
-  
-  // 次のフェーズへ
-  function nextPhase() {
-    if (currentPhase === 'work') {
-      currentRound++;
-      if (currentRound >= totalRounds) {
-        if (loopSelect.value === 'true') {
-          currentRound = 0;
-          currentPhase = 'work';
-          remainingSeconds = workSeconds;
-          sendNotification('🍅 ポモドーロ', '全ラウンド完了！ループします');
-        } else {
-          sendNotification('🍅 ポモドーロ', '全ラウンド完了！お疲れ様でした');
-          stopTimer();
-          currentPhase = 'work';
-          currentRound = 0;
-          remainingSeconds = workSeconds;
-          updateDisplay();
-          return;
-        }
-      } else {
-        currentPhase = 'break';
-        remainingSeconds = breakSeconds;
-        sendNotification('☕ 休憩', '作業完了！休憩しましょう');
-      }
-    } else {
-      currentPhase = 'work';
-      remainingSeconds = workSeconds;
-      sendNotification('🍅 作業開始', '休憩終了！作業を再開しましょう');
-    }
-    updateDisplay();
-  }
-  
-  // スタートボタン
-  startBtn.addEventListener('click', () => {
-    if (isRunning) return;
-    isRunning = true;
-    timerInterval = setInterval(() => {
-      remainingSeconds--;
-      if (remainingSeconds <= 0) {
-        nextPhase();
-      }
-      updateDisplay();
-    }, 1000);
-  });
-  
-  // 一時停止
-  pauseBtn.addEventListener('click', () => {
-    stopTimer();
-  });
-  
-  // リセット
-  resetBtn.addEventListener('click', () => {
-    resetTimer();
-  });
-  
-  // 削除（最後の1つは削除不可）
-  deleteBtn.addEventListener('click', () => {
-    const allCards = pomodoroGrid.querySelectorAll('.pomodoro-card');
-    if (allCards.length > 1) {
-      stopTimer();
-      card.remove();
-      // 番号を振り直す
-      renumberPomodoroCards();
-    } else {
-      alert('最低1つのポモドーロタイマーが必要です');
-    }
-  });
-  
-  // 設定変更時はリセット
-  workTimeInput.addEventListener('change', () => {
-    workSeconds = parseTimeToSeconds(workTimeInput.value);
-    if (!isRunning) {
-      remainingSeconds = workSeconds;
-      updateDisplay();
-    }
-  });
-  
-  breakTimeInput.addEventListener('change', () => {
-    breakSeconds = parseTimeToSeconds(breakTimeInput.value);
-  });
-  
-  roundsInput.addEventListener('change', () => {
-    totalRounds = parseInt(roundsInput.value) || 1;
-    if (totalRounds < 1) totalRounds = 1;
-    roundsInput.value = totalRounds;
-    if (!isRunning) {
-      currentRound = 0;
-      updateDisplay();
-    }
-  });
-  
-  // 初期表示
-  updateDisplay();
-}
-
-// ポモドーロの番号を振り直す関数
-function renumberPomodoroCards() {
-  const cards = pomodoroGrid.querySelectorAll('.pomodoro-card');
-  cards.forEach((card, index) => {
-    const title = card.querySelector('h3');
-    title.textContent = `ポモドーロ ${index + 1}`;
-  });
-}
-
-// 初期2基を生成
-createPomodoroTimer();
-createPomodoroTimer();
-
-// 追加ボタン
-addPomodoroBtn.addEventListener('click', () => {
-  createPomodoroTimer();
-});
+/* 初期表示 */
+updateSW();
 </script>
 </body>
 </html>
