@@ -78,7 +78,6 @@
   }
   #notifBanner .msg small { display:block; opacity: 0.7; margin-top: 4px; font-size: 0.78rem; }
 
-  /* ===== 通知テストボタン ===== */
   .notif-status {
     font-size: 0.75rem;
     padding: 3px 10px;
@@ -108,27 +107,104 @@
   .clock-card .date { font-size: 0.7rem; opacity: 0.6; }
   .clock-card .remove { position: absolute; top: 4px; right: 8px; cursor: pointer; color: var(--neon-pink); font-size: 1rem; }
 
-  /* ===== 検索ボックス ===== */
+  /* ===== 検索ボックス & ドロップダウン ===== */
   .search-wrap { position: relative; }
+
   #tzSearch {
-    width: 100%; padding: 10px 12px;
+    width: 100%;
+    padding: 12px 14px;
     background: rgba(0,0,0,0.5);
     border: 1px solid var(--border);
-    border-radius: 8px; color: #e6f7ff; font-size: 0.95rem; outline: none;
+    border-radius: 8px;
+    color: #e6f7ff;
+    font-size: 0.95rem;
+    outline: none;
     box-shadow: 0 0 8px rgba(0,240,255,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  #tzSearch:focus { border-color: var(--neon-cyan); box-shadow: 0 0 12px var(--neon-cyan); }
+  #tzSearch:focus,
+  #tzSearch.open {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 14px var(--neon-cyan);
+  }
+  #tzSearch::placeholder { color: rgba(230, 247, 255, 0.4); }
 
   #tzResults {
-    position: absolute; top: 100%; left: 0; right: 0;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
     background: rgba(10,10,25,0.98);
     border: 1px solid var(--neon-cyan);
-    border-radius: 8px; max-height: 220px; overflow-y: auto;
-    z-index: 50; display: none;
-    box-shadow: 0 0 20px rgba(0,240,255,0.4);
+    border-radius: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 50;
+    display: none;
+    box-shadow: 0 0 25px rgba(0,240,255,0.5), inset 0 0 20px rgba(0,240,255,0.05);
+    animation: dropIn 0.18s ease-out;
   }
-  #tzResults div { padding: 8px 12px; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid rgba(0,240,255,0.1); }
-  #tzResults div:hover { background: rgba(0,240,255,0.15); color: var(--neon-cyan); }
+  #tzResults.open { display: block; }
+
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #tzResults .tz-item {
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(0,240,255,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.12s;
+  }
+  #tzResults .tz-item:last-child { border-bottom: none; }
+  #tzResults .tz-item:hover,
+  #tzResults .tz-item.active {
+    background: rgba(0,240,255,0.15);
+    color: var(--neon-cyan);
+    text-shadow: 0 0 6px var(--neon-cyan);
+  }
+  #tzResults .tz-item .tz-name { flex: 1; }
+  #tzResults .tz-item .tz-offset {
+    font-size: 0.72rem;
+    color: var(--neon-purple);
+    text-shadow: 0 0 5px var(--neon-purple);
+    font-variant-numeric: tabular-nums;
+  }
+  #tzResults .tz-item.added {
+    opacity: 0.45;
+  }
+  #tzResults .tz-item.added .tz-name::after {
+    content: ' ✓';
+    color: var(--neon-green);
+    text-shadow: 0 0 6px var(--neon-green);
+  }
+
+  #tzResults .tz-group {
+    padding: 6px 14px;
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 5px var(--neon-pink);
+    background: rgba(255,0,229,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+
+  #tzResults .tz-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 0.82rem;
+    opacity: 0.6;
+  }
 
   /* ===== ボタン ===== */
   button {
@@ -140,15 +216,15 @@
     box-shadow: 0 0 8px rgba(0,240,255,0.3), inset 0 0 8px rgba(0,240,255,0.1);
     transition: all 0.2s;
   }
-  button:hover { background: rgba(0,240,255,0.25); box-shadow: 0 0 16px var(--neon-cyan), inset 0 0 12px rgba(0,240,255,0.3); }
-  button:active { transform: scale(0.96); }
+  button:hover:not(:disabled) { background: rgba(0,240,255,0.25); box-shadow: 0 0 16px var(--neon-cyan), inset 0 0 12px rgba(0,240,255,0.3); }
+  button:active:not(:disabled) { transform: scale(0.96); }
   button:disabled { opacity: 0.35; cursor: not-allowed; }
 
   button.pink { border-color: var(--neon-pink); color: var(--neon-pink); text-shadow: 0 0 6px var(--neon-pink); box-shadow: 0 0 8px rgba(255,0,229,0.3); background: rgba(255,0,229,0.08); }
-  button.pink:hover { background: rgba(255,0,229,0.22); box-shadow: 0 0 16px var(--neon-pink); }
+  button.pink:hover:not(:disabled) { background: rgba(255,0,229,0.22); box-shadow: 0 0 16px var(--neon-pink); }
 
   button.green { border-color: var(--neon-green); color: var(--neon-green); text-shadow: 0 0 6px var(--neon-green); box-shadow: 0 0 8px rgba(57,255,20,0.3); background: rgba(57,255,20,0.08); }
-  button.green:hover { background: rgba(57,255,20,0.22); box-shadow: 0 0 16px var(--neon-green); }
+  button.green:hover:not(:disabled) { background: rgba(57,255,20,0.22); box-shadow: 0 0 16px var(--neon-green); }
 
   button.small { padding: 5px 10px; font-size: 0.78rem; }
 
@@ -165,6 +241,10 @@
     box-shadow: inset 0 0 10px rgba(0,240,255,0.2);
     font-family: inherit;
   }
+  .time-input input::-webkit-outer-spin-button,
+  .time-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .time-input input[type=number] { -moz-appearance: textfield; }
+
   .time-input input:focus {
     border-color: var(--neon-pink); color: var(--neon-pink);
     text-shadow: 0 0 8px var(--neon-pink);
@@ -227,12 +307,16 @@
     border-radius: 6px; color: var(--neon-cyan);
     padding: 4px; outline: none; font-family: inherit;
   }
+  .alarm-time-inputs input::-webkit-outer-spin-button,
+  .alarm-time-inputs input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .alarm-time-inputs input[type=number] { -moz-appearance: textfield; }
 
   .switch {
     position: relative; width: 42px; height: 22px; border-radius: 11px;
     background: rgba(0,0,0,0.5);
     border: 1px solid var(--neon-cyan);
     cursor: pointer; transition: 0.2s;
+    flex-shrink: 0;
   }
   .switch::after {
     content: ''; position: absolute; top: 2px; left: 2px;
@@ -255,6 +339,7 @@
     text-shadow: 0 0 8px var(--neon-pink);
     transition: transform 0.4s;
     z-index: 999; pointer-events: none;
+    max-width: 90vw;
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -265,11 +350,13 @@
     border: 1px solid var(--neon-purple);
     color: #fff; font-size: 0.8rem;
     box-shadow: 0 0 8px rgba(176,38,255,0.5);
+    flex-shrink: 0;
   }
   .interval-item.active { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57,255,20,0.4); }
 
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.4); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,240,255,0.6); }
   ::-webkit-scrollbar-track { background: transparent; }
 </style>
 </head>
@@ -293,7 +380,7 @@
 <div class="panel">
   <div class="panel-title">🌍 世界時計</div>
   <div class="search-wrap">
-    <input type="text" id="tzSearch" placeholder="タイムゾーン/都市を検索 (例: Tokyo, New York)" autocomplete="off">
+    <input type="text" id="tzSearch" placeholder="クリックしてタイムゾーンを選択 / 入力で絞り込み" autocomplete="off" readonly>
     <div id="tzResults"></div>
   </div>
   <div id="clockList"></div>
@@ -302,7 +389,7 @@
 <!-- ========== タイマー ========== -->
 <div class="panel">
   <div class="panel-title">⏱ タイマー</div>
-  <div class="time-input" style="margin-bottom:12px;">
+  <div class="time-input" id="timerInputWrap" style="margin-bottom:12px;">
     <input type="number" id="tH" min="0" max="23" value="0" placeholder="00">
     <span class="colon">:</span>
     <input type="number" id="tM" min="0" max="59" value="0" placeholder="00">
@@ -410,7 +497,6 @@ async function requestNotifPermission() {
   }
 }
 
-// デスクトップ通知を送る (許可済みなら)
 function showDesktopNotification(title, body, opts = {}) {
   if (!NOTIF_SUPPORTED) return;
   if (Notification.permission !== 'granted') return;
@@ -427,18 +513,16 @@ function showDesktopNotification(title, body, opts = {}) {
       ),
       tag: opts.tag || 'neon-timer',
       requireInteraction: opts.requireInteraction || false,
-      silent: true, // 自前のビープ音と二重にならないように
+      silent: true,
     });
     n.onclick = () => { window.focus(); n.close(); };
     if (!opts.requireInteraction) {
       setTimeout(() => { try { n.close(); } catch(e){} }, 8000);
     }
-  } catch (e) { /* 通知失敗は無視 */ }
+  } catch (e) {}
 }
 
-// 初期表示
 if (NOTIF_SUPPORTED && Notification.permission === 'default') {
-  // 少し遅らせて表示 (UX配慮)
   setTimeout(() => notifBanner.classList.add('show'), 600);
 } else if (NOTIF_SUPPORTED && Notification.permission === 'denied') {
   notifBanner.classList.add('show');
@@ -454,7 +538,7 @@ notifTest.onclick    = () => {
 };
 
 /* =========================================================
-   通知トースト (画面内) + ビープ音
+   画面内トースト + ビープ音
 ========================================================= */
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
@@ -466,7 +550,6 @@ function toast(msg) {
   beep();
 }
 
-// ビープ (音)
 function beep(times = 1) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -485,14 +568,13 @@ function beep(times = 1) {
   } catch(e) {}
 }
 
-// 通知 + トースト + 音 をまとめて実行
 function notifyAll(title, body, opts = {}) {
   showDesktopNotification(title, body, opts);
   toast((opts.icon || '') + ' ' + title + (body ? ' - ' + body : ''));
 }
 
 /* =========================================================
-   世界時計
+   世界時計 (クリックでドロップダウン表示)
 ========================================================= */
 const tzList = (typeof Intl.supportedValuesOf === 'function')
   ? Intl.supportedValuesOf('timeZone')
@@ -508,6 +590,129 @@ let clocks = [
 ];
 
 function cityFromTz(tz) { return tz.split('/').pop().replace(/_/g, ' '); }
+
+// UTCオフセット文字列を取得 (+09:00 など)
+function getOffsetStr(tz) {
+  try {
+    const now = new Date();
+    const dtf = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, timeZoneName: 'shortOffset'
+    });
+    const parts = dtf.formatToParts(now);
+    const off = parts.find(p => p.type === 'timeZoneName');
+    if (off) return off.value.replace('GMT', 'UTC');
+  } catch(e) {}
+  return '';
+}
+
+// タイムゾーンを「地域」でグループ化
+function groupTz(tz) {
+  const region = tz.split('/')[0];
+  const map = {
+    'Africa': 'アフリカ',
+    'America': 'アメリカ',
+    'Antarctica': '南極',
+    'Arctic': '北極',
+    'Asia': 'アジア',
+    'Atlantic': '大西洋',
+    'Australia': 'オーストラリア',
+    'Europe': 'ヨーロッパ',
+    'Indian': 'インド洋',
+    'Pacific': '太平洋',
+    'Etc': 'その他',
+    'US': 'アメリカ(旧)',
+  };
+  return map[region] || region;
+}
+
+let tzFiltered = [];      // 現在表示中の候補
+let tzActiveIndex = -1;   // キーボードナビ用
+
+function renderTzDropdown(filter = '') {
+  const q = filter.trim().toLowerCase();
+
+  // 候補抽出
+  if (q) {
+    tzFiltered = tzList.filter(tz => tz.toLowerCase().includes(q));
+  } else {
+    tzFiltered = [...tzList];
+  }
+
+  // 表示
+  tzResults.innerHTML = '';
+
+  if (tzFiltered.length === 0) {
+    tzResults.innerHTML = '<div class="tz-empty">該当するタイムゾーンがありません</div>';
+    return;
+  }
+
+  // グループ化して表示
+  const groups = {};
+  tzFiltered.forEach(tz => {
+    const g = groupTz(tz);
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(tz);
+  });
+
+  // よく使う地域を先頭に
+  const order = ['アジア','ヨーロッパ','アメリカ','オセアニア','アフリカ','太平洋','大西洋','インド洋','その他'];
+  const sortedGroups = Object.keys(groups).sort((a, b) => {
+    const ia = order.indexOf(a), ib = order.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b);
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  sortedGroups.forEach(gName => {
+    const header = document.createElement('div');
+    header.className = 'tz-group';
+    header.textContent = gName;
+    tzResults.appendChild(header);
+
+    groups[gName].forEach(tz => {
+      const item = document.createElement('div');
+      item.className = 'tz-item';
+      const already = clocks.some(c => c.tz === tz);
+      if (already) item.classList.add('added');
+      item.innerHTML = `
+        <span class="tz-name">${tz.replace(/_/g, ' ')}</span>
+        <span class="tz-offset">${getOffsetStr(tz)}</span>
+      `;
+      item.dataset.tz = tz;
+      item.onclick = (e) => {
+        e.stopPropagation();
+        selectTz(tz);
+      };
+      tzResults.appendChild(item);
+    });
+  });
+}
+
+function openTzDropdown() {
+  tzSearch.classList.add('open');
+  tzResults.classList.add('open');
+  renderTzDropdown(tzSearch.value);
+  tzActiveIndex = -1;
+}
+
+function closeTzDropdown() {
+  tzSearch.classList.remove('open');
+  tzResults.classList.remove('open');
+  tzActiveIndex = -1;
+}
+
+function selectTz(tz) {
+  if (!clocks.some(c => c.tz === tz)) {
+    clocks.push({ tz, label: cityFromTz(tz) });
+    renderClocks();
+  } else {
+    toast('そのタイムゾーンは既に追加されています');
+  }
+  tzSearch.value = '';
+  // 追加後も開いたまま再描画(連続追加しやすく)
+  renderTzDropdown('');
+}
 
 function renderClocks() {
   clockList.innerHTML = '';
@@ -546,28 +751,52 @@ function updateClocks() {
 }
 setInterval(updateClocks, 1000);
 
+/* --- イベント --- */
+tzSearch.addEventListener('focus', openTzDropdown);
+tzSearch.addEventListener('click', openTzDropdown);
+
+// readonlyだと input イベントが発火しないため、入力可能に戻す場合はここを有効化
+// ここでは「クリックで全表示」＋「タイプで絞り込み」を両立
+tzSearch.removeAttribute('readonly');
 tzSearch.addEventListener('input', () => {
-  const q = tzSearch.value.trim().toLowerCase();
-  if (!q) { tzResults.style.display = 'none'; return; }
-  const matches = tzList.filter(tz => tz.toLowerCase().includes(q)).slice(0, 50);
-  if (matches.length === 0) { tzResults.style.display = 'none'; return; }
-  tzResults.innerHTML = matches.map(tz => `<div data-tz="${tz}">${tz.replace(/_/g,' ')}</div>`).join('');
-  tzResults.style.display = 'block';
-  tzResults.querySelectorAll('div').forEach(d => {
-    d.onclick = () => {
-      const tz = d.dataset.tz;
-      if (!clocks.some(c => c.tz === tz)) {
-        clocks.push({ tz, label: cityFromTz(tz) });
-        renderClocks();
-      }
-      tzSearch.value = '';
-      tzResults.style.display = 'none';
-    };
-  });
+  if (!tzResults.classList.contains('open')) openTzDropdown();
+  renderTzDropdown(tzSearch.value);
+  tzActiveIndex = -1;
 });
+
+// キーボードナビ
+tzSearch.addEventListener('keydown', e => {
+  const items = [...tzResults.querySelectorAll('.tz-item')];
+  if (!items.length) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    tzActiveIndex = Math.min(tzActiveIndex + 1, items.length - 1);
+    updateActiveItem(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    tzActiveIndex = Math.max(tzActiveIndex - 1, 0);
+    updateActiveItem(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (tzActiveIndex >= 0 && items[tzActiveIndex]) {
+      selectTz(items[tzActiveIndex].dataset.tz);
+    }
+  } else if (e.key === 'Escape') {
+    closeTzDropdown();
+    tzSearch.blur();
+  }
+});
+
+function updateActiveItem(items) {
+  items.forEach((it, i) => it.classList.toggle('active', i === tzActiveIndex));
+  if (items[tzActiveIndex]) items[tzActiveIndex].scrollIntoView({ block: 'nearest' });
+}
+
+// 外側クリックで閉じる
 document.addEventListener('click', e => {
   if (!tzSearch.contains(e.target) && !tzResults.contains(e.target)) {
-    tzResults.style.display = 'none';
+    closeTzDropdown();
   }
 });
 
@@ -580,7 +809,7 @@ const tH = document.getElementById('tH');
 const tM = document.getElementById('tM');
 const tS = document.getElementById('tS');
 const timerDisplay = document.getElementById('timerDisplay');
-const timerInputWrap = document.querySelector('#timerDisplay').previousElementSibling; // .time-input
+const timerInputWrap = document.getElementById('timerInputWrap');
 let timerId = null;
 let timerRemaining = 0;
 let timerRunning = false;
@@ -605,16 +834,13 @@ function getTimerInputSec() {
   return (parseInt(tH.value)||0)*3600 + (parseInt(tM.value)||0)*60 + (parseInt(tS.value)||0);
 }
 
-document.getElementById('timerStart').onclick = async () => {
+document.getElementById('timerStart').onclick = () => {
   if (timerRunning) return;
   if (timerRemaining === 0) {
     timerRemaining = getTimerInputSec();
     if (timerRemaining <= 0) { toast('時間を入力してください'); return; }
   }
-  // 通知許可が未確認なら聞く
-  if (NOTIF_SUPPORTED && Notification.permission === 'default') {
-    requestNotifPermission();
-  }
+  if (NOTIF_SUPPORTED && Notification.permission === 'default') requestNotifPermission();
   timerRunning = true;
   timerInputWrap.style.display = 'none';
   timerDisplay.style.display = 'block';
@@ -698,7 +924,7 @@ alDaysEl.querySelectorAll('.day-btn').forEach(btn => {
 function getSelectedDays() {
   return [...alDaysEl.querySelectorAll('.day-btn.active')].map(b => +b.dataset.d);
 }
-document.getElementById('alAdd').onclick = async () => {
+document.getElementById('alAdd').onclick = () => {
   if (NOTIF_SUPPORTED && Notification.permission === 'default') requestNotifPermission();
   const h = Math.min(23, Math.max(0, parseInt(document.getElementById('alH').value)||0));
   const m = Math.min(59, Math.max(0, parseInt(document.getElementById('alM').value)||0));
@@ -889,7 +1115,6 @@ function runIvStep() {
     updateIvDisplays();
     if (ivRemaining <= 0) {
       clearInterval(ivId);
-      // ステップ完了通知
       showDesktopNotification(
         `🔔 ステップ ${ivCurrentIndex+1} 完了`,
         `次はステップ ${ivCurrentIndex+2} です`,
